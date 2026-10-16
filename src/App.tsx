@@ -9,13 +9,16 @@ import { ControlsOverlay } from './components/ControlsOverlay';
 import { DiseaseExplorerModal } from './components/DiseaseExplorerModal';
 import { AboutModal } from './components/AboutModal';
 import { StudentQuizModal } from './components/StudentQuizModal';
+import { StudyLibrary } from './components/StudyLibrary';
+import { PDFBookReader } from './components/PDFBookReader';
 
 export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
   const viewerRef = useRef<ThreeViewer | null>(null);
 
   // App & View State
-  const [viewMode, setViewMode] = useState<'book' | 'explorer'>('book');
+  const [viewMode, setViewMode] = useState<'book' | 'explorer' | 'library' | 'reader'>('book');
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
@@ -32,6 +35,68 @@ export const App: React.FC = () => {
   const [isDiseaseModalOpen, setIsDiseaseModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+
+  // Handle URL Routing (Supports both HTML5 pathname and SPA hash fallback for GitHub Pages)
+  const parseCurrentRoute = useCallback(() => {
+    const path = window.location.pathname.replace(/\/$/, '');
+    const hash = window.location.hash.replace(/^#\/?/, '');
+
+    // Check for individual book reader route: /study/books/:bookId
+    const bookMatch = path.match(/study\/books\/([^/]+)/) || hash.match(/study\/books\/([^/]+)/);
+    if (bookMatch && bookMatch[1]) {
+      setSelectedBookId(bookMatch[1]);
+      setViewMode('reader');
+      return;
+    }
+
+    // Check for library shelf route: /study or #study
+    if (path.endsWith('/study') || path === '/study' || hash.startsWith('study')) {
+      setViewMode('library');
+      setSelectedBookId(null);
+      return;
+    }
+
+    // Default to 3D book/atlas
+    setViewMode((prev) => (prev === 'library' || prev === 'reader' ? 'book' : prev));
+  }, []);
+
+  useEffect(() => {
+    parseCurrentRoute();
+    const handlePopState = () => parseCurrentRoute();
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [parseCurrentRoute]);
+
+  // Navigate functions with history.pushState
+  const navigateToLibrary = useCallback(() => {
+    setViewMode('library');
+    setSelectedBookId(null);
+    try {
+      window.history.pushState(null, '', '/study/');
+    } catch {
+      window.location.hash = '/study';
+    }
+  }, []);
+
+  const navigateToBook = useCallback((bookId: string) => {
+    setSelectedBookId(bookId);
+    setViewMode('reader');
+    try {
+      window.history.pushState(null, '', `/study/books/${bookId}`);
+    } catch {
+      window.location.hash = `/study/books/${bookId}`;
+    }
+  }, []);
+
+  const navigateToAtlas = useCallback((mode: 'book' | 'explorer' = 'book') => {
+    setViewMode(mode);
+    setSelectedBookId(null);
+    try {
+      window.history.pushState(null, '', '/');
+    } catch {
+      window.location.hash = '';
+    }
+  }, []);
 
   // Fetch atlas.json
   useEffect(() => {
@@ -112,7 +177,6 @@ export const App: React.FC = () => {
 
   // Handle selecting a disease from Disease modal or tab
   const handleSelectDisease = useCallback((disease: ClinicalDisease) => {
-    // Find chapter matching the disease's system
     const chIdx = BOOK_CHAPTERS.findIndex(c => c.systemId === disease.system);
     if (chIdx >= 0) {
       setCurrentChapterIndex(chIdx);
@@ -138,9 +202,9 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // Auto Tour Timer (Every 7 seconds advances to next part)
+  // Auto Tour Timer
   useEffect(() => {
-    if (!isTourPlaying) return;
+    if (!isTourPlaying || viewMode !== 'book') return;
 
     const interval = setInterval(() => {
       setCurrentPartIndex(prevIdx => {
@@ -150,7 +214,6 @@ export const App: React.FC = () => {
           handleSelectPart(nextPart);
           return nextIdx;
         } else {
-          // Go to next chapter
           setCurrentChapterIndex(prevCh => {
             const nextCh = (prevCh + 1) % BOOK_CHAPTERS.length;
             const newChapter = BOOK_CHAPTERS[nextCh];
@@ -165,89 +228,116 @@ export const App: React.FC = () => {
     }, 7000);
 
     return () => clearInterval(interval);
-  }, [isTourPlaying, currentChapter, handleSelectPart]);
+  }, [isTourPlaying, viewMode, currentChapter, handleSelectPart]);
 
   return (
     <div className={`app-root view-${viewMode}`} data-theme={theme}>
       {/* Top Application Header */}
       <Header
         viewMode={viewMode}
-        onToggleViewMode={mode => setViewMode(mode)}
+        onToggleViewMode={mode => {
+          if (mode === 'library') {
+            navigateToLibrary();
+          } else {
+            navigateToAtlas(mode);
+          }
+        }}
         onOpenDiseaseModal={() => setIsDiseaseModalOpen(true)}
         onOpenAboutModal={() => setIsAboutModalOpen(true)}
         onOpenQuizModal={() => setIsQuizModalOpen(true)}
         theme={theme}
         onToggleTheme={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}
-        currentChapterTitle={currentChapter.hindiTitle}
+        currentChapterTitle={
+          viewMode === 'library'
+            ? '📚 मानव शरीर अध्ययन पुस्तकालय (Study Library)'
+            : viewMode === 'reader'
+            ? '📖 व्यक्तिगत पाठ्यपुस्तक अध्ययन (PDF Reader)'
+            : currentChapter.hindiTitle
+        }
         totalPartsCount={atlas?.parts.length || 2234}
       />
 
-      {/* Main Workspace (Split View in Book Mode, Full View in Explorer Mode) */}
+      {/* Main Workspace */}
       <main className="app-main-workspace">
-        {/* Left Side: Interactive Anatomy Textbook Reader */}
-        {viewMode === 'book' && (
-          <BookReader
-            currentChapterIndex={currentChapterIndex}
-            currentPartIndex={currentPartIndex}
-            onSelectChapter={idx => {
-              setCurrentChapterIndex(idx);
-              setCurrentPartIndex(0);
-              const ch = BOOK_CHAPTERS[idx];
-              if (ch.parts.length > 0) {
-                handleSelectPart(ch.parts[0]);
-              }
-            }}
-            onSelectPart={handleSelectPart}
-            onIsolatePart={handleIsolatePart}
-            onSelectDisease={handleSelectDisease}
-            isTourPlaying={isTourPlaying}
-            onToggleTour={() => setIsTourPlaying(!isTourPlaying)}
+        {viewMode === 'library' ? (
+          /* Human Body Study Library Shelf */
+          <StudyLibrary
+            onOpenBook={bookId => navigateToBook(bookId)}
+            onBackTo3D={() => navigateToAtlas('book')}
           />
+        ) : viewMode === 'reader' && selectedBookId ? (
+          /* Individual Book PDF & Chapter Reader */
+          <PDFBookReader
+            bookId={selectedBookId}
+            onBackToLibrary={navigateToLibrary}
+            onOpen3DAtlas={() => navigateToAtlas('book')}
+          />
+        ) : (
+          /* 3D Anatomy Atlas & Textbook Split View */
+          <>
+            {viewMode === 'book' && (
+              <BookReader
+                currentChapterIndex={currentChapterIndex}
+                currentPartIndex={currentPartIndex}
+                onSelectChapter={idx => {
+                  setCurrentChapterIndex(idx);
+                  setCurrentPartIndex(0);
+                  const ch = BOOK_CHAPTERS[idx];
+                  if (ch.parts.length > 0) {
+                    handleSelectPart(ch.parts[0]);
+                  }
+                }}
+                onSelectPart={handleSelectPart}
+                onIsolatePart={handleIsolatePart}
+                onSelectDisease={handleSelectDisease}
+                isTourPlaying={isTourPlaying}
+                onToggleTour={() => setIsTourPlaying(!isTourPlaying)}
+              />
+            )}
+
+            <section className="three-viewport-section">
+              <ThreeCanvas
+                atlas={atlas}
+                onViewerReady={viewer => {
+                  viewerRef.current = viewer;
+                }}
+                onSelectPart={handle3DPartClick}
+                explodeValue={explodeValue}
+                currentView={currentView}
+                isAutoRotating={isAutoRotating}
+                selectedPartId={selectedPartId}
+                isIsolated={isIsolated}
+                theme={theme}
+              />
+
+              <ControlsOverlay
+                explodeValue={explodeValue}
+                onExplodeChange={val => setExplodeValue(val)}
+                currentView={currentView}
+                onSetViewPreset={preset => {
+                  setCurrentView(preset);
+                  if (viewerRef.current) viewerRef.current.setViewPreset(preset);
+                }}
+                isAutoRotating={isAutoRotating}
+                onToggleAutoRotate={() => {
+                  const next = !isAutoRotating;
+                  setIsAutoRotating(next);
+                  if (viewerRef.current) viewerRef.current.setAutoRotate(next);
+                }}
+                onReset={handleReset}
+                captionText={captionText}
+                isIsolated={isIsolated}
+                onClearIsolate={() => {
+                  setIsIsolated(false);
+                  if (viewerRef.current) {
+                    viewerRef.current.setIsolated(false);
+                    viewerRef.current.updateStateTextures();
+                  }
+                }}
+              />
+            </section>
+          </>
         )}
-
-        {/* Right Side: 3D WebGL Three.js Canvas Stage */}
-        <section className="three-viewport-section">
-          <ThreeCanvas
-            atlas={atlas}
-            onViewerReady={viewer => {
-              viewerRef.current = viewer;
-            }}
-            onSelectPart={handle3DPartClick}
-            explodeValue={explodeValue}
-            currentView={currentView}
-            isAutoRotating={isAutoRotating}
-            selectedPartId={selectedPartId}
-            isIsolated={isIsolated}
-            theme={theme}
-          />
-
-          {/* 3D Viewport Controls & Explode Slider Overlay */}
-          <ControlsOverlay
-            explodeValue={explodeValue}
-            onExplodeChange={val => setExplodeValue(val)}
-            currentView={currentView}
-            onSetViewPreset={preset => {
-              setCurrentView(preset);
-              if (viewerRef.current) viewerRef.current.setViewPreset(preset);
-            }}
-            isAutoRotating={isAutoRotating}
-            onToggleAutoRotate={() => {
-              const next = !isAutoRotating;
-              setIsAutoRotating(next);
-              if (viewerRef.current) viewerRef.current.setAutoRotate(next);
-            }}
-            onReset={handleReset}
-            captionText={captionText}
-            isIsolated={isIsolated}
-            onClearIsolate={() => {
-              setIsIsolated(false);
-              if (viewerRef.current) {
-                viewerRef.current.setIsolated(false);
-                viewerRef.current.updateStateTextures();
-              }
-            }}
-          />
-        </section>
       </main>
 
       {/* Clinical Disease Encyclopedia Modal */}

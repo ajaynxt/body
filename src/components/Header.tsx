@@ -1,9 +1,9 @@
 import React from 'react';
-import { BookOpen, Box, Stethoscope, Info, Sparkles, Brain, Moon, Sun } from 'lucide-react';
+import { BookOpen, Box, Stethoscope, Info, Sparkles, Brain, Moon, Sun, Library } from 'lucide-react';
 
 interface HeaderProps {
-  viewMode: 'book' | 'explorer';
-  onToggleViewMode: (mode: 'book' | 'explorer') => void;
+  viewMode: 'book' | 'explorer' | 'library' | 'reader';
+  onToggleViewMode: (mode: 'book' | 'explorer' | 'library') => void;
   onOpenDiseaseModal: () => void;
   onOpenAboutModal: () => void;
   onOpenQuizModal: () => void;
@@ -64,6 +64,14 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Box size={16} />
           <span>फुलस्क्रीन 3D (Full Atlas)</span>
+        </button>
+        <button
+          className={`mode-toggle-btn ${viewMode === 'library' ? 'active' : ''}`}
+          onClick={() => onToggleViewMode('library')}
+          title="मानव शरीर अध्ययन पुस्तकालय खोलें (PDF Textbooks & Notes)"
+        >
+          <Library size={16} />
+          <span>लाइब्रेरी (Study Library)</span>
         </button>
       </div>
 

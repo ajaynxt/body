@@ -1,0 +1,29 @@
+# Robots.txt for सचित्र मानव शरीर विज्ञान (Human Body Study Library & 3D Atlas)
+# Verified Canonical Domain: https://ajaynxt.com/body/
+
+User-agent: *
+Allow: /body/
+Allow: /body/study/
+Disallow: /body/study/books/
+Disallow: /study/books/
+Disallow: /models/*.gz
+
+User-agent: Googlebot
+Allow: /body/
+Allow: /body/study/
+Disallow: /body/study/books/
+
+User-agent: Bingbot
+Allow: /body/
+Allow: /body/study/
+Disallow: /body/study/books/
+
+# Keep private personal study sessions, notes, and local book readers out of public search indexing
+User-agent: Slurp
+Disallow: /body/study/books/
+
+User-agent: DuckDuckBot
+Disallow: /body/study/books/
+
+# Sitemap location
+Sitemap: https://ajaynxt.com/body/sitemap.xml

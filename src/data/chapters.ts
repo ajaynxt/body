@@ -541,4 +541,162 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       },
     ],
   },
+
+  // CHAPTER 7: FEMALE REPRODUCTIVE SYSTEM
+  {
+    id: 'chapter-female-reproductive',
+    chapterNumber: 7,
+    systemId: 'reproductive',
+    title: 'The Female Reproductive System & Embryology',
+    hindiTitle: 'अध्याय 7: महिला प्रजनन एवं भ्रूण विकास तंत्र',
+    subtitle: 'जीवन की उत्पत्ति की जननी — गर्भाशय, अंडाशय और मासिक धर्म चक्र',
+    recommendedBooks: [
+      "Gray's Anatomy 42nd Ed (Sec. 9: Female Reproductive System)",
+      "BD Chaurasia's Human Anatomy Vol 2 (Pelvis: Uterus, Ovaries & Vagina)",
+      "Guyton & Hall Physiology (Unit XIV: Endocrinology & Female Reproduction)",
+      "DC Dutta's Textbook of Obstetrics & Gynecology"
+    ],
+    introductionHinglish: 'महिला प्रजनन तंत्र (Female Reproductive System) नए मानव जीवन को उत्पन्न करने, पोषित करने और जन्म देने के लिए प्रकृति का सबसे विस्मयकारी तंत्र है। इसमें आंतरिक अंग (गर्भाशय, दो अंडाशय, दो फैलोपियन ट्यूब, योनि) और स्तन ग्रंथियां शामिल हैं। यह मासिक धर्म चक्र (Menstrual Cycle) और गर्भावस्था (Pregnancy) के लिए एस्ट्रोजन और प्रोजेस्टेरोन हार्मोन का स्राव करता है।',
+    howItWorksHinglish: 'प्रत्येक माह अंडाशय से एक परिपक्व अंडाणु (Ovum) ओव्यूलेशन द्वारा बाहर निकलता है और फैलोपियन ट्यूब में आता है। यदि 24 घंटे में शुक्राणु द्वारा निषेचन (Fertilization) हो जाता है, तो बनने वाला जाइगोट गर्भाशय में आकर प्रत्यारोपित (Implant) होता है और 9 माह तक प्लेसेंटा द्वारा विकसित होकर शिशु बनता है। निषेचन न होने पर गर्भाशय की आंतरिक परत (Endometrium) टूटकर माहवारी के रूप में बाहर निकल जाती है।',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'pcos-pcod' || d.id === 'endometriosis'),
+    parts: [
+      {
+        id: 'uterus-womb',
+        name: 'Uterus (Womb / Metra)',
+        hindiName: 'गर्भाशय (बच्चेदानी / यूटरस)',
+        latinName: 'Uterus / Metra',
+        pronunciation: 'YOO-ter-us',
+        system: 'reproductive',
+        elements: ['FJ2750', 'FJ2751'],
+        locationHinglish: 'महिला श्रोणि गुहा (Pelvic cavity) में मूत्राशय के पीछे और मलाशय के आगे स्थित नाशपाती के आकार का खोखला पेशीय अंग।',
+        functionHinglish: 'निषेचित भ्रूण को 9 महीने तक सुरक्षित रखना, प्लेसेंटा से पोषण देना, और प्रसव के समय शक्तिशाली संकुचन (Oxytocin द्वारा) से शिशु को जन्म देना।',
+        funFactHinglish: 'गर्भावस्था के दौरान गर्भाशय अपने सामान्य आकार से लगभग 500 गुना अधिक फैल सकता है — मानव शरीर की किसी भी अन्य मांसपेशी से अधिक!',
+        clinicalNoteHinglish: 'गर्भाशय की आंतरिक एंडोमेट्रियल परत की मोटाई अल्ट्रासाउंड से मापी जाती है; फाइब्रॉएड (Fibroids) गर्भाशय की मांसपेशियों में बनने वाली हानिरहित रसौली हैं।',
+        highYieldMnemonic: 'Antiverted & Antiflexed (AV & AF): गर्भाशय की सामान्य शारीरिक स्थिति (Angle of Anteversion ~90°, Angle of Anteflexion ~120-170°)',
+        examPearls: [
+          'गर्भाशय की 3 परतें होती हैं: Endometrium (आंतरिक), Myometrium (मोटी पेशीय दीवार), Perimetrium (बाहरी सीरस परत)।',
+          'गर्भाशय की रक्त आपूर्ति: Uterine Artery (Internal Iliac Artery की पूर्ववर्ती शाखा) द्वारा होती है।',
+          'Mackrodt\'s / Cardinal ligaments गर्भाशय को पेल्विस में सहारा देने वाले सबसे मुख्य लिगामेंट्स हैं।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 2",
+            citation: "Pelvis: Uterus and Fallopian Tubes, pp. 415–432",
+            highYieldFact: "The relation of the ureter to the uterine artery is crucial in hysterectomy: 'Water runs under the bridge' — the ureter passes approximately 1.5 cm lateral to the cervix beneath the uterine artery."
+          },
+          {
+            book: "Guyton and Hall Textbook of Medical Physiology",
+            citation: "Unit XIV, Chapter 82 (Female Physiology and Hormones), pp. 1037–1054",
+            highYieldFact: "The LH Surge (Luteinizing Hormone peak) triggers rupture of the mature Graafian follicle and ovulation precisely 24 to 36 hours later, initiating the luteal secretory phase."
+          }
+        ],
+        relatedDiseases: ['Endometriosis', 'Uterine Fibroids', 'Cervical Cancer'],
+      },
+      {
+        id: 'ovaries-paired',
+        name: 'Ovaries (Oophoron)',
+        hindiName: 'अंडाशय (ओवरी - दायां व बायां अंडाशय)',
+        latinName: 'Ovaria',
+        pronunciation: 'oh-VAIR-ee-uh',
+        system: 'reproductive',
+        elements: ['FJ2760', 'FJ2761'],
+        locationHinglish: 'गर्भाशय के दोनों तरफ पेल्विक दीवार में स्थित बादाम के आकार की दो प्राथमिक जनन ग्रंथियां।',
+        functionHinglish: 'दोहरा जीवन-कार्य: 1. डिंब/अंडाणु (Ova) का उत्पादन। 2. महिला सेक्स हार्मोन एस्ट्रोजन और प्रोजेस्टेरोन का निरंतर संश्लेषण।',
+        funFactHinglish: 'एक बालिका अपने दोनों अंडाशयों में लगभग 10 से 20 लाख अपरिपक्व अंडों के साथ जन्म लेती है, जिनमें से पूरे जीवनकाल में केवल लगभग 400 अंडे ही परिपक्व होकर ओव्यूलेट होते हैं!',
+        clinicalNoteHinglish: 'अंडाशय में हार्मोन असंतुलन से PCOS (पॉलीसिस्टिक ओवरी सिंड्रोम) होता है, जिससे चेहरे पर अनचाहे बाल, मुंहासे और अनियमित माहवारी होती है।',
+        highYieldMnemonic: 'Ovary Double Blood Supply: Ovarian Artery (Abdominal Aorta से L2 स्तर पर) और Uterine Artery की शाखाएं',
+        examPearls: [
+          'अंडाशय का लिगामेंट (Ovarian Ligament) इसे गर्भाशय से और सस्पेंसरी लिगामेंट (Infundibulopelvic) इसे पेल्विक दीवार से जोड़ता है।',
+          'कॉर्पस ल्यूटियम (Corpus Luteum): ओव्यूलेशन के बाद बनने वाली पीली ग्रंथि जो गर्भावस्था बनाए रखने के लिए प्रोजेस्टेरोन बनाती है।'
+        ],
+        citations: [
+          {
+            book: "Gray's Anatomy (42nd Edition)",
+            citation: "Section 9: Pelvis, Chapter 75 (Female Internal Genital Organs), pp. 1290–1308",
+            highYieldFact: "Ovarian lymphatic drainage flows primarily upward along the ovarian vessels directly to para-aortic lymph nodes near the origin of renal arteries, distinct from cervical lymphatics."
+          }
+        ],
+        relatedDiseases: ['Polycystic Ovary Syndrome (PCOS)', 'Ovarian Cyst', 'Ovarian Cancer'],
+      },
+    ],
+  },
+
+  // CHAPTER 8: MALE REPRODUCTIVE SYSTEM
+  {
+    id: 'chapter-male-reproductive',
+    chapterNumber: 8,
+    systemId: 'reproductive',
+    title: 'The Male Reproductive System & Endocrinology',
+    hindiTitle: 'अध्याय 8: पुरुष प्रजनन तंत्र एवं एंड्रोजन प्रणाली',
+    subtitle: 'शुक्राणु जनन, टेस्टोस्टेरोन और पौरुष ग्रंथि की कार्यप्रणाली',
+    recommendedBooks: [
+      "Gray's Anatomy 42nd Ed (Sec. 9: Male Reproductive System)",
+      "BD Chaurasia's Human Anatomy Vol 2 (Pelvis: Prostate, Scrotum & Testes)",
+      "Guyton & Hall Physiology (Unit XIV: Male Reproductive Functions)",
+      "Campbell-Walsh Urology (12th Edition)"
+    ],
+    introductionHinglish: 'पुरुष प्रजनन तंत्र (Male Reproductive System) शुक्राणुओं (Spermatozoa) के उत्पादन, पोषण और स्थानांतरण के लिए उत्तरदायी है। इसमें दो वृषण (Testes), अधिवृषण (Epididymis), शुक्रवाहक नलिका (Vas Deferens), प्रोस्टेट ग्रंथि, सेमिनल वेसिकल्स और शिश्न (Penis) शामिल हैं। यह मुख्य पुरुष सेक्स हार्मोन टेस्टोस्टेरोन (Testosterone) का उत्पादन करता है।',
+    howItWorksHinglish: 'वृषण शरीर के बाहर अंडकोष (Scrotum) में स्थित होते हैं क्योंकि शुक्राणु बनने (Spermatogenesis) के लिए शरीर के आंतरिक तापमान (37°C) से 2 से 3 डिग्री सेल्सियस कम तापमान जरूरी होता है। शुक्राणु सेमिनिफेरस नलिकाओं में बनते हैं और एपिडिडीमिस में परिपक्व होते हैं। वीर्यस्खलन के समय प्रोस्टेट और सेमिनल वेसिकल्स का पोषक द्रव मिलकर वीर्य (Semen) बनाता है जो मूत्रमार्ग द्वारा उत्सर्जित होता है।',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'bph-prostate' || d.id === 'varicocele'),
+    parts: [
+      {
+        id: 'testes-paired',
+        name: 'Testes (Testicles)',
+        hindiName: 'वृषण (टेस्टिस / अंडकोषीय ग्रंथि)',
+        latinName: 'Testes',
+        pronunciation: 'TES-teez',
+        system: 'reproductive',
+        elements: ['FJ2780', 'FJ2781'],
+        locationHinglish: 'शरीर के बाहर स्थित अंडकोष (Scrotum) की थैली के अंदर लटके दो अंडाकार अंग।',
+        functionHinglish: 'प्रतिदिन लगभग 20 से 30 करोड़ शुक्राणु बनाना और टेस्टोस्टेरोन हार्मोन स्रावित करना जो पौरुष लक्षण, दाढ़ी-मूंछ, आवाज भारी होना और मांसपेशियों का विकास करता है।',
+        funFactHinglish: 'प्रत्येक वृषण के अंदर अगर सभी सूक्ष्म सेमिनिफेरस नलिकाओं को सीधा फैलाया जाए, तो उनकी कुल लंबाई लगभग 250 मीटर (एक चौथाई किलोमीटर) होगी!',
+        clinicalNoteHinglish: 'अंडकोष में अचानक तेज दर्द टेस्टिकुलर टॉर्शन (Testicular Torsion) का संकेत हो सकता है — यह मेडिकल इमरजेंसी है जिसमें 6 घंटे के अंदर सर्जरी अनिवार्य होती है।',
+        highYieldMnemonic: 'SEVEN UP: शुक्राणु का मार्ग — Seminiferous tubules -> Epididymis -> Vas deferens -> Ejaculatory duct -> (Nothing) -> Urethra -> Penis',
+        examPearls: [
+          'लेडिग कोशिकाएं (Leydig cells): LH हार्मोन के प्रभाव में टेस्टोस्टेरोन बनाती हैं।',
+          'सर्टोली कोशिकाएं (Sertoli cells): "नर्स सेल्स" जो विकासशील शुक्राणुओं को पोषण देती हैं और ब्लड-टेस्टिस बैरियर (Blood-Testis Barrier) बनाती हैं।',
+          'Pampiniform venous plexus टेस्टिकुलर आर्टरी के खून को ठंडा करने के लिए काउंटर-करेंट हीट एक्सचेंजर का काम करता है।'
+        ],
+        citations: [
+          {
+            book: "Guyton and Hall Textbook of Medical Physiology",
+            citation: "Unit XIV, Chapter 81 (Male Reproductive Functions and Testosterone), pp. 1021–1036",
+            highYieldFact: "Spermatogenesis requires an optimal temperature approximately 2°C to 3°C below core body temperature, maintained dynamically by contraction and relaxation of the cremaster and dartos muscles."
+          },
+          {
+            book: "Campbell-Walsh Urology (12th Edition)",
+            citation: "Chapter 64: Male Infertility & Testicular Anatomy, pp. 1420–1445",
+            highYieldFact: "Left testicular vein drains vertically at a right angle into the left renal vein, causing higher hydrostatic retrograde pressure and explaining why >85% of varicoceles occur on the left side."
+          }
+        ],
+        relatedDiseases: ['Varicocele', 'Testicular Torsion', 'Testicular Cancer'],
+      },
+      {
+        id: 'prostate-gland',
+        name: 'Prostate Gland',
+        hindiName: 'पौरुष ग्रंथि (प्रोस्टेट ग्रंथि)',
+        latinName: 'Prostata',
+        pronunciation: 'PROS-tayt',
+        system: 'reproductive',
+        elements: ['FJ2790'],
+        locationHinglish: 'मूत्राशय (Urinary bladder) के ठीक नीचे स्थित अखरोट के आकार की ग्रंथि, जिसके बीच से मूत्रमार्ग (Urethra) गुजरता है।',
+        functionHinglish: 'दूधिया, थोड़ा क्षारीय (Alkaline) प्रोस्टेटिक द्रव बनाना जो वीर्य का 30% हिस्सा होता है; यह योनि के अम्लीय वातावरण को निष्क्रिय कर शुक्राणुओं को जीवित रखता है।',
+        funFactHinglish: 'प्रोस्टेट में सिट्रिक एसिड, जिंक और प्रोस्टेट स्पेसिफिक एंटीजन (PSA) प्रचुर मात्रा में होते हैं जो थक्के वाले वीर्य को पतला (Liquefaction) करते हैं!',
+        clinicalNoteHinglish: 'उम्रदराज पुरुषों में प्रोस्टेट बढ़ने (BPH) से पेशाब की धार कमजोर हो जाती है और रात में बार-बार उठना पड़ता है।',
+        highYieldMnemonic: 'BPH = Transitional Zone (मूत्रमार्ग को दबाता है); Prostate Cancer = Peripheral Zone (DRE पर गांठ महसूस होती है)',
+        examPearls: [
+          'मैकनील के अनुसार प्रोस्टेट 4 ज़ोन में बंटा है: Peripheral, Central, Transition, और Anterior fibromuscular stroma।',
+          'PSA (Prostate Specific Antigen) एक सेरीन प्रोटीज है जो वीर्य को तरल बनाता है; 4 ng/mL से अधिक स्तर कैंसर या BPH का संकेत है।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 2",
+            citation: "Pelvis: Prostate Gland & Seminal Vesicles, pp. 399–412",
+            highYieldFact: "Prostatic venous plexus communicates freely with the internal vertebral venous plexus of Batson without valves, explaining why prostatic carcinoma metastases rapidly spread to lumbar vertebrae."
+          }
+        ],
+        relatedDiseases: ['Benign Prostatic Hyperplasia (BPH)', 'Prostatitis', 'Prostate Cancer'],
+      },
+    ],
+  },
 ];

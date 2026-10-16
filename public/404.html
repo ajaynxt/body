@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>सचित्र मानव शरीर विज्ञान — Redirecting...</title>
+    <script>
+      // Single Page Application Redirect for GitHub Pages
+      // MIT License - https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 1; // Keep '/body' segment if under /body/
+      var l = window.location;
+      var path = l.pathname;
+      
+      // Determine segments
+      var segments = path.split('/').filter(Boolean);
+      var repoSegment = segments[0] === 'body' ? '/body' : '';
+      var route = path.replace(repoSegment, '') || '/';
+      
+      // Redirect to base path with hash route
+      var target = repoSegment + '/#' + route + (l.search ? l.search : '') + (l.hash ? l.hash : '');
+      window.location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to requested page...</p>
+  </body>
+</html>

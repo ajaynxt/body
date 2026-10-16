@@ -19,6 +19,8 @@ import {
   GraduationCap,
   BookMarked,
   Languages,
+  Pill,
+  Brain,
 } from 'lucide-react';
 
 interface BookReaderProps {
@@ -30,6 +32,8 @@ interface BookReaderProps {
   onSelectDisease: (disease: ClinicalDisease) => void;
   isTourPlaying: boolean;
   onToggleTour: () => void;
+  onOpenAudioPlayer?: () => void;
+  onOpenAITutor?: () => void;
 }
 
 export const BookReader: React.FC<BookReaderProps> = ({
@@ -41,6 +45,8 @@ export const BookReader: React.FC<BookReaderProps> = ({
   onSelectDisease,
   isTourPlaying,
   onToggleTour,
+  onOpenAudioPlayer,
+  onOpenAITutor,
 }) => {
   const [activeTab, setActiveTab] = useState<'study' | 'diseases' | 'toc'>('study');
   const [searchQuery, setSearchQuery] = useState('');
@@ -240,14 +246,38 @@ export const BookReader: React.FC<BookReaderProps> = ({
                   </div>
                 </div>
 
-                <button
-                  className="isolate-btn-action"
-                  onClick={() => onIsolatePart(currentPart)}
-                  title="3D में इस अंग को अकेला देखें"
-                >
-                  <Eye size={15} />
-                  <span>3D Isolate</span>
-                </button>
+                <div className="header-action-buttons-group">
+                  <button
+                    className="isolate-btn-action"
+                    onClick={() => onIsolatePart(currentPart)}
+                    title="3D में इस अंग को अकेला देखें (Solo Focus)"
+                  >
+                    <Eye size={14} />
+                    <span>3D Isolate</span>
+                  </button>
+
+                  {onOpenAudioPlayer && (
+                    <button
+                      className="assistant-btn-action"
+                      onClick={onOpenAudioPlayer}
+                      title="Google Assistant से इसका विवरण व उपचार सुनें"
+                    >
+                      <Volume2 size={14} />
+                      <span>सुनें</span>
+                    </button>
+                  )}
+
+                  {onOpenAITutor && (
+                    <button
+                      className="tutor-btn-action"
+                      onClick={onOpenAITutor}
+                      title="AI द्वारा 5 स्टेप्स में सीखें"
+                    >
+                      <Sparkles size={14} />
+                      <span>AI ट्यूटर</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Step Navigation Controls */}
@@ -305,6 +335,84 @@ export const BookReader: React.FC<BookReaderProps> = ({
                   <p className="detail-text">{currentPart.clinicalNoteHinglish}</p>
                 </div>
               </div>
+
+              {/* Scientific Name Etymology & Root Word */}
+              {currentPart.rootWordEtymology && (
+                <div className="etymology-box highlight-border">
+                  <div className="etymology-header">
+                    <Brain size={16} className="text-accent" />
+                    <span className="etymology-heading">🔬 वैज्ञानिक नाम एवं शब्द की उत्पत्ति (Medical Etymology):</span>
+                  </div>
+                  <p className="etymology-content">{currentPart.rootWordEtymology}</p>
+                </div>
+              )}
+
+              {/* Memory Trick / Mnemonics */}
+              {currentPart.memoryTrickHindi && (
+                <div className="memory-trick-card highlight-border">
+                  <div className="trick-title-row">
+                    <Sparkles size={16} className="text-warning" />
+                    <span className="trick-heading">💡 याद रखने की धांसू ट्रिक (Memory Shortcut):</span>
+                  </div>
+                  <p className="trick-content">{currentPart.memoryTrickHindi}</p>
+                </div>
+              )}
+
+              {/* Comprehensive Treatments, Medications & Home Remedies */}
+              {(currentPart.treatmentsHinglish || currentPart.medications || currentPart.homeRemedies || currentPart.researchHighlights) && (
+                <div className="part-treatments-container highlight-border">
+                  <div className="treatment-main-header">
+                    <Pill size={17} className="text-success" />
+                    <h4 className="treatment-main-title">💊 संपूर्ण उपचार, दवाएं एवं सावधानियां (Treatments & Care):</h4>
+                  </div>
+
+                  {currentPart.treatmentsHinglish && currentPart.treatmentsHinglish.length > 0 && (
+                    <div className="treatment-block">
+                      <span className="block-label">🩺 चिकित्सकीय इलाज एवं प्रक्रियाएं:</span>
+                      <ul className="block-list">
+                        {currentPart.treatmentsHinglish.map((t, idx) => (
+                          <li key={idx}>{t}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {currentPart.medications && currentPart.medications.length > 0 && (
+                    <div className="treatment-block">
+                      <span className="block-label">💊 मुख्य औषधियां (Standard Medications):</span>
+                      <div className="med-pills-wrap">
+                        {currentPart.medications.map((m, idx) => (
+                          <span key={idx} className="med-pill-tag">
+                            💊 {m}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {currentPart.homeRemedies && currentPart.homeRemedies.length > 0 && (
+                    <div className="treatment-block">
+                      <span className="block-label">🌿 घरेलू उपाय एवं सावधानियां (Home Care & Habits):</span>
+                      <ul className="block-list">
+                        {currentPart.homeRemedies.map((hr, idx) => (
+                          <li key={idx}>{hr}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {currentPart.researchHighlights && currentPart.researchHighlights.length > 0 && (
+                    <div className="treatment-block research-block">
+                      <span className="block-label">🔬 शोधकर्ता क्लिनिकल नोट्स (Clinical Research):</span>
+                      <ul className="block-list">
+                        {currentPart.researchHighlights.map((rh, idx) => (
+                          <li key={idx}>{rh}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* NEET / MBBS High-Yield Mnemonic & Pearls */}
               {currentPart.highYieldMnemonic && (
@@ -472,6 +580,65 @@ export const BookReader: React.FC<BookReaderProps> = ({
                       ))}
                     </ul>
                   </div>
+
+                  {/* Comprehensive Treatments, Medical Care & Red Flags */}
+                  {disease.treatment && (
+                    <div className="disease-treatment-full-block">
+                      <div className="treatment-heading-row">
+                        <Pill size={15} className="text-accent" />
+                        <span className="treatment-heading-text">💊 संपूर्ण उपचार, दवाएं एवं डॉक्टरी सलाह:</span>
+                      </div>
+
+                      {/* Medical Care */}
+                      {disease.treatment.medical && disease.treatment.medical.length > 0 && (
+                        <div className="treatment-inner-row">
+                          <span className="inner-label">🩺 डॉक्टरी इलाज व दवाएं:</span>
+                          <ul className="inner-list">
+                            {disease.treatment.medical.map((m, mIdx) => (
+                              <li key={mIdx}>{m}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Home Care */}
+                      {disease.treatment.homeCare && disease.treatment.homeCare.length > 0 && (
+                        <div className="treatment-inner-row">
+                          <span className="inner-label">🌿 घरेलू देखभाल व परहेज:</span>
+                          <ul className="inner-list">
+                            {disease.treatment.homeCare.map((h, hIdx) => (
+                              <li key={hIdx}>{h}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Emergency Care / Red Flags (डॉक्टर को कब दिखाएं) */}
+                      {disease.treatment.emergencyCare && (
+                        <div className="emergency-alert-callout">
+                          <AlertCircle size={15} className="text-danger flex-shrink-0" />
+                          <div className="emergency-text">
+                            <strong>डॉक्टर को कब दिखाएं / आपातकालीन कदम:</strong>
+                            <p>{disease.treatment.emergencyCare}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Diagnostic Tests */}
+                      {disease.treatment.diagnosticTests && disease.treatment.diagnosticTests.length > 0 && (
+                        <div className="diagnostic-tests-chips">
+                          <span className="diag-label">🔬 जरूरी जांचें:</span>
+                          <div className="tests-chips-wrap">
+                            {disease.treatment.diagnosticTests.map((t, tIdx) => (
+                              <span key={tIdx} className="diag-chip">
+                                🧪 {t}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

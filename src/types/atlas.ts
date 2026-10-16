@@ -48,6 +48,13 @@ export interface AnatomicalSystem {
   totalParts?: number;
 }
 
+export interface DiseaseTreatment {
+  medical: string[]; // डॉक्टरी इलाज व दवाएं (Medical treatment & drugs)
+  homeCare: string[]; // घरेलू उपाय एवं जीवनशैली (Home remedies & lifestyle)
+  emergencyCare?: string; // आपातकालीन कदम (First Aid / Immediate action)
+  diagnosticTests?: string[]; // जरूरी जांचें (Diagnostics & Tests)
+}
+
 export interface ClinicalDisease {
   id: string;
   name: string;
@@ -59,6 +66,7 @@ export interface ClinicalDisease {
   symptoms: string[];
   causes: string[];
   prevention: string[];
+  treatment?: DiseaseTreatment;
   severity: 'mild' | 'moderate' | 'critical' | 'chronic';
 }
 
@@ -81,6 +89,13 @@ export interface StudyPartItem {
   clinicalNoteHinglish: string;
   relatedDiseases: string[];
   
+  // Treatments & Cures (उपचार एवं सावधानियां)
+  treatmentsHinglish?: string[];
+  treatmentsHindi?: string[];
+  medications?: string[];
+  homeRemedies?: string[];
+  researchHighlights?: string[];
+  
   // Multilingual & Textbook Extensions
   locationHindi?: string;
   locationEn?: string;
@@ -90,6 +105,10 @@ export interface StudyPartItem {
   funFactEn?: string;
   clinicalNoteHindi?: string;
   clinicalNoteEn?: string;
+  
+  // Scientific Name & Memory Tricks (वैज्ञानिक नाम व याद रखने की ट्रिक्स)
+  rootWordEtymology?: string; // रूट वर्ड / शब्द की उत्पत्ति (e.g. Cardio = दिल, Hepato = यकृत)
+  memoryTrickHindi?: string; // आसान याद रखने की ट्रिक / Mnemonic shortcut
   
   pronunciation?: string;
   highYieldMnemonic?: string;

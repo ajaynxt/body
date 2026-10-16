@@ -1,6 +1,11 @@
-import { RotateCcw, Play, Pause, Layers } from 'lucide-react';
+import React from 'react';
+import { RotateCcw, Play, Pause, Layers, Eye } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 interface ControlsOverlayProps {
+  activeGender?: 'male' | 'female';
+  skinOpacity?: number;
+  onSkinOpacityChange?: (val: number) => void;
   explodeValue: number;
   onExplodeChange: (val: number) => void;
   currentView: 'three-quarter' | 'front' | 'side' | 'back';
@@ -14,6 +19,9 @@ interface ControlsOverlayProps {
 }
 
 export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
+  activeGender = 'male',
+  skinOpacity = 0.2,
+  onSkinOpacityChange,
   explodeValue,
   onExplodeChange,
   currentView,
@@ -25,6 +33,8 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   isIsolated,
   onClearIsolate,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="controls-overlay-container pointer-events-none">
       {/* Top Floating View Angle Presets */}
@@ -46,7 +56,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
         <button
           className={`preset-btn ${currentView === 'side' ? 'active' : ''}`}
           onClick={() => onSetViewPreset('side')}
-          title="Side View (दाएं/बाएं से)"
+          title="Side View (पार्श्व से)"
         >
           <span>S</span>
         </button>
@@ -68,7 +78,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
           {isAutoRotating ? <Pause size={15} /> : <Play size={15} />}
         </button>
 
-        <button className="preset-btn" onClick={onReset} title="कैमरा और दृश्य रीसेट करें">
+        <button className="preset-btn" onClick={onReset} title={t.resetView}>
           <RotateCcw size={15} />
         </button>
       </div>
@@ -77,23 +87,54 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
       <div className="caption-banner-wrap">
         <div className="caption-badge glass-panel">
           <span className="caption-line-flair" />
+          <span className="caption-gender-tag">
+            {activeGender === 'female' ? '♀ HuBMAP VHF 1.5' : '♂ BodyParts3D 4.0'}
+          </span>
           <span className="caption-title-text">{captionText}</span>
           {isIsolated && (
             <button className="clear-isolate-chip pointer-events-auto" onClick={onClearIsolate}>
-              पूरा शरीर दिखाएं (Show All)
+              {t.fullCoverage.includes('Full') ? 'Show Full Body' : 'पूरा शरीर दिखाएं'}
             </button>
           )}
           <span className="caption-line-flair" />
         </div>
       </div>
 
-      {/* Bottom Explode Slider Dock */}
+      {/* Bottom Explode Slider Dock & Skin Transparency */}
       <div className="bottom-dock-wrap pointer-events-auto">
         <div className="bottom-dock-card glass-panel">
+          {/* Female Skin Opacity Slider (When Female active) */}
+          {activeGender === 'female' && onSkinOpacityChange && (
+            <div className="skin-slider-subrow">
+              <div className="explode-header-row">
+                <span className="explode-title">
+                  <Eye size={14} className="inline-icon text-accent" />
+                  <span>{t.skinOpacity}:</span>
+                </span>
+                <span className="explode-pct-badge">{Math.round(skinOpacity * 100)}%</span>
+              </div>
+              <div className="slider-row">
+                <span className="slider-endpoint-label">पारदर्शी (Clear)</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.02"
+                  value={skinOpacity}
+                  onChange={e => onSkinOpacityChange(parseFloat(e.target.value))}
+                  className="custom-range-slider"
+                  aria-label="Female skin opacity"
+                />
+                <span className="slider-endpoint-label">अस्पष्ट (Opaque)</span>
+              </div>
+            </div>
+          )}
+
+          {/* Explode Slider */}
           <div className="explode-header-row">
             <span className="explode-title">
               <Layers size={14} className="inline-icon" />
-              <span>शरीर के अंग अलग करें (Explode Anatomy):</span>
+              <span>{t.explodeView}:</span>
             </span>
             <span className="explode-pct-badge">{Math.round(explodeValue * 100)}%</span>
           </div>
@@ -108,12 +149,18 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
               value={explodeValue}
               onChange={e => onExplodeChange(parseFloat(e.target.value))}
               className="custom-range-slider"
+              aria-label="Explode anatomy slider"
             />
-            <span className="slider-endpoint-label">अलग-अलग (Every piece)</span>
+            <span className="slider-endpoint-label">विभाजित (Separated)</span>
           </div>
 
           <div className="dock-hint-text">
-            <span>💡 0-45%: अंग बाहर की ओर खुलते हैं · 45-100%: फ्लैट इन्वेंट्री ग्रिड में सजते हैं</span>
+            <span>
+              💡{' '}
+              {activeGender === 'female'
+                ? 'महिला 3D मॉडल: अंगों को अक्ष से बाहर की ओर फैलाकर आंतरिक संरचनाओं का निरीक्षण करें'
+                : '0-45%: अंग बाहर की ओर खुलते हैं · 45-100%: 2D नॉलिंग ग्रिड में व्यवस्थित होते हैं'}
+            </span>
           </div>
         </div>
       </div>

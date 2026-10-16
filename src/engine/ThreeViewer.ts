@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { AtlasData } from '../types/atlas';
 import { ANATOMICAL_SYSTEMS } from '../data/systems';
 import { decompressGzip } from '../utils/decompression';
 import { calculateKnollingLayout } from '../utils/knolling';
 import type { KnollingLayout } from '../utils/knolling';
+import { FEMALE_MESH_CATALOG, type FemaleAnatomyPart } from '../data/femaleMeshCatalog';
 
 export interface ViewerOptions {
   container: HTMLDivElement;
@@ -14,6 +17,24 @@ export interface ViewerOptions {
   onProgress: (percent: number) => void;
   onError: (error: string) => void;
 }
+
+const SYSTEM_COLORS: Record<string, number> = {
+  skeletal: 0xf4e8d0,
+  muscular: 0xc85a53,
+  cardiac: 0xd32f2f,
+  arterial: 0xe53935,
+  venous: 0x1e88e5,
+  circulatory: 0xd32f2f,
+  respiratory: 0x64b5f6,
+  digestive: 0xffb74d,
+  urinary: 0x81c784,
+  reproductive: 0xec407a,
+  nervous: 0xfff176,
+  endocrine: 0xba68c8,
+  lymphatic: 0xaed581,
+  integumentary: 0xe0ac69,
+  sensory: 0x4dd0e1,
+};
 
 export class ThreeViewer {
   private container: HTMLDivElement;
@@ -27,20 +48,37 @@ export class ThreeViewer {
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
 
-  // GPU DataTextures
+  // Active Gender
+  private activeGender: 'male' | 'female' = 'male';
+  private maleRoot = new THREE.Group();
+  private femaleRoot = new THREE.Group();
+
+  // GPU DataTextures (Male BodyParts3D)
   private stateWidth = 4096;
   private partStateArray!: Float32Array;
   private partStateTexture!: THREE.DataTexture;
   private selectionArray!: Uint8Array;
   private selectionTexture!: THREE.DataTexture;
 
-  // Geometry & meshes
+  // Male Geometry & meshes
   private systemMaterials = new Map<string, THREE.MeshStandardMaterial>();
   private systemMeshes = new Map<string, THREE.Mesh>();
   private individualMeshes: THREE.Mesh[] = [];
   private partCentroids: THREE.Vector3[] = [];
   private partBoundingBoxes: THREE.Box3[] = [];
   private knolledCentroids: THREE.Vector3[] = [];
+
+  // Female Geometry & meshes (HuBMAP VHF 1.5)
+  private femaleLoaded = false;
+  private femaleLoading = false;
+  private femaleMeshes = new Map<string, THREE.Mesh>();
+  private femalePartBounds = new Map<string, THREE.Box3>();
+  private femalePartCentroids = new Map<string, THREE.Vector3>();
+  private femaleMeshOriginalPositions = new Map<string, THREE.Vector3>();
+  private femaleMeshOriginalMaterials = new Map<string, THREE.Material>();
+  private femaleCatalogMap = new Map<string, FemaleAnatomyPart>();
+  private femaleSkinMesh: THREE.Mesh | null = null;
+  private skinOpacity = 0.2;
 
   // Stage objects
   private floorStage!: THREE.Group;
@@ -72,6 +110,11 @@ export class ThreeViewer {
     this.onSelectPart = options.onSelectPart;
     this.onProgress = options.onProgress;
     this.onError = options.onError;
+
+    // Index female catalog
+    FEMALE_MESH_CATALOG.forEach(p => {
+      this.femaleCatalogMap.set(p.id, p);
+    });
 
     // Default visible systems: all except integumentary
     ANATOMICAL_SYSTEMS.forEach(s => {
@@ -113,6 +156,11 @@ export class ThreeViewer {
     this.container.appendChild(this.renderer.domElement);
 
     this.scene = new THREE.Scene();
+
+    // Model root groups
+    this.scene.add(this.maleRoot);
+    this.scene.add(this.femaleRoot);
+    this.femaleRoot.visible = false;
 
     // Camera setup (34 deg FOV, resting at 3/4 view)
     this.camera = new THREE.PerspectiveCamera(34, width / height, 0.005, 100);
@@ -287,7 +335,7 @@ export class ThreeViewer {
           `
         );
 
-        // Mix vibrant cyan glow (0.42, 0.85, 0.78) for selected parts
+        // Mix vibrant cyan glow for selected parts
         shader.fragmentShader = shader.fragmentShader.replace(
           '#include <color_fragment>',
           `#include <color_fragment>
@@ -308,7 +356,6 @@ export class ThreeViewer {
 
     const loadSingleChunk = async (chunkIndex: number) => {
       const chunk = chunks[chunkIndex];
-      // Target .bin.gz with decompressGzip
       const url = chunk.gzip.startsWith('./') ? chunk.gzip.replace('./', '/') : chunk.gzip;
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`Chunk ${chunkIndex} could not be loaded (${resp.status})`);
@@ -360,7 +407,9 @@ export class ThreeViewer {
       });
 
       completedChunks++;
-      this.onProgress(Math.round((completedChunks / chunks.length) * 100));
+      if (this.activeGender === 'male') {
+        this.onProgress(Math.round((completedChunks / chunks.length) * 100));
+      }
     };
 
     try {
@@ -384,18 +433,158 @@ export class ThreeViewer {
         const mat = this.systemMaterials.get(sysId);
         const mesh = new THREE.Mesh(merged, mat);
         mesh.frustumCulled = false;
-        this.scene.add(mesh);
+        this.maleRoot.add(mesh);
         this.systemMeshes.set(sysId, mesh);
       });
 
       this.updateStateTextures();
-      this.onProgress(100);
+      if (this.activeGender === 'male') {
+        this.onProgress(100);
+      }
     } catch (err) {
       this.onError((err as Error).message || 'Failed to load anatomy models.');
     }
   }
 
+  // --- FEMALE 3D MODEL LOADING (HuBMAP VHF 1.5) ---
+
+  private async loadFemaleModel(): Promise<void> {
+    if (this.femaleLoaded || this.femaleLoading) return;
+    this.femaleLoading = true;
+    this.onProgress(10);
+
+    try {
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+
+      const gltf = await new Promise<any>((resolve, reject) => {
+        loader.load(
+          '/models/female-atlas.glb',
+          resolve,
+          xhr => {
+            if (xhr.lengthComputable) {
+              const pct = Math.round((xhr.loaded / xhr.total) * 100);
+              this.onProgress(pct);
+            }
+          },
+          reject
+        );
+      });
+
+      const scene = gltf.scene as THREE.Group;
+
+      // Position female model so feet rest at y=0.0 on pedestal (bounding box min was -0.795)
+      scene.position.y = 0.795;
+      scene.updateMatrixWorld(true);
+
+      this.femaleRoot.add(scene);
+
+      // Traverse all meshes and organize by system and metadata
+      scene.traverse(obj => {
+        if ((obj as THREE.Mesh).isMesh) {
+          const mesh = obj as THREE.Mesh;
+          mesh.castShadow = false;
+          mesh.receiveShadow = false;
+
+          const partId = mesh.name;
+          this.femaleMeshes.set(partId, mesh);
+
+          // Compute world bounding box & centroid
+          const worldBox = new THREE.Box3().setFromObject(mesh);
+          this.femalePartBounds.set(partId, worldBox);
+          this.femalePartCentroids.set(partId, worldBox.getCenter(new THREE.Vector3()));
+          this.femaleMeshOriginalPositions.set(partId, mesh.position.clone());
+
+          const catalogItem = this.femaleCatalogMap.get(partId);
+          const sysId = catalogItem ? catalogItem.system : 'other';
+
+          // Assign medical system color
+          if (partId === 'VH_F_skin') {
+            const skinMat = new THREE.MeshStandardMaterial({
+              color: 0xdeb887,
+              roughness: 0.65,
+              metalness: 0.08,
+              transparent: true,
+              opacity: this.skinOpacity,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+            });
+            mesh.material = skinMat;
+            this.femaleSkinMesh = mesh;
+            this.femaleMeshOriginalMaterials.set(partId, skinMat);
+          } else {
+            const colorHex = SYSTEM_COLORS[sysId] || 0xe2e8f0;
+            const mat = new THREE.MeshStandardMaterial({
+              color: new THREE.Color(colorHex),
+              roughness: 0.52,
+              metalness: 0.08,
+              side: THREE.DoubleSide,
+            });
+            mesh.material = mat;
+            this.femaleMeshOriginalMaterials.set(partId, mat);
+          }
+        }
+      });
+
+      this.femaleLoaded = true;
+      this.femaleLoading = false;
+      this.updateFemaleState();
+      this.onProgress(100);
+    } catch (err) {
+      this.femaleLoading = false;
+      this.onError('महिला 3D मॉडल (HuBMAP VHF 1.5) लोड करने में त्रुटि: ' + (err as Error).message);
+    }
+  }
+
+  public async switchGender(gender: 'male' | 'female'): Promise<void> {
+    if (this.activeGender === gender) return;
+    this.activeGender = gender;
+
+    if (gender === 'female') {
+      this.maleRoot.visible = false;
+      this.femaleRoot.visible = true;
+      if (!this.femaleLoaded) {
+        await this.loadFemaleModel();
+      } else {
+        this.updateFemaleState();
+      }
+    } else {
+      this.femaleRoot.visible = false;
+      this.maleRoot.visible = true;
+      this.updateStateTextures();
+    }
+  }
+
+  public getActiveGender(): 'male' | 'female' {
+    return this.activeGender;
+  }
+
+  public setSkinOpacity(val: number): void {
+    this.skinOpacity = Math.max(0, Math.min(1, val));
+    if (this.femaleSkinMesh) {
+      const mat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
+      mat.opacity = this.skinOpacity;
+      this.femaleSkinMesh.visible = this.skinOpacity > 0.01;
+    }
+  }
+
+  public getSkinOpacity(): number {
+    return this.skinOpacity;
+  }
+
+  // --- STATE UPDATES ---
+
+  public updateState(): void {
+    if (this.activeGender === 'male') {
+      this.updateStateTextures();
+    } else {
+      this.updateFemaleState();
+    }
+  }
+
   public updateStateTextures() {
+    if (this.activeGender !== 'male') return;
+
     const numSystems = ANATOMICAL_SYSTEMS.length;
     const aspect = (this.container.clientWidth || 1) / (this.container.clientHeight || 1);
 
@@ -475,6 +664,75 @@ export class ThreeViewer {
     this.floorStage.visible = h < 0.5 && !this.isIsolated;
   }
 
+  private updateFemaleState(): void {
+    if (!this.femaleLoaded || this.activeGender !== 'female') return;
+
+    const explode = this.currentExplodeDamped;
+    const isIso = this.isIsolated;
+
+    this.femaleMeshes.forEach((mesh, partId) => {
+      const catalogItem = this.femaleCatalogMap.get(partId);
+      const sysId = catalogItem ? catalogItem.system : 'other';
+      const isSelected = this.selectedPartIds.has(partId);
+
+      // Visibility logic
+      let isVisible = false;
+      if (isIso) {
+        isVisible = isSelected;
+      } else {
+        isVisible = this.visibleSystems.has(sysId) || isSelected;
+      }
+      mesh.visible = isVisible;
+
+      // Explode translation outward radially from spine/center
+      const origPos = this.femaleMeshOriginalPositions.get(partId);
+      if (origPos) {
+        if (explode > 0.01) {
+          const centroid = this.femalePartCentroids.get(partId) || origPos;
+          const radial = new THREE.Vector3(centroid.x, 0, centroid.z).normalize();
+          if (radial.lengthSq() < 0.001) radial.set(0, 0, 1);
+          const yDisp = (centroid.y - 0.85) * 0.35;
+          mesh.position.copy(origPos).addScaledVector(radial, explode * 0.48);
+          mesh.position.y += yDisp * explode;
+        } else {
+          mesh.position.copy(origPos);
+        }
+      }
+
+      // Selection Highlight
+      if (isSelected) {
+        if (!mesh.userData.isSelected) {
+          mesh.userData.isSelected = true;
+          mesh.userData.origMat = mesh.material;
+          mesh.material = new THREE.MeshStandardMaterial({
+            color: 0x4debc2,
+            emissive: 0x1aa385,
+            emissiveIntensity: 0.6,
+            roughness: 0.3,
+            metalness: 0.2,
+            side: THREE.DoubleSide,
+          });
+        }
+      } else {
+        if (mesh.userData.isSelected) {
+          mesh.userData.isSelected = false;
+          if (mesh.userData.origMat) {
+            mesh.material = mesh.userData.origMat;
+          }
+        }
+      }
+    });
+
+    // Skin transparency
+    if (this.femaleSkinMesh && !isIso) {
+      const skinMat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
+      skinMat.opacity = this.skinOpacity;
+      this.femaleSkinMesh.visible = this.skinOpacity > 0.01 && this.visibleSystems.has('integumentary');
+    }
+
+    this.floorStage.visible = explode < 0.5 && !this.isIsolated;
+  }
+
   private setupEvents() {
     const el = this.renderer.domElement;
 
@@ -498,6 +756,34 @@ export class ThreeViewer {
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
 
+      // --- FEMALE RAYCASTING ---
+      if (this.activeGender === 'female' && this.femaleLoaded) {
+        const candidateMeshes: THREE.Mesh[] = [];
+        this.femaleMeshes.forEach(mesh => {
+          // If skin is translucent, let clicks pass through to organs
+          if (mesh === this.femaleSkinMesh && this.skinOpacity < 0.75) return;
+          if (mesh.visible) candidateMeshes.push(mesh);
+        });
+
+        const intersects = this.raycaster.intersectObjects(candidateMeshes, false);
+        if (intersects.length > 0) {
+          const hit = intersects[0].object as THREE.Mesh;
+          this.onSelectPart(hit.name);
+          return;
+        }
+
+        // If no organ hit, but skin is visible, check skin
+        if (this.femaleSkinMesh && this.femaleSkinMesh.visible) {
+          const skinHits = this.raycaster.intersectObject(this.femaleSkinMesh, false);
+          if (skinHits.length > 0) {
+            this.onSelectPart(this.femaleSkinMesh.name);
+            return;
+          }
+        }
+        return;
+      }
+
+      // --- MALE RAYCASTING ---
       let closestDist = Infinity;
       let hitPartIdx = -1;
 
@@ -531,7 +817,7 @@ export class ThreeViewer {
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(w, h);
-      this.updateStateTextures();
+      this.updateState();
     });
     this.resizeObserver.observe(this.container);
   }
@@ -548,7 +834,7 @@ export class ThreeViewer {
     } else {
       this.visibleSystems.delete(systemId);
     }
-    this.updateStateTextures();
+    this.updateState();
   }
 
   public setAllSystemsVisible(visible: boolean) {
@@ -557,7 +843,7 @@ export class ThreeViewer {
     } else {
       this.visibleSystems.clear();
     }
-    this.updateStateTextures();
+    this.updateState();
   }
 
   public selectPart(partId: string | null) {
@@ -565,13 +851,13 @@ export class ThreeViewer {
     if (partId) {
       this.selectedPartIds.add(partId);
     }
-    this.updateStateTextures();
+    this.updateState();
   }
 
   public selectMultipleParts(partIds: string[]) {
     this.selectedPartIds.clear();
     partIds.forEach(id => this.selectedPartIds.add(id));
-    this.updateStateTextures();
+    this.updateState();
   }
 
   public setIsolated(isolate: boolean) {
@@ -580,20 +866,31 @@ export class ThreeViewer {
       this.explodeValue = 0;
       this.frameSelectedStructure();
     }
-    this.updateStateTextures();
+    this.updateState();
   }
 
   public frameSelectedStructure(offsetRatioX: number = 0) {
     if (this.selectedPartIds.size === 0) return;
 
     const unionBox = new THREE.Box3();
-    this.atlas.parts.forEach((part, idx) => {
-      if (this.selectedPartIds.has(part.id)) {
-        const indMesh = this.individualMeshes[idx];
-        const offset = indMesh ? indMesh.position : new THREE.Vector3();
-        unionBox.union(this.partBoundingBoxes[idx].clone().translate(offset));
-      }
-    });
+
+    if (this.activeGender === 'male') {
+      this.atlas.parts.forEach((part, idx) => {
+        if (this.selectedPartIds.has(part.id)) {
+          const indMesh = this.individualMeshes[idx];
+          const offset = indMesh ? indMesh.position : new THREE.Vector3();
+          unionBox.union(this.partBoundingBoxes[idx].clone().translate(offset));
+        }
+      });
+    } else {
+      this.selectedPartIds.forEach(id => {
+        const mesh = this.femaleMeshes.get(id);
+        if (mesh) {
+          const worldBox = new THREE.Box3().setFromObject(mesh);
+          unionBox.union(worldBox);
+        }
+      });
+    }
 
     if (unionBox.isEmpty()) return;
 
@@ -669,7 +966,7 @@ export class ThreeViewer {
     this.camera.position.set(1.4, 1.05, 3.6);
     this.controls.update();
     this.setAllSystemsVisible(true);
-    this.updateStateTextures();
+    this.updateState();
   }
 
   private animate = () => {
@@ -685,7 +982,7 @@ export class ThreeViewer {
         8,
         delta
       );
-      this.updateStateTextures();
+      this.updateState();
     }
 
     // Modal switch: if exploded > 80%, change left click from Orbit to Pan

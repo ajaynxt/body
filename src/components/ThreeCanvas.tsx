@@ -5,6 +5,8 @@ import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ThreeCanvasProps {
   atlas: AtlasData | null;
+  activeGender?: 'male' | 'female';
+  skinOpacity?: number;
   onViewerReady?: (viewer: ThreeViewer) => void;
   onSelectPart: (partId: string) => void;
   explodeValue: number;
@@ -17,6 +19,8 @@ interface ThreeCanvasProps {
 
 export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
   atlas,
+  activeGender = 'male',
+  skinOpacity = 0.2,
   onViewerReady,
   onSelectPart,
   explodeValue,
@@ -53,6 +57,18 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       viewerRef.current = null;
     };
   }, [atlas]);
+
+  // Sync active gender with ThreeViewer
+  useEffect(() => {
+    if (!viewerRef.current) return;
+    viewerRef.current.switchGender(activeGender);
+  }, [activeGender]);
+
+  // Sync skin opacity
+  useEffect(() => {
+    if (!viewerRef.current) return;
+    viewerRef.current.setSkinOpacity(skinOpacity);
+  }, [skinOpacity]);
 
   // Sync state changes with ThreeViewer
   useEffect(() => {
@@ -95,9 +111,16 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
           <div className="loading-card glass-panel">
             <Loader2 size={24} className="spinning-loader text-accent" />
             <div className="loading-text-col">
-              <strong className="loading-heading">3D एनाटॉमी मॉडल तैयार हो रहा है...</strong>
+              <strong className="loading-heading">
+                {activeGender === 'female'
+                  ? 'महिला 3D एनाटॉमी मॉडल (HuBMAP VHF 1.5) तैयार हो रहा है...'
+                  : 'पुरुष 3D एनाटॉमी मॉडल (BodyParts3D) तैयार हो रहा है...'}
+              </strong>
               <span className="loading-sub">
-                {loadingProgress}% · 2,234 शारीरिक अंग लोड हो रहे हैं
+                {loadingProgress}% ·{' '}
+                {activeGender === 'female'
+                  ? '888 शारीरिक संरचनाएं लोड हो रही हैं'
+                  : '2,234 शारीरिक अंग लोड हो रहे हैं'}
               </span>
               <div className="progress-bar-track">
                 <div

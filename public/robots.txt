@@ -1,5 +1,5 @@
 # Robots.txt for सचित्र मानव शरीर विज्ञान (Human Body Study Library & 3D Atlas)
-# Verified Canonical Domain: https://ajaynxt.com/body/
+# Verified URL: https://ajaynxt.github.io/body/
 
 User-agent: *
 Allow: /body/
@@ -7,6 +7,23 @@ Allow: /body/study/
 Disallow: /body/study/books/
 Disallow: /study/books/
 Disallow: /models/*.gz
+
+# AI Crawlers & LLM Indexers
+User-agent: GPTBot
+Allow: /body/
+Allow: /body/llms.txt
+
+User-agent: ClaudeBot
+Allow: /body/
+Allow: /body/llms.txt
+
+User-agent: PerplexityBot
+Allow: /body/
+Allow: /body/llms.txt
+
+User-agent: Google-Extended
+Allow: /body/
+Allow: /body/llms.txt
 
 User-agent: Googlebot
 Allow: /body/
@@ -18,12 +35,6 @@ Allow: /body/
 Allow: /body/study/
 Disallow: /body/study/books/
 
-# Keep private personal study sessions, notes, and local book readers out of public search indexing
-User-agent: Slurp
-Disallow: /body/study/books/
-
-User-agent: DuckDuckBot
-Disallow: /body/study/books/
-
 # Sitemap location
+Sitemap: https://ajaynxt.github.io/body/sitemap.xml
 Sitemap: https://ajaynxt.com/body/sitemap.xml

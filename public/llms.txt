@@ -1,0 +1,38 @@
+# सचित्र मानव शरीर विज्ञान (Interactive 3D Human Anatomy Atlas & Medical Study Library)
+> Free interactive 3D human anatomy textbook, clinical disease guide, Latin scientific terminology, medical memory mnemonics, comprehensive treatments & remedies, and Google Assistant voice audio reader.
+
+## Overview
+- **Project URL**: https://ajaynxt.github.io/body/
+- **Publisher**: AJAY NXT Medical Education
+- **Reference Models**:
+  - Male 3D Model: BodyParts3D 4.0 (DBCLS, University of Tokyo) with 2,234 anatomical structures
+  - Female 3D Model: HuBMAP Visible Human Female 1.5 (CC BY 4.0, DOI: 10.48539/HBM352.BTSQ.586) with 888 segmented organs
+- **Supported Languages**: 24 global & Indian languages (हिन्दी, English, Hinglish, Español, Français, Deutsch, Русский, 中文, 日本語, 한국어, العربية, اردو, বাংলা, తెలుగు, தமிழ், मराठी, ગુજરાતી, ಕನ್ನಡ, മലയാളം, ਪੰਜਾਬੀ, etc.) with RTL support.
+
+## Key Features & Content
+1. **Interactive 3D Human Anatomy**:
+   - Complete Male and Female anatomical models with skin opacity slider (0-100%) and 3D radial explosion slider.
+   - 1-Click "Solo View" (केवल यही अंग देखें): Isolates any clicked organ for 360-degree detailed inspection.
+2. **Scientific Names & Medical Etymology**:
+   - Latin and Greek scientific anatomical names (Cor humanum, Hepar, Pulmo, Ren, Cerebrum, etc.) with native pronunciation guide.
+   - Root word breakdowns explaining medical terms (e.g., Cardio-, Hepato-, Nephro-, Pulmo-, Gastro-).
+3. **Memory Tricks & Mnemonics (याद रखने की धांसू ट्रिक्स)**:
+   - High-yield medical memory hacks for NEET, MBBS, and biology students (e.g., TPMA for heart valves, LAB RAT, F-POT for brain lobes, BEAN-12-6-3 for kidneys).
+4. **Comprehensive Treatments & Remedies (संपूर्ण उपचार व सावधानियां)**:
+   - Detailed medical protocols, standard pharmaceuticals (prescription drugs), home care remedies, emergency red flags, and diagnostic tests for 18+ major conditions including heart attacks, stroke, asthma, muscle pain & cramps (myalgia), fatty liver, diabetes, and kidney stones.
+5. **Google Assistant Voice Audio Reader**:
+   - Web Speech Synthesis integration reading full chapters, organ anatomy, clinical significance, and treatments out loud in natural Hindi and English voices.
+6. **Step-by-Step AI Anatomy Tutor**:
+   - 5-step interactive guided learning module:
+     - Step 1: Anatomy & 3D Structure (शारीरिक परिचय)
+     - Step 2: Physiology & How It Works (कार्यप्रणाली)
+     - Step 3: Pathology & Symptoms (प्रमुख रोग व लक्षण)
+     - Step 4: Medical Treatments & Home Care (संपूर्ण उपचार)
+     - Step 5: Research Pearls & Quick Quiz (रिसर्च व क्विज़)
+
+## Medical Citations & References
+- Gray's Anatomy: The Anatomical Basis of Clinical Practice (42nd Edition)
+- Guyton and Hall Textbook of Medical Physiology (14th Edition)
+- BD Chaurasia's Human Anatomy (Vols 1, 2, 3)
+- Robbins & Cotran Pathologic Basis of Disease (10th Edition)
+- Netter's Atlas of Human Anatomy (7th Edition)

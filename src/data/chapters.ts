@@ -32,6 +32,9 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'kôr hyoo-muh-nuhm',
         system: 'cardiac',
         elements: ['FJ1890', 'FJ1891', 'FJ1892', 'FJ1893', 'FJ1894', 'FJ1895', 'FJ1896', 'FJ1897', 'FJ1898'],
+        
+        rootWordEtymology: "ग्रीक 'Kardia' और लैटिन 'Cor' (हृदय/कोर) से उत्पन्न। इसी से बने शब्द: Cardiology (हृदय विज्ञान), Cardiac arrest, Myocardium, Endocarditis।",
+        memoryTrickHindi: "ट्रिक: \"COR = Core of Life\" — शरीर का केंद्रीय इंजन जो जीवन में 2.5 अरब बार धड़कता है। वाल्व का क्रम: \"TPMA\" (Tricuspid -> Pulmonary -> Mitral -> Aortic)।",
         locationHinglish: 'छाती के बीच में (Mediastinum), स्टर्नम हड्डी के पीछे और दोनों फेफड़ों के बीच, 2/3 हिस्सा बाईं ओर झुका हुआ।',
         functionHinglish: 'पूरे शरीर और मस्तिष्क को चौबीसों घंटे ऑक्सीजन, ग्लूकोज और पोषक तत्वों से भरपूर रक्त पहुंचाना।',
         funFactHinglish: 'औसत मानव जीवनकाल में दिल लगभग 2.5 अरब (2.5 billion) बार धड़कता है — बिना 1 सेकंड भी रुके!',
@@ -69,6 +72,9 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'ven-TRIK-yoo-lus SIN-is-ter',
         system: 'cardiac',
         elements: ['FJ1890', 'FJ1894'],
+        
+        rootWordEtymology: "लैटिन 'Ventriculus' (छोटा पेट/थैली) + 'Sinister' (बायां भाग)। चिकित्सा विज्ञान में Sinister का अर्थ बायां और Dexter का अर्थ दायां होता है।",
+        memoryTrickHindi: "ट्रिक: \"LV = Lion's Vigor\" — यह शेर की तरह सबसे ताकतवर है, 3 गुना मोटी मायोकार्डियल दीवार के साथ पूरे शरीर में 120 mmHg के भारी दबाव से शुद्ध खून पंप करता है।",
         locationHinglish: 'हृदय के निचले बाएं हिस्से में; इसकी पेशीय दीवार (Myocardium) सबसे मोटी (लगभग 12-15 मिमी) होती है।',
         functionHinglish: 'यह दिल का सबसे शक्तिशाली कक्ष है जो शुद्ध खून को 120 mmHg के भारी दबाव के साथ महाधमनी (Aorta) में धकेलता है।',
         funFactHinglish: 'बाएं निलय का दबाव इतना अधिक होता है कि यह रक्त को 30 फीट की ऊंचाई तक उछाल सकता है!',
@@ -86,6 +92,15 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Left-sided heart failure is the most common cause of pulmonary edema; chronic hypertension leads to concentric left ventricular hypertrophy with diminished compliance."
           }
         ],
+        
+        treatmentsHinglish: [
+          "हाई ब्लड प्रेशर का कड़ा नियंत्रण (Target < 130/80 mmHg) ताकि निलय की दीवार न फूले (LVH Reversal)।",
+          "ARNI थेरेपी (Sacubitril + Valsartan) पंपिंग क्षमता (Ejection Fraction) सुधारने हेतु।",
+          "गंभीर मामलों में लेफ्ट वेंट्रिकुलर असिस्ट डिवाइस (LVAD) या हार्ट ट्रांसप्लांटेशन।"
+],
+        medications: ["Sacubitril/Valsartan 50/100mg","Carvedilol 6.25/12.5mg","Spironolactone 25mg"],
+        homeRemedies: ["तरल पदार्थों की मात्रा प्रतिदिन 1.5 - 2 लीटर तक सीमित रखें यदि सूजन हो।","वजन पर कड़ा नियंत्रण और नियमित नींद।","धूम्रपान और अल्कोहल का संपूर्ण त्याग।"],
+        researchHighlights: ["PARADIGM-HF ट्रायल: ARNI थेरेपी ने पारंपरिक इनालाप्रिल की तुलना में कार्डियोवैस्कुलर मृत्यु दर 20% घटाई।"],
         relatedDiseases: ['Left Ventricular Failure', 'Hypertensive Heart Disease'],
       },
       {
@@ -96,6 +111,9 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'VAL-vee KOR-dis',
         system: 'cardiac',
         elements: ['FJ1892', 'FJ1893', 'FJ1895'],
+        
+        rootWordEtymology: "लैटिन 'Valva' (तह होने वाले दरवाजे के पल्ले)। एकतरफा कपाट जो रक्त को केवल आगे बहने देते हैं और पीछे लौटने (Backflow) से रोकते हैं।",
+        memoryTrickHindi: "ट्रिक: \"LAB RAT\" — Left Atrium = Bicuspid (Mitral), Right Atrium = Tricuspid। लव (LUB - S1) = AV वाल्व बंद, डब (DUB - S2) = सेमिलूनर वाल्व बंद होने की ध्वनि है।",
         locationHinglish: 'आलिंद और निलय के बीच और महाधमनी के मुहाने पर लगे एकतरफा कपाट (One-way doors)।',
         functionHinglish: 'रक्त को केवल एक ही दिशा में आगे बहने देना और पीछे लौटने (Backflow) से पूरी तरह रोकना।',
         funFactHinglish: 'स्टेथोस्कोप से सुनाई देने वाली "लब-डब" (Lub-Dub) आवाज वास्तव में दिल की मांसपेशियों की नहीं, बल्कि इन वाल्वों के बंद होने की ध्वनि है!',
@@ -113,6 +131,15 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Aortic valve contains three semilunar cusps (right, left, posterior/non-coronary). The ostia of right and left coronary arteries arise from aortic sinuses of Valsalva."
           }
         ],
+        
+        treatmentsHinglish: [
+          "माइट्रल/एओर्टिक वाल्व स्टेनोसिस में ट्रांसकैथेटर एओर्टिक वाल्व रिप्लेसमेंट (TAVR) बिना ओपन-हार्ट सर्जरी।",
+          "गंभीर वाल्व लीकेज में वाल्व रिपेयर या मैकेनिकल/बायोप्रोस्थेटिक वाल्व रिप्लेसमेंट।",
+          "रूमेटिक वाल्व रोग में पेनिसिलिन प्रोफिलेक्सिस।"
+],
+        medications: ["Warfarin / Acenocoumarol (Blood Thinner for mechanical valves)","Furosemide 40mg (Diuretic)","Digoxin (if Atrial Fibrillation)"],
+        homeRemedies: ["दांतों की सफाई का विशेष ध्यान रखें ताकि एंडोकार्डाइटिस (Infective Endocarditis) का संक्रमण न फैले।","अत्यधिक भारी वजन उठाने वाले व्यायाम से बचें।","बीपी और धड़कन को नियंत्रित रखें।"],
+        researchHighlights: ["PARTNER 3 ट्रायल: TAVR प्रक्रिया लो-रिस्क रोगियों में भी पारंपरिक ओपन सर्जरी जितनी सुरक्षित और प्रभावी सिद्ध हुई है।"],
         relatedDiseases: ['Rheumatic Heart Disease', 'Aortic Stenosis', 'Mitral Valve Prolapse'],
       },
     ],
@@ -123,18 +150,19 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     id: 'chapter-skeletal',
     chapterNumber: 2,
     systemId: 'skeletal',
-    title: 'The Skeletal System & Framework',
-    hindiTitle: 'अध्याय 2: कंकाल तंत्र (मानव अस्थि ढांचा)',
-    subtitle: '206 हड्डियां, संधियां और सुरक्षा कवच — शरीर का आधारभूत ढांचा',
+    title: 'The Skeletal & Muscular Framework (Locomotor System)',
+    hindiTitle: 'अध्याय 2: कंकाल एवं मांसपेशी तंत्र (लोकोमोटर सिस्टम)',
+    subtitle: '206 हड्डियां, 600+ मांसपेशियां, संधियां और गतिशीलता — शरीर का मजबूत ढांचा',
     recommendedBooks: [
-      "Gray's Anatomy 42nd Ed (Sec. 2: Skeletal System)",
-      "BD Chaurasia's Human Anatomy Vol 1 & 2 (General Anatomy & Osteology)",
+      "Gray's Anatomy 42nd Ed (Sec. 2: Skeletal & Muscular System)",
+      "BD Chaurasia's Human Anatomy Vol 1 & 2 (General Anatomy, Osteology & Myology)",
+      "Guyton & Hall Textbook of Medical Physiology (Unit II: Nerve and Muscle)",
       "Netter's Atlas of Human Anatomy (Section 1: General Anatomy)",
       "Snell's Clinical Anatomy by Regions"
     ],
-    introductionHinglish: 'मानव कंकाल शरीर का मुख्य आंतरिक ढांचा (Endoskeleton) है। जन्म के समय एक शिशु में लगभग 300 हड्डियां होती हैं, जो बड़े होने पर आपस में जुड़कर 206 रह जाती हैं। कंकाल शरीर को सीधा खड़ा रखता है, नाजुक अंगों (जैसे दिमाग, दिल, फेफड़े) की रक्षा करता है, और मांसपेशियों को गति के लिए लीवर प्रदान करता है।',
-    howItWorksHinglish: 'हड्डियां केवल मृत कैल्शियम का खंभा नहीं हैं, बल्कि सजीव ऊतक (Living tissue) हैं। इनमें लगातार पुरानी हड्डी टूटती है (Osteoclasts) और नई हड्डी बनती है (Osteoblasts)। लंबी हड्डियों के अंदर स्थित लाल अस्थिमज्जा (Red Bone Marrow) में हर सेकंड 20 लाख नई लाल रक्त कोशिकाएं (RBCs) बनती हैं।',
-    commonDiseases: CLINICAL_DISEASES.filter(d => d.system === 'skeletal'),
+    introductionHinglish: 'मानव लोकोमोटर तंत्र शरीर का मुख्य आंतरिक ढांचा और गति इंजन है। 206 हड्डियां और 600 से अधिक कंकाल मांसपेशियां (Skeletal Muscles) आपस में टेंडन और जोड़ों द्वारा जुड़कर हमें चलने, दौड़ने और वजन उठाने में सक्षम बनाती हैं। कंकाल शरीर को सीधा खड़ा रखता है, जबकि मांसपेशियां संकुचित होकर गति उत्पन्न करती हैं।',
+    howItWorksHinglish: 'मस्तिष्क से मोटर न्यूरॉन्स द्वारा Acetylcholine रिलीज होता है, जिससे मसल फाइबर में कैल्शियम आयन छूटते हैं और Actin व Myosin फिलामेंट्स आपस में फिसलते हैं (Sliding Filament Theory)। मांसपेशियों में अधिक कार्य करने या पानी/नमक की कमी से लैक्टिक एसिड जमा होता है जिससे दर्द (Muscle Pain/Soreness) और ऐंठन (Cramps) होती है।',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.system === 'skeletal' || d.system === 'muscular'),
     parts: [
       {
         id: 'cranium-skull',
@@ -170,6 +198,9 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'FEE-mer',
         system: 'skeletal',
         elements: ['FJ1500', 'FJ1501', 'FJ1502'],
+        
+        rootWordEtymology: "लैटिन 'Femur' (जांघ)।",
+        memoryTrickHindi: "ट्रिक: \"FEMUR = 1/4th of Human Height\" — शरीर की सबसे लंबी (औसत 45 cm), सबसे भारी और कंक्रीट से 4 गुना मजबूत वजन उठाने वाली मुख्य हड्डी।",
         locationHinglish: 'कूल्हे के जोड़ (Pelvis) से लेकर घुटने के जोड़ तक फैली जांघ की हड्डी।',
         functionHinglish: 'शरीर का सारा भार संभालना और चलने, दौड़ने और कूदने के लिए सबसे शक्तिशाली उत्तोलक (Lever) का काम करना।',
         funFactHinglish: 'फीमर मानव शरीर की सबसे लंबी, सबसे भारी और सबसे मजबूत हड्डी है। यह कंक्रीट से भी अधिक दबाव सह सकती है!',
@@ -186,6 +217,15 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "The retinacular vessels arising from the trochanteric anastomosis (primarily the medial circumflex femoral artery) supply the femoral head; subcapital fractures sever these, risking avascular necrosis."
           }
         ],
+        
+        treatmentsHinglish: [
+          "फीमर फ्रैक्चर में इंट्रामेडुलरी नेलिंग (IM Nailing) या प्लेट ऑस्टियोसिंथेसिस।",
+          "नेक फीमर फ्रैक्चर (बुजुर्गों में) में हेमी या टोटल हिप आर्थ्रोप्लास्टी।",
+          "ऑस्टियोपोरोसिस फ्रैक्चर से बचाव हेतु बिसफॉस्फोनेट्स।"
+],
+        medications: ["Zoledronic Acid 5mg IV वार्षिक","Calcium 1000mg + Vitamin D3 60,000 IU","Teriparatide"],
+        homeRemedies: ["बाथरूम में एंटी-स्लिप मैट लगाएं ताकि बुजुर्गों के फिसलने से बचा जा सके।","तिल, रागी, दूध और हरी सब्जियों का प्रचुर सेवन हड्डियों की मजबूती के लिए।","रोजाना सुबह की गुनगुनी धूप में 20 मिनट बैठें।"],
+        researchHighlights: ["बायो-एक्टिव सिरेमिक्स और ऑस्टियोइंडक्टिव बोन ग्राफ्ट्स: फीमर के जटिल फ्रैक्चर को तेजी से जोड़ने में क्रांतिकारी परिणाम दे रहे हैं।"],
         relatedDiseases: ['Femoral Neck Fracture', 'Osteoporosis'],
       },
       {
@@ -214,6 +254,70 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           }
         ],
         relatedDiseases: ['Slip Disc / Sciatica', 'Spondylosis', 'Scoliosis'],
+      },
+      {
+        id: 'skeletal-muscles',
+        name: 'Major Skeletal Muscles (Musculi Sceleti)',
+        hindiName: 'कंकाल मांसपेशियां (मांसपेशी तंत्र एवं दर्द निवारण)',
+        latinName: 'Musculi sceleti / Systema musculare',
+        pronunciation: 'MOOS-koo-lee skeh-LEH-tee',
+        system: 'muscular',
+        elements: ['FJ1400', 'FJ1401', 'FJ1402', 'FJ1403', 'FJ1404'],
+        rootWordEtymology: "लैटिन शब्द 'Musculus' (अर्थात 'छोटा चूहा') — प्राचीन काल में वैज्ञानिकों को बाइसेप्स का संकुचन त्वचा के नीचे चूहे के भागने जैसा लगा था!",
+        memoryTrickHindi: "मांसपेशियों के दर्द की गोल्डन ट्रिक: \"R.I.C.E. = Rest, Ice, Compression, Elevation\" (पहले 48 घंटे बर्फ, 48 घंटे बाद गर्म सिकाई)। ऐंठन (Cramp) की ट्रिक: \"C-R-A-M-P = Calcium, Rehydration, Alkaline water, Magnesium, Potassium\"!",
+        locationHinglish: 'शरीर की सभी हड्डियों पर टेंडन (Tendon) द्वारा जुड़ी हुई ऐच्छिक मांसपेशियां (जैसे बाइसेप्स, ट्राइसेप्स, डेल्टॉइड, ट्रेपेजियस, क्वाड्रिसेप्स और हैमस्ट्रिंग्स)।',
+        functionHinglish: 'शरीर को गतिशीलता देना, जोड़ों को स्थिरता प्रदान करना, सही पोस्चर बनाए रखना और कंपकंपी (Shivering) द्वारा शरीर का तापमान बनाए रखना।',
+        funFactHinglish: 'मानव शरीर में 600 से अधिक मांसपेशियां होती हैं। शरीर की सबसे मजबूत मांसपेशी चबाने वाली मैसेटर (Masseter / Jaw) है और सबसे सक्रिय आंख की मांसपेशियां हैं!',
+        clinicalNoteHinglish: 'भारी व्यायाम या पानी-नमक की कमी से मांसपेशियों में लैक्टिक एसिड जमा होता है जिसे DOMS (Delayed Onset Muscle Soreness) कहते हैं। R.I.C.E और हाइड्रेशन से यह 48-72 घंटे में ठीक हो जाता है।',
+        highYieldMnemonic: 'R.I.C.E Protocol: Rest (आराम), Ice (बर्फ 15-20 मिनट), Compression (हल्की गर्म पट्टी), Elevation (अंग को दिल के स्तर से ऊपर उठाना)।',
+        examPearls: [
+          'शरीर की सबसे लंबी मांसपेशी: Sartorius (दर्जी मांसपेशी - जांघ में)।',
+          'शरीर की सबसे बड़ी मांसपेशी: Gluteus Maximus (कूल्हे की मांसपेशी)।',
+          'मांसपेशी संकुचन की इकाई: Sarcomere (Actin + Myosin filaments)।',
+          'क्रिएटिन काइनेज (CPK / CK-MM): मांसपेशी डैमेज होने पर खून में इसका स्तर अत्यधिक बढ़ जाता है।'
+        ],
+        citations: [
+          {
+            book: "Guyton & Hall Textbook of Medical Physiology (14th Ed)",
+            citation: "Unit II: Membrane Physiology, Nerve, and Muscle, Chapters 6–8, pp. 75–104",
+            highYieldFact: "Muscle contraction proceeds via the sliding filament mechanism initiated by acetylcholine release at the motor end plate, triggering sarcoplasmic calcium influx binding to Troponin C."
+          },
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 1",
+            citation: "Section 1: Upper Limb, Chapter 2 (Pectoral Region & Arm), pp. 45–68",
+            highYieldFact: "Rotator cuff muscles (SITS: Supraspinatus, Infraspinatus, Teres minor, Subscapularis) dynamically stabilize the glenohumeral joint; supraspinatus tendonitis is the most common cause of painful arc syndrome."
+          }
+        ],
+        treatmentsHinglish: [
+          "प्राथमिक चिकित्सा (पहले 48 घंटे): R.I.C.E प्रोटोकॉल (आराम, बर्फ की सिकाई, हल्की संपीड़न पट्टी, अंग को ऊपर उठाना)।",
+          "48 घंटे बाद: गुनगुने पानी में सेंधा नमक (Epsom Salt - मैग्नीशियम सल्फेट) डालकर 15-20 मिनट सिकाई करें।",
+          "दर्द व सूजन निवारक: पैरासिटामोल 650mg या आइबूप्रोफेन 400mg (भोजन के उपरांत चिकित्सक के परामर्श पर)।",
+          "मांसपेशी शिथिलक (Muscle Relaxant): थियोकोलचिकोसाइड (Thiocolchicoside 4/8mg) या क्लोरजॉक्साजोन जब गंभीर ऐंठन या जकड़न हो।",
+          "लोकल दर्द निवारक: डाइक्लोफेनेक + मेंथॉल जेल (Diclofenac Gel) से हल्के हाथ से मालिश करें (जोर से न रगड़ें)।",
+          "फिजियोथेरेपी: IFT (इंटरफेरेनशियल थेरेपी), अल्ट्रासाउंड मसाज और जेंटल स्ट्रेचिंग एक्सरसाइज।"
+        ],
+        medications: [
+          "Paracetamol 650 mg (हल्के-मध्यम दर्द हेतु)",
+          "Ibuprofen 400 mg (सूजन व दर्द कम करने हेतु)",
+          "Thiocolchicoside 4mg / 8mg (मसल रिलैक्सेंट)",
+          "Diclofenac Sodium 1.16% w/w Gel (टॉपिकल पेन जेल)",
+          "Magnesium Glycinate 250mg + Vitamin D3 60k IU (क्रोनिक ऐंठन व कमजोरी हेतु)"
+        ],
+        homeRemedies: [
+          "सेंधा नमक (Epsom Salt) बाथ: गुनगुने पानी में 2 चम्मच एप्सम सॉल्ट डालकर सिकाई करें, मैग्नीशियम त्वचा से अवशोषित होकर मांसपेशियों को तुरंत राहत देता है।",
+          "हल्दी-अदरक का काढ़ा या गुनगुना दूध: कर्क्यूमिन (Curcumin) प्राकृतिक एंटी-इंफ्लेमेटरी एजेंट है जो सूजन घटाता है।",
+          "भरपूर हाइड्रेशन: दिन में 3 से 3.5 लीटर पानी, नारियल पानी (इलेक्ट्रोलाइट्स) और नींबू पानी पिएं।",
+          "केला व मुनक्का/खजूर का सेवन: मांसपेशियों में पोटैशियम और कैल्शियम की भरपाई करता है जिससे बार-बार नस चढ़ना या ऐंठन रुकती है।"
+        ],
+        researchHighlights: [
+          "🚨 डॉक्टर को तुरंत कब दिखाएं (Danger Red Flags): 1) दर्द 3 से 5 दिनों से अधिक समय तक लगातार बना रहे या बढ़ता जाए; 2) प्रभावित अंग में अत्यधिक सूजन, लालिमा या छूने पर जलन हो; 3) पेशाब का रंग गहरा भूरा, कोला या चाय जैसा हो (Rhabdomyolysis — किडनी फेलियर का बड़ा जोखिम); 4) हाथ-पैर में सुन्नपन (Numbness) हो या अंग बिल्कुल न हिला सकें; 5) सीने, बाएं कंधे या जबड़े में खिंचाव के साथ पसीना आए (हार्ट अटैक का संकेत)।"
+        ],
+        relatedDiseases: [
+          'Muscle Pain, Strain & Cramps (Myalgia)',
+          'Fibromyalgia',
+          'Rotator Cuff Tendonitis',
+          'Rhabdomyolysis'
+        ],
       },
     ],
   },
@@ -447,6 +551,9 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'PAN-kree-us',
         system: 'digestive',
         elements: ['FJ2650'],
+        
+        rootWordEtymology: "ग्रीक 'Pan' (पूरा) + 'Kreas' (मांस) = All flesh। क्योंकि इसमें कोई हड्डी नहीं, यह शुद्ध एंजाइम व हार्मोन बनाने वाला ग्रंथि ऊतक है।",
+        memoryTrickHindi: "ट्रिक: \"Dual Dynamo\" — 99% पाचक रस (ट्रिप्सिन, एमाइलेज, लाइपेज) + 1% इंसुलिन और ग्लूकागन हार्मोन जो ब्लड शुगर को 80-120 mg/dL पर स्थिर रखते हैं।",
         locationHinglish: 'पेट के पीछे, रीढ़ की हड्डी के ठीक आगे स्थित चपटी पत्ती जैसी ग्रंथि।',
         functionHinglish: 'दोहरा कार्य: 1. पाचन एंजाइम बनाना जो छोटी आंत में भोजन पचाते हैं। 2. इंसुलिन हार्मोन बनाना जो रक्त में शुगर को नियंत्रित करता है।',
         funFactHinglish: 'पैंक्रियाज के बिना हम मीठे का एक दाना भी नहीं पचा सकते! इसके आइलेट्स ऑफ लैंगरहेंस (Islets of Langerhans) सीधे खून में इंसुलिन छोड़ते हैं।',
@@ -463,6 +570,15 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Carcinoma of the head of pancreas compresses the common bile duct, presenting classically as painless progressive jaundice with a palpable enlarged gallbladder (Courvoisier's law)."
           }
         ],
+        
+        treatmentsHinglish: [
+          "एक्यूट पैन्क्रियाटाइटिस में अस्पताल में आक्रामक IV फ्लूइड्स, दर्द नियंत्रण और आंतों को आराम (Bowel Rest)।",
+          "क्रॉनिक पैन्क्रियाटाइटिस में एंजाइम रिप्लेसमेंट थेरेपी (CREON Capsules खाने के साथ)।",
+          "टाइप 1 डायबिटीज में इंसुलिन रिप्लेसमेंट और टाइप 2 में ओरल हाइपोग्लाइसेमिक दवाएं।"
+],
+        medications: ["Pancreatin Capsules (Creon 10000/25000)","Metformin 500/1000mg","Insulin Glargine / Lispro"],
+        homeRemedies: ["शराब और सिगरेट पूरी तरह बंद करें (पैन्क्रियाटाइटिस का सबसे बड़ा कारण)।","कम वसा (Low Fat) वाला भोजन करें और एक बार में भारी भोजन न लें।","दिनभर में 5-6 छोटे सुपाच्य भोजन लें।"],
+        researchHighlights: ["आर्टिफिशियल पैन्क्रियास (क्लोज्ड-लूप इंसुलिन पंप): सीजीएम सेंसर और स्वचालित इंसुलिन डिलीवरी द्वारा ग्लूकोज नियंत्रण में क्रांतिकारी सफलता।"],
         relatedDiseases: ['Diabetes Mellitus', 'Pancreatitis', 'Pancreatic Cancer'],
       },
     ],

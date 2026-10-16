@@ -116,9 +116,11 @@ export const App: React.FC = () => {
 
   // Fetch atlas.json (Male reference metadata)
   useEffect(() => {
-    fetch('/models/atlas.json')
+    const base = import.meta.env.BASE_URL || './';
+    const atlasUrl = `${base.replace(/\/$/, '')}/models/atlas.json`;
+    fetch(atlasUrl)
       .then(res => {
-        if (!res.ok) throw new Error('Atlas manifest not found.');
+        if (!res.ok) throw new Error(`Atlas manifest not found at ${atlasUrl}`);
         return res.json();
       })
       .then((data: AtlasData) => {

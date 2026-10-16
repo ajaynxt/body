@@ -356,7 +356,13 @@ export class ThreeViewer {
 
     const loadSingleChunk = async (chunkIndex: number) => {
       const chunk = chunks[chunkIndex];
-      const url = chunk.gzip.startsWith('./') ? chunk.gzip.replace('./', '/') : chunk.gzip;
+      const base = import.meta.env.BASE_URL || './';
+      const cleanGzip = chunk.gzip.startsWith('./')
+        ? chunk.gzip.slice(2)
+        : chunk.gzip.startsWith('/')
+        ? chunk.gzip.slice(1)
+        : chunk.gzip;
+      const url = `${base.replace(/\/$/, '')}/${cleanGzip}`;
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`Chunk ${chunkIndex} could not be loaded (${resp.status})`);
 
@@ -457,9 +463,11 @@ export class ThreeViewer {
       const loader = new GLTFLoader();
       loader.setMeshoptDecoder(MeshoptDecoder);
 
+      const base = import.meta.env.BASE_URL || './';
+      const femaleUrl = `${base.replace(/\/$/, '')}/models/female-atlas.glb`;
       const gltf = await new Promise<any>((resolve, reject) => {
         loader.load(
-          '/models/female-atlas.glb',
+          femaleUrl,
           resolve,
           xhr => {
             if (xhr.lengthComputable) {

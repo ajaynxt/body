@@ -1,15 +1,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { AtlasData } from '../types/atlas';
 import { ANATOMICAL_SYSTEMS } from '../data/systems';
 import { decompressGzip } from '../utils/decompression';
 import { calculateKnollingLayout } from '../utils/knolling';
 import type { KnollingLayout } from '../utils/knolling';
 import { FEMALE_MESH_CATALOG, type FemaleAnatomyPart } from '../data/femaleMeshCatalog';
-import { fetchWithCache } from '../utils/cacheStorage';
+import { fetchWithCache, fetchJsonWithCache } from '../utils/cacheStorage';
 
 export interface ViewerOptions {
   container: HTMLDivElement;
@@ -21,7 +19,9 @@ export interface ViewerOptions {
 
 const SYSTEM_COLORS: Record<string, number> = {
   skeletal: 0xf4e8d0,
+  borrowed: 0xf4e8d0, // Fitted skull, ribs, pelvis, arms, hands, feet bones
   muscular: 0xc85a53,
+  'donor-muscle': 0xc85a53, // Female leg & lower extremity muscles
   cardiac: 0xd32f2f,
   arterial: 0xe53935,
   venous: 0x1e88e5,
@@ -30,11 +30,14 @@ const SYSTEM_COLORS: Record<string, number> = {
   digestive: 0xffb74d,
   urinary: 0x81c784,
   reproductive: 0xec407a,
+  pregnancy: 0xf06292,
   nervous: 0xfff176,
+  brain: 0xce93d8, // Distinct Lilac for cerebral hemispheres & cerebellum
   endocrine: 0xba68c8,
   lymphatic: 0xaed581,
-  integumentary: 0xe0ac69,
+  integumentary: 0xdeb887,
   sensory: 0x4dd0e1,
+  connective: 0xd7ccc8,
 };
 
 export class ThreeViewer {
@@ -69,17 +72,23 @@ export class ThreeViewer {
   private partBoundingBoxes: THREE.Box3[] = [];
   private knolledCentroids: THREE.Vector3[] = [];
 
-  // Female Geometry & meshes (HuBMAP VHF 1.5)
+  // Female Geometry & GPU DataTextures (Complete HuBMAP Female Reference Atlas + Fitted Skeleton & VHF Muscles)
+  private femaleAtlas: AtlasData | null = null;
   private femaleLoaded = false;
   private femaleLoading = false;
-  private femaleMeshes = new Map<string, THREE.Mesh>();
-  private femalePartBounds = new Map<string, THREE.Box3>();
-  private femalePartCentroids = new Map<string, THREE.Vector3>();
-  private femaleMeshOriginalPositions = new Map<string, THREE.Vector3>();
-  private femaleMeshOriginalMaterials = new Map<string, THREE.Material>();
+  private femaleStateWidth = 2048;
+  private femalePartStateArray!: Float32Array;
+  private femalePartStateTexture!: THREE.DataTexture;
+  private femaleSelectionArray!: Uint8Array;
+  private femaleSelectionTexture!: THREE.DataTexture;
+  private femaleSystemMaterials = new Map<string, THREE.MeshStandardMaterial>();
+  private femaleSystemMeshes = new Map<string, THREE.Mesh>();
+  private femaleIndividualMeshes: THREE.Mesh[] = [];
+  private femalePartCentroids: THREE.Vector3[] = [];
+  private femalePartBoundingBoxes: THREE.Box3[] = [];
   private femaleCatalogMap = new Map<string, FemaleAnatomyPart>();
   private femaleSkinMesh: THREE.Mesh | null = null;
-  private skinOpacity = 0.2;
+  private skinOpacity = 0.35;
 
   // Stage objects
   private floorStage!: THREE.Group;
@@ -451,86 +460,229 @@ export class ThreeViewer {
     }
   }
 
-  // --- FEMALE 3D MODEL LOADING (HuBMAP VHF 1.5) ---
+  // --- FEMALE 3D MODEL LOADING (Complete Standalone HuBMAP Female Reference Atlas) ---
 
   private async loadFemaleModel(): Promise<void> {
     if (this.femaleLoaded || this.femaleLoading) return;
     this.femaleLoading = true;
-    this.onProgress(10);
+    this.onProgress(5);
 
     try {
-      const loader = new GLTFLoader();
-      loader.setMeshoptDecoder(MeshoptDecoder);
-
       const base = import.meta.env.BASE_URL || './';
-      const femaleUrl = `${base.replace(/\/$/, '')}/models/female-atlas.glb`;
-      const buffer = await fetchWithCache(femaleUrl);
-      const gltf = await new Promise<any>((resolve, reject) => {
-        loader.parse(buffer, femaleUrl, resolve, reject);
+      const femaleAtlasUrl = `${base.replace(/\/$/, '')}/models/atlas-female.json`;
+      const femaleData = await fetchJsonWithCache<AtlasData>(femaleAtlasUrl);
+      this.femaleAtlas = femaleData;
+
+      // 1. Initialize GPU DataTextures for female model
+      this.femaleStateWidth = THREE.MathUtils.ceilPowerOfTwo(femaleData.parts.length);
+      this.femalePartStateArray = new Float32Array(this.femaleStateWidth * 4);
+      this.femalePartStateTexture = new THREE.DataTexture(
+        this.femalePartStateArray,
+        this.femaleStateWidth,
+        1,
+        THREE.RGBAFormat,
+        THREE.FloatType
+      );
+      this.femalePartStateTexture.needsUpdate = true;
+
+      this.femaleSelectionArray = new Uint8Array(this.femaleStateWidth * 4);
+      this.femaleSelectionTexture = new THREE.DataTexture(
+        this.femaleSelectionArray,
+        this.femaleStateWidth,
+        1,
+        THREE.RGBAFormat,
+        THREE.UnsignedByteType
+      );
+      this.femaleSelectionTexture.needsUpdate = true;
+
+      // 2. Initialize Female System Materials & Shaders
+      const uniqueSystems = new Set(femaleData.parts.map(p => p.system));
+      uniqueSystems.forEach(sysId => {
+        const isSkin = sysId === 'integumentary';
+        const colorHex = SYSTEM_COLORS[sysId] || 0xe2e8f0;
+        const mat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(colorHex),
+          metalness: 0.08,
+          roughness: 0.53,
+          side: THREE.DoubleSide,
+          transparent: isSkin,
+          opacity: isSkin ? this.skinOpacity : 1.0,
+          depthWrite: !isSkin,
+        });
+
+        mat.onBeforeCompile = shader => {
+          shader.uniforms.partState = { value: this.femalePartStateTexture };
+          shader.uniforms.selectionState = { value: this.femaleSelectionTexture };
+          shader.uniforms.stateWidth = { value: this.femaleStateWidth };
+
+          shader.vertexShader = `
+            attribute float partIndex;
+            uniform sampler2D partState;
+            uniform sampler2D selectionState;
+            uniform float stateWidth;
+            varying float partVisible;
+            varying float partSelected;
+            ${shader.vertexShader}
+          `;
+
+          shader.vertexShader = shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            `#include <begin_vertex>
+            vec2 stateUv = vec2((partIndex + 0.5) / stateWidth, 0.5);
+            vec4 state = texture2D(partState, stateUv);
+            transformed += state.xyz;
+            partVisible = state.w;
+            partSelected = texture2D(selectionState, stateUv).r;
+            `
+          );
+
+          shader.fragmentShader = `
+            varying float partVisible;
+            varying float partSelected;
+            ${shader.fragmentShader}
+          `;
+
+          shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <clipping_planes_fragment>',
+            `#include <clipping_planes_fragment>
+            if (partVisible < 0.5) discard;
+            `
+          );
+
+          shader.fragmentShader = shader.fragmentShader.replace(
+            '#include <color_fragment>',
+            `#include <color_fragment>
+            diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.85, 0.78), partSelected * 0.75);
+            `
+          );
+        };
+
+        this.femaleSystemMaterials.set(sysId, mat);
       });
 
-      const scene = gltf.scene as THREE.Group;
+      // 3. Download & decompress 15 binary chunks in parallel
+      const chunks = femaleData.chunks;
+      let completedChunks = 0;
+      const systemGeometries = new Map<string, THREE.BufferGeometry[]>();
+      let skinGeometry: THREE.BufferGeometry | null = null;
 
-      // Position female model so feet rest at y=0.0 on pedestal (bounding box min was -0.795)
-      scene.position.y = 0.795;
-      scene.updateMatrixWorld(true);
+      const loadSingleFemaleChunk = async (chunkIndex: number) => {
+        const chunk = chunks[chunkIndex];
+        const cleanGzip = chunk.gzip.startsWith('./')
+          ? chunk.gzip.slice(2)
+          : chunk.gzip.startsWith('/')
+          ? chunk.gzip.slice(1)
+          : chunk.gzip;
+        const url = `${base.replace(/\/$/, '')}/${cleanGzip}`;
+        const rawBuffer = await fetchWithCache(url);
+        const decompressedBuffer = await decompressGzip(rawBuffer, chunk.bytes);
 
-      this.femaleRoot.add(scene);
+        femaleData.parts.forEach((part, partIdx) => {
+          if (part.chunk !== chunkIndex) return;
 
-      // Traverse all meshes and organize by system and metadata
-      scene.traverse(obj => {
-        if ((obj as THREE.Mesh).isMesh) {
-          const mesh = obj as THREE.Mesh;
-          mesh.castShadow = false;
-          mesh.receiveShadow = false;
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute(
+            'position',
+            new THREE.BufferAttribute(
+              new Float32Array(decompressedBuffer, part.positions, part.vertexCount * 3),
+              3
+            )
+          );
+          geo.setAttribute(
+            'normal',
+            new THREE.BufferAttribute(
+              new Int16Array(decompressedBuffer, part.normals, part.vertexCount * 3),
+              3,
+              true
+            )
+          );
+          geo.setIndex(
+            new THREE.BufferAttribute(
+              new Uint32Array(decompressedBuffer, part.indices, part.indexCount),
+              1
+            )
+          );
+          geo.setAttribute(
+            'partIndex',
+            new THREE.BufferAttribute(new Float32Array(part.vertexCount).fill(partIdx), 1)
+          );
 
-          const partId = mesh.name;
-          this.femaleMeshes.set(partId, mesh);
+          const mesh = new THREE.Mesh(geo);
+          mesh.matrixAutoUpdate = false;
+          this.femaleIndividualMeshes[partIdx] = mesh;
 
-          // Compute world bounding box & centroid
-          const worldBox = new THREE.Box3().setFromObject(mesh);
-          this.femalePartBounds.set(partId, worldBox);
-          this.femalePartCentroids.set(partId, worldBox.getCenter(new THREE.Vector3()));
-          this.femaleMeshOriginalPositions.set(partId, mesh.position.clone());
+          // Centroid & Bounding Box
+          const min = new THREE.Vector3(...part.bounds[0]);
+          const max = new THREE.Vector3(...part.bounds[1]);
+          this.femalePartBoundingBoxes[partIdx] = new THREE.Box3(min, max);
+          this.femalePartCentroids[partIdx] = min.clone().add(max).multiplyScalar(0.5);
 
-          const catalogItem = this.femaleCatalogMap.get(partId);
-          const sysId = catalogItem ? catalogItem.system : 'other';
-
-          // Assign medical system color
-          if (partId === 'VH_F_skin') {
-            const skinMat = new THREE.MeshStandardMaterial({
-              color: 0xdeb887,
-              roughness: 0.65,
-              metalness: 0.08,
-              transparent: true,
-              opacity: this.skinOpacity,
-              depthWrite: false,
-              side: THREE.DoubleSide,
-            });
-            mesh.material = skinMat;
-            this.femaleSkinMesh = mesh;
-            this.femaleMeshOriginalMaterials.set(partId, skinMat);
+          if (part.id === 'HRAF0003') {
+            skinGeometry = geo;
           } else {
-            const colorHex = SYSTEM_COLORS[sysId] || 0xe2e8f0;
-            const mat = new THREE.MeshStandardMaterial({
-              color: new THREE.Color(colorHex),
-              roughness: 0.52,
-              metalness: 0.08,
-              side: THREE.DoubleSide,
-            });
-            mesh.material = mat;
-            this.femaleMeshOriginalMaterials.set(partId, mat);
+            const list = systemGeometries.get(part.system) || [];
+            list.push(geo);
+            systemGeometries.set(part.system, list);
           }
+        });
+
+        completedChunks++;
+        if (this.activeGender === 'female') {
+          this.onProgress(Math.round((completedChunks / chunks.length) * 100));
         }
+      };
+
+      let currentIndex = 0;
+      await Promise.all(
+        Array.from({ length: 6 }, async () => {
+          while (currentIndex < chunks.length) {
+            const idx = currentIndex++;
+            await loadSingleFemaleChunk(idx);
+          }
+        })
+      );
+
+      // 4. Merge geometries per system into single draw calls
+      systemGeometries.forEach((geos, sysId) => {
+        if (geos.length === 0) return;
+        const merged = BufferGeometryUtils.mergeGeometries(geos, false);
+        if (!merged) return;
+
+        const mat = this.femaleSystemMaterials.get(sysId);
+        const mesh = new THREE.Mesh(merged, mat);
+        mesh.frustumCulled = false;
+        this.femaleRoot.add(mesh);
+        this.femaleSystemMeshes.set(sysId, mesh);
       });
+
+      // 5. Dedicated translucent Skin mesh for female body contour
+      if (skinGeometry) {
+        const skinMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(0xdeb887),
+          roughness: 0.65,
+          metalness: 0.08,
+          transparent: true,
+          opacity: this.skinOpacity,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        });
+        const skinMesh = new THREE.Mesh(skinGeometry, skinMat);
+        skinMesh.name = 'HRAF0003';
+        skinMesh.frustumCulled = false;
+        skinMesh.visible = this.skinOpacity > 0.02;
+        this.femaleRoot.add(skinMesh);
+        this.femaleSkinMesh = skinMesh;
+      }
 
       this.femaleLoaded = true;
       this.femaleLoading = false;
       this.updateFemaleState();
-      this.onProgress(100);
+      if (this.activeGender === 'female') {
+        this.onProgress(100);
+      }
     } catch (err) {
       this.femaleLoading = false;
-      this.onError('महिला 3D मॉडल (HuBMAP VHF 1.5) लोड करने में त्रुटि: ' + (err as Error).message);
+      this.onError('महिला 3D मॉडल लोड करने में त्रुटि: ' + (err as Error).message);
     }
   }
 
@@ -539,18 +691,17 @@ export class ThreeViewer {
     this.activeGender = gender;
 
     if (gender === 'female') {
-      this.maleRoot.visible = true; // Complete full-body human skeleton & anatomy
-      this.femaleRoot.visible = true; // Female-specific reproductive organs, breasts & contour
+      this.maleRoot.visible = false; // Male completely hidden! Standalone female
+      this.femaleRoot.visible = true; // Complete female body
       if (!this.femaleLoaded) {
         await this.loadFemaleModel();
       } else {
         this.updateFemaleState();
       }
-      this.updateStateTextures(); // Filters out male-only genitalia (FJ3132-FJ3143)
     } else {
       this.femaleRoot.visible = false;
       this.maleRoot.visible = true;
-      this.updateStateTextures(); // Restores male genitalia
+      this.updateStateTextures();
     }
   }
 
@@ -558,12 +709,19 @@ export class ThreeViewer {
     return this.activeGender;
   }
 
+  public getFemaleAtlas(): AtlasData | null {
+    return this.femaleAtlas;
+  }
+
   public setSkinOpacity(val: number): void {
     this.skinOpacity = Math.max(0, Math.min(1, val));
     if (this.femaleSkinMesh) {
       const mat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
       mat.opacity = this.skinOpacity;
-      this.femaleSkinMesh.visible = this.skinOpacity > 0.02;
+      this.femaleSkinMesh.visible = this.skinOpacity > 0.02 && !this.isIsolated;
+    }
+    if (this.femaleLoaded) {
+      this.updateFemaleState();
     }
   }
 
@@ -574,21 +732,18 @@ export class ThreeViewer {
   // --- STATE UPDATES ---
 
   public updateState(): void {
-    this.updateStateTextures();
-    if (this.activeGender === 'female' && this.femaleLoaded) {
-      this.updateFemaleState();
+    if (this.activeGender === 'female') {
+      if (this.femaleLoaded) {
+        this.updateFemaleState();
+      }
+    } else {
+      this.updateStateTextures();
     }
   }
 
   public updateStateTextures() {
     const numSystems = ANATOMICAL_SYSTEMS.length;
     const aspect = (this.container.clientWidth || 1) / (this.container.clientHeight || 1);
-
-    const MALE_REPRODUCTIVE_IDS = new Set([
-      'FJ3132', 'FJ3133', 'FJ3134', 'FJ3135', 'FJ3136',
-      'FJ3137', 'FJ3138', 'FJ3139', 'FJ3140', 'FJ3141',
-      'FJ3142', 'FJ3143'
-    ]);
 
     // Calculate 2D knolling inventory grid when exploded
     const layout: KnollingLayout = calculateKnollingLayout(this.atlas.parts, aspect);
@@ -643,11 +798,6 @@ export class ThreeViewer {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
       }
 
-      // Hide male-only reproductive organs when female mode is active
-      if (this.activeGender === 'female' && MALE_REPRODUCTIVE_IDS.has(part.id)) {
-        isVisible = false;
-      }
-
       this.partStateArray[idx * 4] = dx;
       this.partStateArray[idx * 4 + 1] = dy;
       this.partStateArray[idx * 4 + 2] = dz;
@@ -671,70 +821,67 @@ export class ThreeViewer {
   }
 
   private updateFemaleState(): void {
-    if (!this.femaleLoaded || this.activeGender !== 'female') return;
+    if (!this.femaleLoaded || !this.femaleAtlas || this.activeGender !== 'female') return;
 
     const explode = this.currentExplodeDamped;
     const isIso = this.isIsolated;
 
-    this.femaleMeshes.forEach((mesh, partId) => {
-      const catalogItem = this.femaleCatalogMap.get(partId);
-      const sysId = catalogItem ? catalogItem.system : 'other';
-      const isSelected = this.selectedPartIds.has(partId);
+    this.femaleAtlas.parts.forEach((part, idx) => {
+      const centroid = this.femalePartCentroids[idx];
+      let dx = 0;
+      let dy = 0;
+      let dz = 0;
 
-      // Visibility logic
+      if (explode > 0.001 && centroid) {
+        // Outward radial expansion from spine / hip center
+        const radial = new THREE.Vector3(centroid.x, 0, centroid.z).normalize();
+        if (radial.lengthSq() < 0.001) radial.set(0, 0, 1);
+        dx = radial.x * explode * 0.48;
+        dy = (centroid.y - 0.85) * explode * 0.35;
+        dz = radial.z * explode * 0.48;
+      }
+
+      // Map female systems to core anatomical system toggles
+      let effSys = part.system;
+      if (effSys === 'borrowed') effSys = 'skeletal';
+      else if (effSys === 'donor-muscle') effSys = 'muscular';
+      else if (effSys === 'pregnancy') effSys = 'reproductive';
+      else if (effSys === 'brain') effSys = 'nervous';
+
+      const isSelected = this.selectedPartIds.has(part.id) || this.selectedPartIds.has(part.conceptId);
       let isVisible = false;
+
       if (isIso) {
         isVisible = isSelected;
       } else {
-        isVisible = this.visibleSystems.has(sysId) || isSelected;
-      }
-      mesh.visible = isVisible;
-
-      // Explode translation outward radially from spine/center
-      const origPos = this.femaleMeshOriginalPositions.get(partId);
-      if (origPos) {
-        if (explode > 0.01) {
-          const centroid = this.femalePartCentroids.get(partId) || origPos;
-          const radial = new THREE.Vector3(centroid.x, 0, centroid.z).normalize();
-          if (radial.lengthSq() < 0.001) radial.set(0, 0, 1);
-          const yDisp = (centroid.y - 0.85) * 0.35;
-          mesh.position.copy(origPos).addScaledVector(radial, explode * 0.48);
-          mesh.position.y += yDisp * explode;
-        } else {
-          mesh.position.copy(origPos);
-        }
+        isVisible = this.visibleSystems.has(effSys) || isSelected;
       }
 
-      // Selection Highlight
-      if (isSelected) {
-        if (!mesh.userData.isSelected) {
-          mesh.userData.isSelected = true;
-          mesh.userData.origMat = mesh.material;
-          mesh.material = new THREE.MeshStandardMaterial({
-            color: 0x4debc2,
-            emissive: 0x1aa385,
-            emissiveIntensity: 0.6,
-            roughness: 0.3,
-            metalness: 0.2,
-            side: THREE.DoubleSide,
-          });
-        }
-      } else {
-        if (mesh.userData.isSelected) {
-          mesh.userData.isSelected = false;
-          if (mesh.userData.origMat) {
-            mesh.material = mesh.userData.origMat;
-          }
-        }
+      // Skin special handling
+      if (part.id === 'HRAF0003') {
+        isVisible = !isIso && this.skinOpacity > 0.02 && this.visibleSystems.has('integumentary');
+      }
+
+      this.femalePartStateArray[idx * 4 + 0] = dx;
+      this.femalePartStateArray[idx * 4 + 1] = dy;
+      this.femalePartStateArray[idx * 4 + 2] = dz;
+      this.femalePartStateArray[idx * 4 + 3] = isVisible ? 1.0 : 0.0;
+
+      this.femaleSelectionArray[idx * 4 + 0] = isSelected ? 255 : 0;
+
+      const indMesh = this.femaleIndividualMeshes[idx];
+      if (indMesh) {
+        indMesh.position.set(dx, dy, dz);
+        indMesh.updateMatrix();
       }
     });
 
-    // Female Full Body Skin
-    if (this.femaleSkinMesh && !isIso) {
-      const skinMat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
-      skinMat.opacity = this.skinOpacity;
-      // Body silhouette is visible whenever skin opacity > 0.02
-      this.femaleSkinMesh.visible = this.skinOpacity > 0.02;
+    this.femalePartStateTexture.needsUpdate = true;
+    this.femaleSelectionTexture.needsUpdate = true;
+
+    if (this.femaleSkinMesh) {
+      this.femaleSkinMesh.visible = !isIso && this.skinOpacity > 0.02 && this.visibleSystems.has('integumentary');
+      (this.femaleSkinMesh.material as THREE.MeshStandardMaterial).opacity = this.skinOpacity;
     }
 
     this.floorStage.visible = explode < 0.5 && !this.isIsolated;
@@ -763,23 +910,45 @@ export class ThreeViewer {
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
 
-      // --- FEMALE-SPECIFIC ORGANS RAYCASTING FIRST ---
-      if (this.activeGender === 'female' && this.femaleLoaded) {
-        const candidateMeshes: THREE.Mesh[] = [];
-        this.femaleMeshes.forEach(mesh => {
-          if (mesh === this.femaleSkinMesh) return;
-          if (mesh.visible) candidateMeshes.push(mesh);
+      // --- FEMALE 3D MODEL RAYCASTING ---
+      if (this.activeGender === 'female' && this.femaleLoaded && this.femaleAtlas) {
+        let closestDist = Infinity;
+        let hitPartIdx = -1;
+
+        const tempBox = new THREE.Box3();
+        this.femaleAtlas.parts.forEach((part, idx) => {
+          const indMesh = this.femaleIndividualMeshes[idx];
+          if (!indMesh || this.femalePartStateArray[idx * 4 + 3] < 0.5) return;
+          // When skin is translucent, skip skin so user can effortlessly click internal organs/bones
+          if (part.id === 'HRAF0003' && this.skinOpacity < 0.5) return;
+
+          tempBox.copy(this.femalePartBoundingBoxes[idx]).translate(indMesh.position);
+          if (!this.raycaster.ray.intersectsBox(tempBox)) return;
+
+          const intersects = this.raycaster.intersectObject(indMesh, false);
+          if (intersects.length > 0 && intersects[0].distance < closestDist) {
+            closestDist = intersects[0].distance;
+            hitPartIdx = idx;
+          }
         });
 
-        const intersects = this.raycaster.intersectObjects(candidateMeshes, false);
-        if (intersects.length > 0) {
-          const hit = intersects[0].object as THREE.Mesh;
-          this.onSelectPart(hit.name);
+        if (hitPartIdx >= 0) {
+          this.onSelectPart(this.femaleAtlas.parts[hitPartIdx].id);
           return;
         }
+
+        // Test translucent skin mesh if nothing internal was clicked
+        if (this.femaleSkinMesh && this.femaleSkinMesh.visible) {
+          const skinHits = this.raycaster.intersectObject(this.femaleSkinMesh, false);
+          if (skinHits.length > 0) {
+            this.onSelectPart('HRAF0003');
+            return;
+          }
+        }
+        return;
       }
 
-      // --- UNIVERSAL FULL HUMAN BODY RAYCASTING (All 206 Bones, Muscles, Heart, Brain, Limbs) ---
+      // --- MALE 3D MODEL RAYCASTING ---
       let closestDist = Infinity;
       let hitPartIdx = -1;
 
@@ -802,13 +971,6 @@ export class ThreeViewer {
       if (hitPartIdx >= 0) {
         this.onSelectPart(this.atlas.parts[hitPartIdx].id);
         return;
-      }
-
-      if (this.activeGender === 'female' && this.femaleSkinMesh && this.femaleSkinMesh.visible) {
-        const skinHits = this.raycaster.intersectObject(this.femaleSkinMesh, false);
-        if (skinHits.length > 0) {
-          this.onSelectPart(this.femaleSkinMesh.name);
-        }
       }
     });
 
@@ -880,18 +1042,18 @@ export class ThreeViewer {
 
     if (this.activeGender === 'male') {
       this.atlas.parts.forEach((part, idx) => {
-        if (this.selectedPartIds.has(part.id)) {
+        if (this.selectedPartIds.has(part.id) || this.selectedPartIds.has(part.conceptId)) {
           const indMesh = this.individualMeshes[idx];
           const offset = indMesh ? indMesh.position : new THREE.Vector3();
           unionBox.union(this.partBoundingBoxes[idx].clone().translate(offset));
         }
       });
-    } else {
-      this.selectedPartIds.forEach(id => {
-        const mesh = this.femaleMeshes.get(id);
-        if (mesh) {
-          const worldBox = new THREE.Box3().setFromObject(mesh);
-          unionBox.union(worldBox);
+    } else if (this.femaleAtlas) {
+      this.femaleAtlas.parts.forEach((part, idx) => {
+        if (this.selectedPartIds.has(part.id) || this.selectedPartIds.has(part.conceptId)) {
+          const indMesh = this.femaleIndividualMeshes[idx];
+          const offset = indMesh ? indMesh.position : new THREE.Vector3();
+          unionBox.union(this.femalePartBoundingBoxes[idx].clone().translate(offset));
         }
       });
     }
@@ -1007,6 +1169,8 @@ export class ThreeViewer {
     this.renderer?.dispose();
     this.partStateTexture?.dispose();
     this.selectionTexture?.dispose();
+    this.femalePartStateTexture?.dispose();
+    this.femaleSelectionTexture?.dispose();
     this.container.innerHTML = '';
   }
 }

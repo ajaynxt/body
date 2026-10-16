@@ -276,8 +276,23 @@ export function getLocalizedAnatomicalName(name: string, system?: string): { hin
 export function resolveAnatomicalPart(
   partId: string,
   atlas: AtlasData | null,
-  activeGender: 'male' | 'female'
+  activeGender: 'male' | 'female',
+  femaleAtlas?: AtlasData | null
 ): { part: StudyPartItem; chapterIndex?: number; partIndex?: number } | null {
+  // Muscle Pain & Doctor Guidance helper
+  const getMuscularCare = (name: string) => ({
+    treatments: [
+      `${name} दर्द (Myalgia / Strain): R.I.C.E. विधि (Rest - आराम, Ice - 15 मिनट बर्फ सिकाई, Compression - सपोर्टिव बैंडेज, Elevation - ऊंचाई पर रखना)।`,
+      'कब डॉक्टर को दिखाएं (When to Consult Doctor): यदि मांसपेशियों में दर्द 3 दिन से ज्यादा रहे, तेज सूजन या लालिमा हो, चलने-फिरने में असमर्थ हों, सुन्नपन आए या बुखार हो, तो तुरंत ऑर्थोपेडिक या फिजिशियन डॉक्टर को दिखाएं।',
+      'डॉक्टरी जांच: गंभीर दर्द में डॉक्टर एक्स-रे, सीरम सीपीके (CPK) टेस्ट या एमआरआई द्वारा मांसपेशियों के फटने (Tear) की जांच करते हैं।',
+    ],
+    homeRemedies: [
+      'पर्याप्त जल और इलेक्ट्रोलाइट्स (ओआरएस/नारियल पानी) पिएं ताकि मांसपेशियों में ऐंठन (Cramps) न हो।',
+      'मैग्नीशियम, पोटैशियम और प्रोटीन से भरपूर आहार (केला, पालक, नट्स) मांसपेशियों की रिकवरी तेज करते हैं।',
+      'दर्द के दौरान भारी वजन न उठाएं और तेज मालिश से बचें जब तक सूजन पूरी तरह ठीक न हो जाए।',
+    ],
+  });
+
   // 1. First, search if part matches curated BOOK_CHAPTERS
   for (let cIdx = 0; cIdx < BOOK_CHAPTERS.length; cIdx++) {
     const ch = BOOK_CHAPTERS[cIdx];
@@ -291,7 +306,47 @@ export function resolveAnatomicalPart(
     }
   }
 
-  // 2. If female model is active, search FEMALE_MESH_CATALOG
+  // 2. Search in official femaleAtlas (HuBMAP Female Reference Atlas: 1,220 parts)
+  if (femaleAtlas && femaleAtlas.parts) {
+    const fPart = femaleAtlas.parts.find(p => p.id === partId || p.conceptId === partId);
+    if (fPart) {
+      // Map system
+      let effSys = fPart.system;
+      if (effSys === 'borrowed') effSys = 'skeletal';
+      else if (effSys === 'donor-muscle') effSys = 'muscular';
+      else if (effSys === 'pregnancy') effSys = 'reproductive';
+      else if (effSys === 'brain') effSys = 'nervous';
+
+      const loc = getLocalizedAnatomicalName(fPart.name, effSys);
+      const isMuscular = effSys === 'muscular' || fPart.system === 'donor-muscle' || fPart.name.toLowerCase().includes('muscle');
+      const muscleCare = isMuscular ? getMuscularCare(fPart.name) : null;
+
+      const studyItem: StudyPartItem = {
+        id: fPart.id,
+        name: fPart.name,
+        hindiName: loc.hindiName,
+        latinName: fPart.conceptId || fPart.name,
+        system: effSys,
+        elements: [fPart.id],
+        locationHinglish: `महिला शरीर रचना (${effSys} तंत्र) में स्थित।`,
+        functionHinglish: loc.description,
+        funFactHinglish: `HuBMAP Female Reference Atlas · कोड: ${fPart.conceptId || fPart.id}`,
+        clinicalNoteHinglish: loc.clinical,
+        relatedDiseases: [],
+        treatmentsHinglish: muscleCare ? muscleCare.treatments : [
+          'नियमित स्वास्थ्य परीक्षण एवं जीवनशैली सुधार द्वारा अंग को स्वस्थ रखें।',
+          'लक्षण या लगातार दर्द होने पर विशेषज्ञ डॉक्टर से क्लिनिकल परामर्श लें।',
+        ],
+        homeRemedies: muscleCare ? muscleCare.homeRemedies : [
+          'संतुलित पोषक आहार, पर्याप्त जलपान और नियमित हल्का व्यायाम करें।',
+          'अत्यधिक शारीरिक व मानसिक तनाव से बचें।',
+        ],
+      };
+      return { part: studyItem };
+    }
+  }
+
+  // 3. Search in FEMALE_MESH_CATALOG
   if (activeGender === 'female') {
     const fItem = FEMALE_MESH_CATALOG.find(p => p.id === partId);
     if (fItem) {
@@ -305,7 +360,7 @@ export function resolveAnatomicalPart(
         elements: [fItem.id],
         locationHinglish: `महिला शरीर रचना (${fItem.system} तंत्र) की संरचना।`,
         functionHinglish: fItem.description || loc.description,
-        funFactHinglish: fItem.fmaId ? `HuBMAP VHF 1.5 संदर्भ कोड: ${fItem.fmaId}` : 'HuBMAP वैज्ञानिक 3D मेश',
+        funFactHinglish: fItem.fmaId ? `HuBMAP VHF संदर्भ कोड: ${fItem.fmaId}` : 'HuBMAP वैज्ञानिक 3D मेश',
         clinicalNoteHinglish: loc.clinical,
         relatedDiseases: [],
         treatmentsHinglish: [
@@ -321,11 +376,14 @@ export function resolveAnatomicalPart(
     }
   }
 
-  // 3. Search in atlas.parts (BodyParts3D 2,234 parts)
+  // 4. Search in atlas.parts (BodyParts3D 2,234 parts)
   if (atlas && atlas.parts) {
     const atlasPart = atlas.parts.find(p => p.id === partId);
     if (atlasPart) {
       const loc = getLocalizedAnatomicalName(atlasPart.name, atlasPart.system);
+      const isMuscular = atlasPart.system === 'muscular' || atlasPart.name.toLowerCase().includes('muscle');
+      const muscleCare = isMuscular ? getMuscularCare(atlasPart.name) : null;
+
       const studyItem: StudyPartItem = {
         id: atlasPart.id,
         name: atlasPart.name,
@@ -338,11 +396,11 @@ export function resolveAnatomicalPart(
         funFactHinglish: `FMA स्रोत कोड: ${atlasPart.conceptId} · BodyParts3D संदर्भ संरचना।`,
         clinicalNoteHinglish: loc.clinical,
         relatedDiseases: [],
-        treatmentsHinglish: [
+        treatmentsHinglish: muscleCare ? muscleCare.treatments : [
           'लक्षण या गंभीर दर्द होने पर योग्य चिकित्सक / विशेषज्ञ से परामर्श लें।',
           'आवश्यकतानुसार एक्स-रे, एमआरआई या अल्ट्रासाउंड जांच कराएं।',
         ],
-        homeRemedies: [
+        homeRemedies: muscleCare ? muscleCare.homeRemedies : [
           'प्रभावित हिस्से को आराम दें और भारी वजन उठाने से बचें।',
           'हल्की गर्म या ठंडी सिकाई से आराम मिल सकता है।',
         ],

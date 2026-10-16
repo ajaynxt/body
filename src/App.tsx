@@ -183,8 +183,9 @@ export const App: React.FC = () => {
   const handle3DPartClick = useCallback((partId: string) => {
     setSelectedPartId(partId);
 
+    const femaleAtlas = viewerRef.current?.getFemaleAtlas() || null;
     // Resolve organ details (Male, Female, Bones, Muscles, Vessels)
-    const resolved = resolveAnatomicalPart(partId, atlas, activeGender);
+    const resolved = resolveAnatomicalPart(partId, atlas, activeGender, femaleAtlas);
     if (resolved) {
       setSelectedPartItem(resolved.part);
       if (resolved.chapterIndex !== undefined && resolved.partIndex !== undefined) {
@@ -334,10 +335,10 @@ export const App: React.FC = () => {
             : viewMode === 'reader'
             ? '📖 व्यक्तिगत पाठ्यपुस्तक अध्ययन (PDF Reader)'
             : activeGender === 'female'
-            ? '♀ महिला संदर्भ शरीर रचना (HuBMAP VHF 1.5)'
+            ? '♀ महिला संपूर्ण शरीर रचना (HuBMAP Human Atlas)'
             : currentChapter.hindiTitle
         }
-        totalPartsCount={activeGender === 'female' ? 888 : atlas?.parts.length || 2234}
+        totalPartsCount={activeGender === 'female' ? 1220 : atlas?.parts.length || 2234}
       />
 
       {/* Main Workspace */}

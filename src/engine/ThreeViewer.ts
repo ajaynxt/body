@@ -9,6 +9,7 @@ import { decompressGzip } from '../utils/decompression';
 import { calculateKnollingLayout } from '../utils/knolling';
 import type { KnollingLayout } from '../utils/knolling';
 import { FEMALE_MESH_CATALOG, type FemaleAnatomyPart } from '../data/femaleMeshCatalog';
+import { fetchWithCache } from '../utils/cacheStorage';
 
 export interface ViewerOptions {
   container: HTMLDivElement;
@@ -147,7 +148,8 @@ export class ThreeViewer {
       return;
     }
 
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    this.renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
     this.renderer.setSize(width, height);
     this.renderer.setClearColor(0xf2f3f3);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -363,10 +365,7 @@ export class ThreeViewer {
         ? chunk.gzip.slice(1)
         : chunk.gzip;
       const url = `${base.replace(/\/$/, '')}/${cleanGzip}`;
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`Chunk ${chunkIndex} could not be loaded (${resp.status})`);
-
-      const rawBuffer = await resp.arrayBuffer();
+      const rawBuffer = await fetchWithCache(url);
       const decompressedBuffer = await decompressGzip(rawBuffer, chunk.bytes);
 
       this.atlas.parts.forEach((part, partIdx) => {
@@ -419,10 +418,10 @@ export class ThreeViewer {
     };
 
     try {
-      // 3 concurrent downloads
+      // 6 concurrent streams for rapid parallel chunk downloading
       let currentIndex = 0;
       await Promise.all(
-        Array.from({ length: 3 }, async () => {
+        Array.from({ length: 6 }, async () => {
           while (currentIndex < chunks.length) {
             const idx = currentIndex++;
             await loadSingleChunk(idx);
@@ -465,18 +464,9 @@ export class ThreeViewer {
 
       const base = import.meta.env.BASE_URL || './';
       const femaleUrl = `${base.replace(/\/$/, '')}/models/female-atlas.glb`;
+      const buffer = await fetchWithCache(femaleUrl);
       const gltf = await new Promise<any>((resolve, reject) => {
-        loader.load(
-          femaleUrl,
-          resolve,
-          xhr => {
-            if (xhr.lengthComputable) {
-              const pct = Math.round((xhr.loaded / xhr.total) * 100);
-              this.onProgress(pct);
-            }
-          },
-          reject
-        );
+        loader.parse(buffer, femaleUrl, resolve, reject);
       });
 
       const scene = gltf.scene as THREE.Group;
@@ -549,17 +539,18 @@ export class ThreeViewer {
     this.activeGender = gender;
 
     if (gender === 'female') {
-      this.maleRoot.visible = false;
-      this.femaleRoot.visible = true;
+      this.maleRoot.visible = true; // Complete full-body human skeleton & anatomy
+      this.femaleRoot.visible = true; // Female-specific reproductive organs, breasts & contour
       if (!this.femaleLoaded) {
         await this.loadFemaleModel();
       } else {
         this.updateFemaleState();
       }
+      this.updateStateTextures(); // Filters out male-only genitalia (FJ3132-FJ3143)
     } else {
       this.femaleRoot.visible = false;
       this.maleRoot.visible = true;
-      this.updateStateTextures();
+      this.updateStateTextures(); // Restores male genitalia
     }
   }
 
@@ -572,7 +563,7 @@ export class ThreeViewer {
     if (this.femaleSkinMesh) {
       const mat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
       mat.opacity = this.skinOpacity;
-      this.femaleSkinMesh.visible = this.skinOpacity > 0.01;
+      this.femaleSkinMesh.visible = this.skinOpacity > 0.02;
     }
   }
 
@@ -583,18 +574,21 @@ export class ThreeViewer {
   // --- STATE UPDATES ---
 
   public updateState(): void {
-    if (this.activeGender === 'male') {
-      this.updateStateTextures();
-    } else {
+    this.updateStateTextures();
+    if (this.activeGender === 'female' && this.femaleLoaded) {
       this.updateFemaleState();
     }
   }
 
   public updateStateTextures() {
-    if (this.activeGender !== 'male') return;
-
     const numSystems = ANATOMICAL_SYSTEMS.length;
     const aspect = (this.container.clientWidth || 1) / (this.container.clientHeight || 1);
+
+    const MALE_REPRODUCTIVE_IDS = new Set([
+      'FJ3132', 'FJ3133', 'FJ3134', 'FJ3135', 'FJ3136',
+      'FJ3137', 'FJ3138', 'FJ3139', 'FJ3140', 'FJ3141',
+      'FJ3142', 'FJ3143'
+    ]);
 
     // Calculate 2D knolling inventory grid when exploded
     const layout: KnollingLayout = calculateKnollingLayout(this.atlas.parts, aspect);
@@ -649,6 +643,11 @@ export class ThreeViewer {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
       }
 
+      // Hide male-only reproductive organs when female mode is active
+      if (this.activeGender === 'female' && MALE_REPRODUCTIVE_IDS.has(part.id)) {
+        isVisible = false;
+      }
+
       this.partStateArray[idx * 4] = dx;
       this.partStateArray[idx * 4 + 1] = dy;
       this.partStateArray[idx * 4 + 2] = dz;
@@ -661,7 +660,6 @@ export class ThreeViewer {
       if (indMesh) {
         indMesh.position.set(dx, dy, dz);
         indMesh.updateMatrix();
-        indMesh.updateMatrixWorld(true);
       }
     });
 
@@ -731,11 +729,12 @@ export class ThreeViewer {
       }
     });
 
-    // Skin transparency
+    // Female Full Body Skin
     if (this.femaleSkinMesh && !isIso) {
       const skinMat = this.femaleSkinMesh.material as THREE.MeshStandardMaterial;
       skinMat.opacity = this.skinOpacity;
-      this.femaleSkinMesh.visible = this.skinOpacity > 0.01 && this.visibleSystems.has('integumentary');
+      // Body silhouette is visible whenever skin opacity > 0.02
+      this.femaleSkinMesh.visible = this.skinOpacity > 0.02;
     }
 
     this.floorStage.visible = explode < 0.5 && !this.isIsolated;
@@ -764,12 +763,11 @@ export class ThreeViewer {
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
 
-      // --- FEMALE RAYCASTING ---
+      // --- FEMALE-SPECIFIC ORGANS RAYCASTING FIRST ---
       if (this.activeGender === 'female' && this.femaleLoaded) {
         const candidateMeshes: THREE.Mesh[] = [];
         this.femaleMeshes.forEach(mesh => {
-          // If skin is translucent, let clicks pass through to organs
-          if (mesh === this.femaleSkinMesh && this.skinOpacity < 0.75) return;
+          if (mesh === this.femaleSkinMesh) return;
           if (mesh.visible) candidateMeshes.push(mesh);
         });
 
@@ -779,19 +777,9 @@ export class ThreeViewer {
           this.onSelectPart(hit.name);
           return;
         }
-
-        // If no organ hit, but skin is visible, check skin
-        if (this.femaleSkinMesh && this.femaleSkinMesh.visible) {
-          const skinHits = this.raycaster.intersectObject(this.femaleSkinMesh, false);
-          if (skinHits.length > 0) {
-            this.onSelectPart(this.femaleSkinMesh.name);
-            return;
-          }
-        }
-        return;
       }
 
-      // --- MALE RAYCASTING ---
+      // --- UNIVERSAL FULL HUMAN BODY RAYCASTING (All 206 Bones, Muscles, Heart, Brain, Limbs) ---
       let closestDist = Infinity;
       let hitPartIdx = -1;
 
@@ -813,6 +801,14 @@ export class ThreeViewer {
 
       if (hitPartIdx >= 0) {
         this.onSelectPart(this.atlas.parts[hitPartIdx].id);
+        return;
+      }
+
+      if (this.activeGender === 'female' && this.femaleSkinMesh && this.femaleSkinMesh.visible) {
+        const skinHits = this.raycaster.intersectObject(this.femaleSkinMesh, false);
+        if (skinHits.length > 0) {
+          this.onSelectPart(this.femaleSkinMesh.name);
+        }
       }
     });
 

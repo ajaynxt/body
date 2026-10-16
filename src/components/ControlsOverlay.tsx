@@ -13,9 +13,6 @@ interface ControlsOverlayProps {
   isAutoRotating: boolean;
   onToggleAutoRotate: () => void;
   onReset: () => void;
-  captionText: string;
-  isIsolated: boolean;
-  onClearIsolate: () => void;
 }
 
 export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
@@ -29,9 +26,6 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
   isAutoRotating,
   onToggleAutoRotate,
   onReset,
-  captionText,
-  isIsolated,
-  onClearIsolate,
 }) => {
   const { t } = useTranslation();
 
@@ -83,22 +77,6 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
         </button>
       </div>
 
-      {/* Floating Dynamic Caption Line */}
-      <div className="caption-banner-wrap">
-        <div className="caption-badge glass-panel">
-          <span className="caption-line-flair" />
-          <span className="caption-gender-tag">
-            {activeGender === 'female' ? '♀ HuBMAP VHF 1.5' : '♂ BodyParts3D 4.0'}
-          </span>
-          <span className="caption-title-text">{captionText}</span>
-          {isIsolated && (
-            <button className="clear-isolate-chip pointer-events-auto" onClick={onClearIsolate}>
-              {t.fullCoverage.includes('Full') ? 'Show Full Body' : 'पूरा शरीर दिखाएं'}
-            </button>
-          )}
-          <span className="caption-line-flair" />
-        </div>
-      </div>
 
       {/* Bottom Explode Slider Dock & Skin Transparency */}
       <div className="bottom-dock-wrap pointer-events-auto">

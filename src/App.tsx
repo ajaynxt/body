@@ -1,22 +1,25 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
 import type { AtlasData, StudyPartItem, ClinicalDisease } from './types/atlas';
 import { BOOK_CHAPTERS } from './data/chapters';
-import { FEMALE_MESH_CATALOG } from './data/femaleMeshCatalog';
 import { ThreeViewer } from './engine/ThreeViewer';
 import { Header } from './components/Header';
 import { ThreeCanvas } from './components/ThreeCanvas';
 import { BookReader } from './components/BookReader';
 import { ControlsOverlay } from './components/ControlsOverlay';
-import { DiseaseExplorerModal } from './components/DiseaseExplorerModal';
-import { AboutModal } from './components/AboutModal';
-import { StudentQuizModal } from './components/StudentQuizModal';
-import { StudyLibrary } from './components/StudyLibrary';
-import { PDFBookReader } from './components/PDFBookReader';
-import { CompareModal } from './components/CompareModal';
-import { StudySuiteModal } from './components/StudySuiteModal';
-import { QuickOrganFocusBar } from './components/QuickOrganFocusBar';
+import { SideOrganInspector } from './components/SideOrganInspector';
 import { GoogleAssistantAudioPlayer } from './components/GoogleAssistantAudioPlayer';
-import { StepByStepAITutor } from './components/StepByStepAITutor';
+import { fetchJsonWithCache } from './utils/cacheStorage';
+import { resolveAnatomicalPart } from './utils/anatomicalResolver';
+
+// Code-split heavy modals and secondary views for instant first page load
+const DiseaseExplorerModal = lazy(() => import('./components/DiseaseExplorerModal').then(m => ({ default: m.DiseaseExplorerModal })));
+const AboutModal = lazy(() => import('./components/AboutModal').then(m => ({ default: m.AboutModal })));
+const StudentQuizModal = lazy(() => import('./components/StudentQuizModal').then(m => ({ default: m.StudentQuizModal })));
+const StudyLibrary = lazy(() => import('./components/StudyLibrary').then(m => ({ default: m.StudyLibrary })));
+const PDFBookReader = lazy(() => import('./components/PDFBookReader').then(m => ({ default: m.PDFBookReader })));
+const CompareModal = lazy(() => import('./components/CompareModal').then(m => ({ default: m.CompareModal })));
+const StudySuiteModal = lazy(() => import('./components/StudySuiteModal').then(m => ({ default: m.StudySuiteModal })));
+const StepByStepAITutor = lazy(() => import('./components/StepByStepAITutor').then(m => ({ default: m.StepByStepAITutor })));
 
 export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
@@ -24,7 +27,7 @@ export const App: React.FC = () => {
 
   // Active Gender Model ('male' = BodyParts3D 4.0, 'female' = HuBMAP VHF 1.5)
   const [activeGender, setActiveGender] = useState<'male' | 'female'>('male');
-  const [skinOpacity, setSkinOpacity] = useState(0.2);
+  const [skinOpacity, setSkinOpacity] = useState(0.35); // 0.35 gives clear full female body contour while showing inner organs
 
   // App & View State
   const [viewMode, setViewMode] = useState<'book' | 'explorer' | 'library' | 'reader'>('book');
@@ -33,6 +36,7 @@ export const App: React.FC = () => {
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
   const [selectedFemalePart, setSelectedFemalePart] = useState<StudyPartItem | null>(null);
+  const [selectedPartItem, setSelectedPartItem] = useState<StudyPartItem | null>(null);
 
   // 3D Controls State
   const [explodeValue, setExplodeValue] = useState(0);
@@ -50,7 +54,6 @@ export const App: React.FC = () => {
   const [isStudySuiteModalOpen, setIsStudySuiteModalOpen] = useState(false);
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isAITutorOpen, setIsAITutorOpen] = useState(false);
-  const [isQuickFocusOpen, setIsQuickFocusOpen] = useState(false);
 
   // Handle URL Routing (Supports both HTML5 pathname and SPA hash fallback for GitHub Pages)
   const parseCurrentRoute = useCallback(() => {
@@ -118,11 +121,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const base = import.meta.env.BASE_URL || './';
     const atlasUrl = `${base.replace(/\/$/, '')}/models/atlas.json`;
-    fetch(atlasUrl)
-      .then(res => {
-        if (!res.ok) throw new Error(`Atlas manifest not found at ${atlasUrl}`);
-        return res.json();
-      })
+    fetchJsonWithCache<AtlasData>(atlasUrl)
       .then((data: AtlasData) => {
         setAtlas(data);
       })
@@ -132,25 +131,12 @@ export const App: React.FC = () => {
   }, []);
 
   const currentChapter = BOOK_CHAPTERS[currentChapterIndex] || BOOK_CHAPTERS[0];
-  const currentPart = selectedFemalePart || currentChapter.parts[currentPartIndex];
-
-  // Dynamic Caption Text
-  const captionText = isIsolated
-    ? `${currentPart ? currentPart.hindiName : 'चयनित अंग'} · अकेला दृश्य (Isolated 3D)`
-    : explodeValue > 0.8
-    ? 'विभाजित अंग सूची (2D Knolled Inventory Grid)'
-    : explodeValue > 0.05
-    ? 'विभाजित शारीरिक संरचनाएं (Separated Anatomy)'
-    : currentPart
-    ? `${currentPart.hindiName} (${currentPart.name})`
-    : activeGender === 'female'
-    ? 'महिला शारीरिक संरचना (HuBMAP Visible Human Female 1.5)'
-    : `${currentChapter.hindiTitle}`;
 
   // Handle switching gender model
   const handleSwitchGender = useCallback(async (gender: 'male' | 'female') => {
     setActiveGender(gender);
     setSelectedPartId(null);
+    setSelectedPartItem(null);
     setSelectedFemalePart(null);
     setIsIsolated(false);
     if (viewerRef.current) {
@@ -161,6 +147,7 @@ export const App: React.FC = () => {
   // Handle selecting a part from Book Reader or Study Suite
   const handleSelectPart = useCallback((part: StudyPartItem) => {
     setSelectedPartId(part.elements[0] || part.id);
+    setSelectedPartItem(part);
     setSelectedFemalePart(null);
     setIsIsolated(false);
 
@@ -181,6 +168,7 @@ export const App: React.FC = () => {
   // Handle isolating a part
   const handleIsolatePart = useCallback((part: StudyPartItem) => {
     setSelectedPartId(part.elements[0] || part.id);
+    setSelectedPartItem(part);
     setIsIsolated(true);
     setExplodeValue(0);
 
@@ -191,55 +179,27 @@ export const App: React.FC = () => {
     }
   }, [viewMode]);
 
-  // Handle clicking directly in 3D viewport
+  // Handle clicking directly in 3D viewport ("jis pr click kre vo hi name side me aaye")
   const handle3DPartClick = useCallback((partId: string) => {
     setSelectedPartId(partId);
 
-    // Check if clicked in female model
-    if (activeGender === 'female') {
-      const fItem = FEMALE_MESH_CATALOG.find(p => p.id === partId);
-      if (fItem) {
-        const femaleStudyItem: StudyPartItem = {
-          id: fItem.id,
-          name: fItem.name,
-          hindiName: fItem.hindiName || fItem.name,
-          latinName: fItem.fmaId || undefined,
-          system: fItem.system,
-          elements: [fItem.id],
-          locationHinglish: `महिला शरीर रचना (${fItem.system} तंत्र) का अंग।`,
-          functionHinglish: fItem.description,
-          funFactHinglish: fItem.fmaId ? `FMA स्रोत ID: ${fItem.fmaId}` : 'HuBMAP VHF 1.5 3D मेश',
-          clinicalNoteHinglish: 'HuBMAP Visible Human Female 1.5 संदर्भ डेटासेट से प्राप्त वैज्ञानिक 3D संरचना।',
-          relatedDiseases: [],
-        };
-        setSelectedFemalePart(femaleStudyItem);
-        if (viewerRef.current) {
-          viewerRef.current.selectPart(partId);
-          viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
-        }
-        return;
+    // Resolve organ details (Male, Female, Bones, Muscles, Vessels)
+    const resolved = resolveAnatomicalPart(partId, atlas, activeGender);
+    if (resolved) {
+      setSelectedPartItem(resolved.part);
+      if (resolved.chapterIndex !== undefined && resolved.partIndex !== undefined) {
+        setCurrentChapterIndex(resolved.chapterIndex);
+        setCurrentPartIndex(resolved.partIndex);
       }
+    } else {
+      setSelectedPartItem(null);
     }
 
-    setSelectedFemalePart(null);
-
-    // Look for matching part in male curated chapters
-    for (let cIdx = 0; cIdx < BOOK_CHAPTERS.length; cIdx++) {
-      const ch = BOOK_CHAPTERS[cIdx];
-      const foundPartIdx = ch.parts.findIndex(p => p.elements.includes(partId) || p.id === partId);
-      if (foundPartIdx >= 0) {
-        setCurrentChapterIndex(cIdx);
-        setCurrentPartIndex(foundPartIdx);
-        break;
-      }
-    }
-
-    setIsQuickFocusOpen(true);
     if (viewerRef.current) {
       viewerRef.current.selectPart(partId);
       viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
     }
-  }, [activeGender, viewMode]);
+  }, [atlas, activeGender, viewMode]);
 
   // Handle toggling Solo Focus / Isolate from quick focus pill
   const handleToggleQuickIsolate = useCallback(() => {
@@ -302,6 +262,7 @@ export const App: React.FC = () => {
     setExplodeValue(0);
     setIsIsolated(false);
     setSelectedPartId(null);
+    setSelectedPartItem(null);
     setSelectedFemalePart(null);
     setIsAutoRotating(false);
     setCurrentView('three-quarter');
@@ -341,9 +302,10 @@ export const App: React.FC = () => {
 
   // Currently focused / active part across male & female reference models
   const activePart: StudyPartItem | undefined =
-    activeGender === 'female'
+    selectedPartItem ||
+    (activeGender === 'female'
       ? selectedFemalePart || undefined
-      : BOOK_CHAPTERS[currentChapterIndex]?.parts[currentPartIndex];
+      : BOOK_CHAPTERS[currentChapterIndex]?.parts[currentPartIndex]);
 
   return (
     <div className={`app-root view-${viewMode}`} data-theme={theme}>
@@ -382,17 +344,21 @@ export const App: React.FC = () => {
       <main className="app-main-workspace">
         {viewMode === 'library' ? (
           /* Human Body Study Library Shelf */
-          <StudyLibrary
-            onOpenBook={bookId => navigateToBook(bookId)}
-            onBackTo3D={() => navigateToAtlas('book')}
-          />
+          <Suspense fallback={<div className="loading-fallback glass-panel"><div className="spinning-loader text-accent" /> पुस्तकालय लोड हो रहा है...</div>}>
+            <StudyLibrary
+              onOpenBook={bookId => navigateToBook(bookId)}
+              onBackTo3D={() => navigateToAtlas('book')}
+            />
+          </Suspense>
         ) : viewMode === 'reader' && selectedBookId ? (
           /* Individual Book PDF & Chapter Reader */
-          <PDFBookReader
-            bookId={selectedBookId}
-            onBackToLibrary={navigateToLibrary}
-            onOpen3DAtlas={() => navigateToAtlas('book')}
-          />
+          <Suspense fallback={<div className="loading-fallback glass-panel"><div className="spinning-loader text-accent" /> पुस्तक लोड हो रही है...</div>}>
+            <PDFBookReader
+              bookId={selectedBookId}
+              onBackToLibrary={navigateToLibrary}
+              onOpen3DAtlas={() => navigateToAtlas('book')}
+            />
+          </Suspense>
         ) : (
           /* 3D Anatomy Atlas & Textbook Split View */
           <>
@@ -400,9 +366,11 @@ export const App: React.FC = () => {
               <BookReader
                 currentChapterIndex={currentChapterIndex}
                 currentPartIndex={currentPartIndex}
+                selectedPart={selectedPartItem}
                 onSelectChapter={idx => {
                   setCurrentChapterIndex(idx);
                   setCurrentPartIndex(0);
+                  setSelectedPartItem(null);
                   setSelectedFemalePart(null);
                   const ch = BOOK_CHAPTERS[idx];
                   if (ch.parts.length > 0) {
@@ -457,26 +425,28 @@ export const App: React.FC = () => {
                   if (viewerRef.current) viewerRef.current.setAutoRotate(next);
                 }}
                 onReset={handleReset}
-                captionText={captionText}
-                isIsolated={isIsolated}
-                onClearIsolate={() => {
-                  setIsIsolated(false);
-                  if (viewerRef.current) {
-                    viewerRef.current.setIsolated(false);
-                    viewerRef.current.updateState();
-                  }
-                }}
               />
 
-              {/* Floating Quick Organ Focus Bar (Solo View, Audio, AI Tutor) */}
-              {isQuickFocusOpen && activePart && (
-                <QuickOrganFocusBar
-                  part={activePart}
+              {/* Dedicated Side Inspector Drawer on the side ("side me aaye vo") */}
+              {viewMode === 'explorer' && selectedPartItem && (
+                <SideOrganInspector
+                  part={selectedPartItem}
                   isIsolated={isIsolated}
                   onToggleIsolate={handleToggleQuickIsolate}
                   onOpenAudioPlayer={() => setIsAudioPlayerOpen(true)}
                   onOpenAITutor={() => setIsAITutorOpen(true)}
-                  onClose={() => setIsQuickFocusOpen(false)}
+                  onOpenInBook={() => {
+                    setViewMode('book');
+                  }}
+                  onClose={() => {
+                    setSelectedPartId(null);
+                    setSelectedPartItem(null);
+                    setSelectedFemalePart(null);
+                    if (viewerRef.current) {
+                      viewerRef.current.selectPart(null);
+                      viewerRef.current.updateState();
+                    }
+                  }}
                 />
               )}
             </section>
@@ -484,41 +454,55 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Compare Mode Modal (Male vs Female) */}
-      <CompareModal
-        isOpen={isCompareModalOpen}
-        onClose={() => setIsCompareModalOpen(false)}
-        activeGender={activeGender}
-        onSwitchGender={handleSwitchGender}
-      />
+      {/* Code-Split Lazy Modals */}
+      <Suspense fallback={null}>
+        {/* Compare Mode Modal (Male vs Female) */}
+        <CompareModal
+          isOpen={isCompareModalOpen}
+          onClose={() => setIsCompareModalOpen(false)}
+          activeGender={activeGender}
+          onSwitchGender={handleSwitchGender}
+        />
 
-      {/* Anatomy Study Suite Modal (Flashcards, Layer Mode, Glossary, Bookmarks) */}
-      <StudySuiteModal
-        isOpen={isStudySuiteModalOpen}
-        onClose={() => setIsStudySuiteModalOpen(false)}
-        onSelectPart={handleSelectPart}
-        onApplyLayerMode={handleApplyLayerMode}
-      />
+        {/* Anatomy Study Suite Modal (Flashcards, Layer Mode, Glossary, Bookmarks) */}
+        <StudySuiteModal
+          isOpen={isStudySuiteModalOpen}
+          onClose={() => setIsStudySuiteModalOpen(false)}
+          onSelectPart={handleSelectPart}
+          onApplyLayerMode={handleApplyLayerMode}
+        />
 
-      {/* Clinical Disease Encyclopedia Modal */}
-      <DiseaseExplorerModal
-        isOpen={isDiseaseModalOpen}
-        onClose={() => setIsDiseaseModalOpen(false)}
-        onSelectDisease={handleSelectDisease}
-      />
+        {/* Clinical Disease Encyclopedia Modal */}
+        <DiseaseExplorerModal
+          isOpen={isDiseaseModalOpen}
+          onClose={() => setIsDiseaseModalOpen(false)}
+          onSelectDisease={handleSelectDisease}
+        />
 
-      {/* Interactive Active Recall 3D Quiz Modal */}
-      <StudentQuizModal
-        isOpen={isQuizModalOpen}
-        onClose={() => setIsQuizModalOpen(false)}
-        onHighlightPart={handleSelectPart}
-      />
+        {/* Interactive Active Recall 3D Quiz Modal (1,50,000+ AI Questions) */}
+        <StudentQuizModal
+          isOpen={isQuizModalOpen}
+          onClose={() => setIsQuizModalOpen(false)}
+          onHighlightPart={handleSelectPart}
+        />
 
-      {/* Attribution & About Modal */}
-      <AboutModal
-        isOpen={isAboutModalOpen}
-        onClose={() => setIsAboutModalOpen(false)}
-      />
+        {/* Attribution & About Modal */}
+        <AboutModal
+          isOpen={isAboutModalOpen}
+          onClose={() => setIsAboutModalOpen(false)}
+        />
+
+        {/* AI Step-by-Step Anatomy Tutor */}
+        <StepByStepAITutor
+          isOpen={isAITutorOpen}
+          onClose={() => setIsAITutorOpen(false)}
+          currentPart={activePart}
+          currentChapter={BOOK_CHAPTERS[currentChapterIndex]}
+          onIsolateIn3D={() => {
+            if (activePart) handleIsolatePart(activePart);
+          }}
+        />
+      </Suspense>
 
       {/* Google Assistant Voice Player */}
       <GoogleAssistantAudioPlayer
@@ -526,17 +510,6 @@ export const App: React.FC = () => {
         onClose={() => setIsAudioPlayerOpen(false)}
         currentPart={activePart}
         currentChapter={BOOK_CHAPTERS[currentChapterIndex]}
-      />
-
-      {/* AI Step-by-Step Anatomy Tutor */}
-      <StepByStepAITutor
-        isOpen={isAITutorOpen}
-        onClose={() => setIsAITutorOpen(false)}
-        currentPart={activePart}
-        currentChapter={BOOK_CHAPTERS[currentChapterIndex]}
-        onIsolateIn3D={() => {
-          if (activePart) handleIsolatePart(activePart);
-        }}
       />
     </div>
   );

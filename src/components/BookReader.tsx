@@ -26,6 +26,7 @@ import {
 interface BookReaderProps {
   currentChapterIndex: number;
   currentPartIndex: number;
+  selectedPart?: StudyPartItem | null;
   onSelectChapter: (index: number) => void;
   onSelectPart: (part: StudyPartItem) => void;
   onIsolatePart: (part: StudyPartItem) => void;
@@ -39,6 +40,7 @@ interface BookReaderProps {
 export const BookReader: React.FC<BookReaderProps> = ({
   currentChapterIndex,
   currentPartIndex,
+  selectedPart,
   onSelectChapter,
   onSelectPart,
   onIsolatePart,
@@ -53,8 +55,15 @@ export const BookReader: React.FC<BookReaderProps> = ({
   const [language, setLanguage] = useState<'hinglish' | 'hindi' | 'english'>('hinglish');
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  // Auto-switch to study tab if an organ was clicked in 3D
+  React.useEffect(() => {
+    if (selectedPart) {
+      setActiveTab('study');
+    }
+  }, [selectedPart]);
+
   const chapter: BookChapter = BOOK_CHAPTERS[currentChapterIndex] || BOOK_CHAPTERS[0];
-  const currentPart: StudyPartItem | undefined = chapter.parts[currentPartIndex];
+  const currentPart: StudyPartItem | undefined = selectedPart || chapter.parts[currentPartIndex];
 
   // Speech pronunciation helper
   const handleSpeak = (text: string, langCode: string = 'hi-IN') => {
@@ -214,7 +223,11 @@ export const BookReader: React.FC<BookReaderProps> = ({
               <div className="part-study-header">
                 <div>
                   <span className="part-step-badge">
-                    भाग {currentPartIndex + 1} / {chapter.parts.length}
+                    {selectedPart && selectedPart.id !== chapter.parts[currentPartIndex]?.id ? (
+                      <span className="active-3d-badge-text">🎯 3D में चयनित अंग (Selected Structure)</span>
+                    ) : (
+                      `भाग ${currentPartIndex + 1} / ${chapter.parts.length}`
+                    )}
                   </span>
                   <div className="organ-title-row">
                     <h3 className="part-study-name">

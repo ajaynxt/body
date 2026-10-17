@@ -150,7 +150,6 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
         const arrayBuffer = await uploadFile.arrayBuffer();
         const doc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
         detectedPages = doc.numPages;
-        await doc.destroy();
         if (!Number.isFinite(detectedPages) || detectedPages < 1) {
           throw new Error('The PDF has no readable pages.');
         }

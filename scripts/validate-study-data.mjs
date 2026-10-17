@@ -5,7 +5,7 @@ const read = path => readFile(new URL(path, import.meta.url), 'utf8');
 const [
   femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource,
   bookReaderSource, anatomyVisualSource, librarySource, starterContentSource,
-  threeViewerSource, threeCanvasSource, cacheSource, studyLibrarySource,
+  threeViewerSource, threeCanvasSource, cacheSource, studyLibrarySource, pdfReaderSource, indexCssSource,
 ] = await Promise.all([
   read('../public/models/atlas-female.json'),
   read('../src/data/chapters.ts'),
@@ -20,6 +20,8 @@ const [
   read('../src/components/ThreeCanvas.tsx'),
   read('../src/utils/cacheStorage.ts'),
   read('../src/components/StudyLibrary.tsx'),
+  read('../src/components/PDFBookReader.tsx'),
+  read('../src/index.css'),
 ]);
 
 const femaleAtlas = JSON.parse(femaleAtlasText);
@@ -86,6 +88,14 @@ assert.match(librarySource, /starter-books-v1/, 'Starter-book migration must be 
 assert.match(librarySource, /missingStarterBooks = STARTER_BOOKS\.filter/, 'Migration must add only missing starter books and preserve user books.');
 assert.match(studyLibrarySource, /MAX_PDF_SIZE_BYTES = 150 \* 1024 \* 1024/, 'PDF upload must enforce its advertised 150 MB limit.');
 assert.match(studyLibrarySource, /valid, non-password-protected PDF/, 'Invalid PDFs must be rejected before saving instead of being recorded as readable.');
+assert.doesNotMatch(studyLibrarySource, /doc\.destroy\(\)/, 'PDF.js preflight must use only supported PDFDocumentProxy APIs.');
+assert.match(pdfReaderSource, /aria-label="PDF zoom level"/, 'PDF pages need an accessible fine-grained zoom slider.');
+assert.match(pdfReaderSource, /AnatomyStudyVisual/, 'Built-in study pages must include visual anatomy references.');
+assert.match(anatomyVisualSource, /anatomy-image-lightbox/, 'Study diagrams must open into an enlarged lightbox.');
+assert.match(anatomyVisualSource, /aria-label="Diagram zoom level"/, 'Enlarged diagrams need an accessible zoom slider.');
+assert.match(anatomyVisualSource, /setZoomScale\(scale => Math\.min\(4/, 'Diagram zoom should support detailed close-up inspection.');
+assert.match(indexCssSource, /\.anatomy-image-lightbox__viewport/, 'Image zoom view must scroll when an image exceeds the viewport.');
+assert.match(indexCssSource, /@media \(max-width: 680px\)/, 'Diagram and PDF zoom controls need mobile layout rules.');
 assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');
 assert.match(questionBankSource, /hasMnemonicParts = eligibleParts\.some/, 'Mnemonic questions must only be selected when data exists.');
 assert.match(questionBankSource, /new Set\([\s\S]*treatment !== correctTreatment/, 'Treatment answer choices must not duplicate the correct answer.');

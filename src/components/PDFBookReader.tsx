@@ -35,6 +35,7 @@ import {
   saveBook,
 } from '../utils/libraryStorage';
 import { STARTER_BOOK_CONTENTS } from '../data/starterBookContents';
+import { AnatomyStudyVisual } from './AnatomyStudyVisual';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Configure PDF.js worker
@@ -454,28 +455,47 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
             </button>
           )}
 
-          {/* Zoom Controls */}
+          {/* Study zoom controls: enlarge small labels/diagrams and return to a readable baseline. */}
           {hasPdfBlob && (
-            <div className="reader-zoom-group">
+            <div className="reader-zoom-group" role="group" aria-label="PDF zoom controls">
               <button
-                onClick={() => setScale((s) => Math.max(0.6, s - 0.15))}
+                type="button"
+                onClick={() => setScale(s => Math.max(0.5, Number((s - 0.1).toFixed(2))))}
                 className="zoom-btn"
-                title="Zoom Out (-)"
+                title="Zoom out"
+                aria-label="Zoom PDF out"
+                disabled={scale <= 0.5}
               >
-                <ZoomOut size={15} />
+                <ZoomOut size={16} />
               </button>
-              <span className="zoom-label">{Math.round(scale * 100)}%</span>
+              <span className="zoom-label" aria-live="polite">{Math.round(scale * 100)}%</span>
+              <input
+                className="zoom-range"
+                type="range"
+                min={50}
+                max={300}
+                step={5}
+                value={Math.round(scale * 100)}
+                onChange={event => setScale(Number(event.target.value) / 100)}
+                aria-label="PDF zoom level"
+                title="Drag to zoom the PDF page"
+              />
               <button
-                onClick={() => setScale((s) => Math.min(2.5, s + 0.15))}
+                type="button"
+                onClick={() => setScale(s => Math.min(3, Number((s + 0.1).toFixed(2))))}
                 className="zoom-btn"
-                title="Zoom In (+)"
+                title="Zoom in"
+                aria-label="Zoom PDF in"
+                disabled={scale >= 3}
               >
-                <ZoomIn size={15} />
+                <ZoomIn size={16} />
               </button>
               <button
+                type="button"
                 onClick={() => setScale(1.15)}
                 className="zoom-btn reset-zoom"
-                title="Reset Zoom"
+                title="Reset zoom to 115%"
+                aria-label="Reset PDF zoom"
               >
                 <RotateCcw size={13} />
               </button>
@@ -577,6 +597,13 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
               <div className="page-summary-box">
                 <p className="summary-paragraph">{currentStarterPage.summary}</p>
               </div>
+
+              {/* Study diagram: tap to open a larger view with zoom controls. */}
+              <AnatomyStudyVisual
+                name={currentStarterPage.topicTitle}
+                hindiName={currentStarterPage.hindiTitle}
+                system={currentStarterPage.chapterTitle}
+              />
 
               {/* Key High-Yield Bullet Points */}
               <div className="study-section-card key-points-card">

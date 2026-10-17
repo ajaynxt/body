@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, ImageOff } from 'lucide-react';
+import { ExternalLink, ImageOff, Maximize2, ZoomIn, ZoomOut, RotateCcw, X } from 'lucide-react';
 
 interface AnatomyStudyVisualProps {
   name: string;
@@ -127,29 +127,74 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
   variant = 'default',
 }) => {
   const visual = chooseVisual(name, hindiName, latinName, system);
-  const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(visual.file)}?width=900`;
+  const imageUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(visual.file)}?width=1800`;
   const [imageFailed, setImageFailed] = useState(false);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [zoomScale, setZoomScale] = useState(1);
 
   useEffect(() => {
     setImageFailed(false);
+    setIsZoomOpen(false);
+    setZoomScale(1);
   }, [imageUrl]);
+
+  useEffect(() => {
+    if (!isZoomOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsZoomOpen(false);
+      } else if (event.key === '+' || event.key === '=') {
+        event.preventDefault();
+        setZoomScale(scale => Math.min(4, Number((scale + 0.1).toFixed(2))));
+      } else if (event.key === '-') {
+        event.preventDefault();
+        setZoomScale(scale => Math.max(0.5, Number((scale - 0.1).toFixed(2))));
+      } else if (event.key === '0') {
+        setZoomScale(1);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isZoomOpen]);
 
   return (
     <figure className={`anatomy-study-visual ${variant === 'compact' ? 'anatomy-study-visual--compact' : ''}`}>
       <div className="anatomy-study-visual__heading">
         <span>अध्ययन चित्र (Study image)</span>
         <span className="anatomy-study-visual__subject">{visual.label}</span>
+        {!imageFailed && (
+          <button
+            type="button"
+            className="anatomy-study-visual__zoom-trigger"
+            onClick={() => { setZoomScale(1); setIsZoomOpen(true); }}
+            aria-label={`Open a larger view of ${visual.label}`}
+            title="चित्र बड़ा करके देखें (Zoom diagram)"
+          >
+            <Maximize2 size={15} />
+            <span>बड़ा करें</span>
+          </button>
+        )}
       </div>
       <div className="anatomy-study-visual__media">
         {!imageFailed ? (
-          <img
-            src={imageUrl}
-            alt={`${hindiName} — ${visual.label} anatomical reference illustration`}
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-            onError={() => setImageFailed(true)}
-          />
+          <button
+            type="button"
+            className="anatomy-study-visual__open-image"
+            onClick={() => { setZoomScale(1); setIsZoomOpen(true); }}
+            aria-label={`Enlarge ${hindiName} anatomy diagram`}
+            title="Click to enlarge diagram"
+          >
+            <img
+              src={imageUrl}
+              alt={`${hindiName} — ${visual.label} anatomical reference illustration`}
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={() => setImageFailed(true)}
+            />
+          </button>
         ) : (
           <div className="anatomy-study-visual__fallback">
             <ImageOff size={26} />
@@ -164,6 +209,80 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
           स्रोत <ExternalLink size={12} />
         </a>
       </figcaption>
+
+      {isZoomOpen && !imageFailed && (
+        <div
+          className="anatomy-image-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Zoomed study diagram: ${visual.label}`}
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <section className="anatomy-image-lightbox__panel" onClick={event => event.stopPropagation()}>
+            <header className="anatomy-image-lightbox__toolbar">
+              <div className="anatomy-image-lightbox__title">
+                <strong>{visual.label}</strong>
+                <span>{Math.round(zoomScale * 100)}% zoom</span>
+              </div>
+              <div className="anatomy-image-lightbox__controls" role="group" aria-label="Diagram zoom controls">
+                <button
+                  type="button"
+                  onClick={() => setZoomScale(scale => Math.max(0.5, Number((scale - 0.1).toFixed(2))))}
+                  aria-label="Zoom diagram out"
+                  title="Zoom out"
+                  disabled={zoomScale <= 0.5}
+                >
+                  <ZoomOut size={18} />
+                </button>
+                <input
+                  type="range"
+                  min={50}
+                  max={400}
+                  step={10}
+                  value={Math.round(zoomScale * 100)}
+                  onChange={event => setZoomScale(Number(event.target.value) / 100)}
+                  aria-label="Diagram zoom level"
+                />
+                <button
+                  type="button"
+                  onClick={() => setZoomScale(scale => Math.min(4, Number((scale + 0.1).toFixed(2))))}
+                  aria-label="Zoom diagram in"
+                  title="Zoom in"
+                  disabled={zoomScale >= 4}
+                >
+                  <ZoomIn size={18} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoomScale(1)}
+                  aria-label="Reset diagram zoom"
+                  title="Reset zoom"
+                >
+                  <RotateCcw size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsZoomOpen(false)}
+                  aria-label="Close enlarged diagram"
+                  title="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </header>
+            <div className="anatomy-image-lightbox__viewport">
+              <img
+                className="anatomy-image-lightbox__image"
+                src={imageUrl}
+                alt={`${hindiName} — enlarged ${visual.label} study diagram`}
+                style={{ width: `${zoomScale * 100}%` }}
+                draggable={false}
+              />
+            </div>
+            <p className="anatomy-image-lightbox__hint">चित्र को बड़ा/छोटा करने के लिए slider या +/− दबाएँ · Esc से बंद करें · ज़ूम होने पर स्क्रॉल करें</p>
+          </section>
+        </div>
+      )}
     </figure>
   );
 };

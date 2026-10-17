@@ -166,7 +166,10 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="tools-selector-wrap" ref={toolsMenuRef}>
           <button
             className={`tool-btn tools-dropdown-btn ${isToolsMenuOpen ? 'active' : ''}`}
-            onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+            onClick={() => setIsToolsMenuOpen(open => !open)}
+            aria-expanded={isToolsMenuOpen}
+            aria-controls="medical-tools-menu"
+            aria-haspopup="true"
             title={isHindi ? 'चिकित्सीय टूल्स व जांच सूची' : 'Medical Tools & Tests'}
           >
             <Stethoscope size={14} className="text-accent" />
@@ -175,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {isToolsMenuOpen && (
-            <div className="tools-dropdown-menu glass-panel">
+            <div id="medical-tools-menu" className="tools-dropdown-menu glass-panel" role="region" aria-label={isHindi ? 'चिकित्सीय टूल्स' : 'Clinical and learning tools'}>
               <div className="tools-dropdown-header">
                 <strong>{isHindi ? '🔬 चिकित्सीय टूल्स (Medical Tools)' : '🔬 Clinical & Learning Tools'}</strong>
               </div>
@@ -288,7 +291,10 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="language-selector-wrap" ref={langMenuRef}>
           <button
             className="tool-btn lang-toggle-btn"
-            onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+            onClick={() => setIsLangMenuOpen(open => !open)}
+            aria-expanded={isLangMenuOpen}
+            aria-controls="language-selection-menu"
+            aria-haspopup="true"
             title="भाषा चुनें / Select Language (24 Languages)"
             aria-label="Language selection"
           >
@@ -297,7 +303,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {isLangMenuOpen && (
-            <div className="language-dropdown-menu glass-panel">
+            <div id="language-selection-menu" className="language-dropdown-menu glass-panel" role="region" aria-label="Language selection">
               <div className="lang-dropdown-header">
                 <strong>{isHindi ? 'भाषा चुनें (24 Languages)' : 'Select Language (24 Languages)'}</strong>
                 <span className="lang-count-badge">24</span>

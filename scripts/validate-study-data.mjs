@@ -69,7 +69,7 @@ const starterStart = librarySource.indexOf('export const STARTER_BOOKS: StudyBoo
 const starterEnd = librarySource.indexOf('\n];', starterStart);
 assert.ok(starterStart >= 0 && starterEnd > starterStart, 'Starter study books must be defined.');
 const starterBookIds = [...librarySource.slice(starterStart, starterEnd).matchAll(/id:\s*'([^']+)'/g)].map(match => match[1]);
-const starterContentIds = [...starterContentSource.matchAll(/^\s*['"](starter_[\w-]+)['"]\s*:/gm)].map(match => match[1]);
+const starterContentIds = [...starterContentSource.matchAll(/^\s*['"]?(starter_[\w-]+)['"]?\s*:/gm)].map(match => match[1]);
 assert.deepEqual([...new Set(starterContentIds)].sort(), [...new Set(starterBookIds)].sort(), 'Every starter Study book must have matching built-in reader content.');
 
 console.log(`Study data validation passed: ${femaleAtlas.parts.length} female atlas parts, ${mappedElementCount} mapped female study elements, ${starterBookIds.length} starter books.`);

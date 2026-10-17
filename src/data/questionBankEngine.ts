@@ -137,7 +137,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
   // --- ARCHETYPE 2: SCIENTIFIC / LATIN NAME (लैटिन वैज्ञानिक नाम) ---
   if (pickedType === 'latin_name') {
     const partsWithLatin = eligibleParts.filter(p => !!p.latinName);
-    const targetPart = partsWithLatin[Math.floor(Math.random() * partsWithLatin.length)] || activeParts[0];
+    const targetPart = partsWithLatin[Math.floor(Math.random() * partsWithLatin.length)] || eligibleParts[0];
     const distractors = pickDistractors(partsWithLatin, 3, p => p.id === targetPart.id);
 
     const shuffled = shuffle([targetPart, ...distractors]);
@@ -218,7 +218,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
   // --- ARCHETYPE 5: MEMORY MNEMONIC (याद रखने की ट्रिक्स) ---
   if (pickedType === 'memory_mnemonic') {
     const partsWithMnemonics = eligibleParts.filter(p => !!p.memoryTrickHindi || !!p.highYieldMnemonic);
-    const targetPart = partsWithMnemonics[Math.floor(Math.random() * partsWithMnemonics.length)] || activeParts[0];
+    const targetPart = partsWithMnemonics[Math.floor(Math.random() * partsWithMnemonics.length)] || eligibleParts[0];
     const distractors = pickDistractors(activeParts, 3, p => p.id === targetPart.id);
 
     const shuffled = shuffle([targetPart, ...distractors]);

@@ -180,18 +180,21 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
       <div className="bottom-dock-wrap pointer-events-auto">
         <div className={`bottom-dock-card glass-panel ${isDockExpanded ? 'expanded' : 'compact'}`}>
           {/* Compact Mini Dock Toggle Header */}
-          <div
-            className="dock-compact-bar"
-            onClick={() => setIsDockExpanded(!isDockExpanded)}
-            title="विस्फोट व्यू व त्वचा पारदर्शिता स्लाइडर खोलें/बंद करें"
-          >
-            <div className="dock-bar-left">
+          <div className="dock-compact-bar">
+            <button
+              type="button"
+              className="dock-bar-left dock-toggle-label"
+              onClick={() => setIsDockExpanded(expanded => !expanded)}
+              aria-expanded={isDockExpanded}
+              aria-controls="anatomy-explode-controls"
+              title="विस्फोट व्यू व त्वचा पारदर्शिता स्लाइडर खोलें/बंद करें"
+            >
               <Layers size={14} className="text-accent" />
               <span className="dock-bar-title">3D विच्छेदन व फैलाव (Explode Slider)</span>
               {explodeValue > 0 && (
                 <span className="explode-pct-badge">{Math.round(explodeValue * 100)}%</span>
               )}
-            </div>
+            </button>
 
             <div className="dock-bar-right">
               {activeGender === 'female' && (
@@ -199,7 +202,14 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
                   <Eye size={12} /> {Math.round(skinOpacity * 100)}%
                 </span>
               )}
-              <button className="dock-toggle-arrow-btn">
+              <button
+                type="button"
+                className="dock-toggle-arrow-btn"
+                onClick={() => setIsDockExpanded(expanded => !expanded)}
+                aria-expanded={isDockExpanded}
+                aria-controls="anatomy-explode-controls"
+                aria-label={isDockExpanded ? 'Collapse 3D layer controls' : 'Expand 3D layer controls'}
+              >
                 {isDockExpanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
               </button>
             </div>
@@ -207,7 +217,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
 
           {/* Expanded Sliders Section */}
           {isDockExpanded && (
-            <div className="dock-expanded-content fade-in">
+            <div id="anatomy-explode-controls" className="dock-expanded-content fade-in">
               {/* Female Skin Opacity Slider (When Female active) */}
               {activeGender === 'female' && onSkinOpacityChange && (
                 <div className="skin-slider-subrow">

@@ -131,9 +131,10 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
 
         if (blob) {
           setHasPdfBlob(true);
+          let loadingTask: ReturnType<typeof pdfjsLib.getDocument> | null = null;
           try {
             const arrayBuffer = await blob.arrayBuffer();
-            const loadingTask = pdfjsLib.getDocument({
+            loadingTask = pdfjsLib.getDocument({
               data: new Uint8Array(arrayBuffer),
             });
             const loadedPdf = await loadingTask.promise;
@@ -167,6 +168,11 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
               });
             }
           } catch (pdfErr) {
+            if (loadingTask) {
+              void loadingTask.destroy().catch(cleanupErr => {
+                console.warn('Could not clean up an unreadable saved PDF:', cleanupErr);
+              });
+            }
             console.error('Failed to parse PDF with pdfjs-dist:', pdfErr);
             if (isMounted) {
               setPdfLoadError('Saved PDF file could not be opened. Attach a valid copy of the PDF to continue reading.');

@@ -1,8 +1,16 @@
-# सचित्र मानव शरीर विज्ञान (Visual 3D Anatomy Book & Disease Guide)
+<div align="center">
+  <img src="public/ajaynxt-avatar.png" width="90" height="90" alt="AJAYNXT" style="border-radius: 18px; box-shadow: 0 4px 20px rgba(0,240,255,0.4);" />
+  
+  # सचित्र मानव शरीर विज्ञान (3D Human Anatomy Atlas)
+  
+  [![Live on GitHub Pages](https://img.shields.io/badge/Live_Demo-GitHub_Pages-00f0ff?style=for-the-badge&logo=github)](https://ajaynxt.github.io/body/)
+  [![Custom Domain](https://img.shields.io/badge/Domain-body.ajaynxt.com-8b5cf6?style=for-the-badge)](https://body.ajaynxt.com/)
+  [![Creator](https://img.shields.io/badge/Architect-AJAYNXT-f59e0b?style=for-the-badge)](https://github.com/ajaynxt)
+  [![3D Meshes](https://img.shields.io/badge/3D_Meshes-2%2C234_Organs-10b981?style=for-the-badge)](#)
 
-An interactive, bilingual 3D Human Anatomy Atlas and Clinical Disease Encyclopedia designed specifically for medical students, NEET aspirants, and visual learners.
-
-Explore **2,234 anatomical meshes** and **3,432 named concepts** from the BodyParts3D reference dataset with side-by-side bilingual textbook study notes, disease pathophysiology, and real-time GPU-accelerated 3D WebGL rendering.
+  <p><b>An interactive, bilingual 3D Human Anatomy Atlas, Virtual Stethoscope, Cadaver Dissection & Clinical Diagnostics Suite.</b></p>
+  <p><i>Designed for MBBS, NEET-UG/PG, Nursing, and Biology students.</i></p>
+</div>
 
 ---
 
@@ -27,6 +35,16 @@ Explore **2,234 anatomical meshes** and **3,432 named concepts** from the BodyPa
   * Zero per-mesh draw call bottleneck: 2,234 parts are batched into ~12–14 system meshes.
   * Vertex transformations, explosion displacements, and visibility discards are driven by a dynamic `Float32Array` `partState` `DataTexture` inside vertex shaders.
   * Instant selection glow (`vec3(0.42, 0.85, 0.78)`) via a `Uint8Array` `selectionState` `DataTexture`.
+
+* **⚡ स्टूडेंट ज़ोन (Student Fun Zone · NEET/MBBS Special):**
+  * 🩺 **3D Virtual Stethoscope & Live ECG Lead II:** Real-time Web Audio API synthesized heartbeats (S1/S2 Lub-Dub), systolic murmur (Aortic stenosis), and wheezing sounds across 5 auscultation landmarks with an interactive BPM slider (45-160 BPM).
+  * 🔪 **Cadaver Dissection Lab:** Step-by-step 4-layer virtual dissection (Skin & Fascia -> Pectoral Wall -> Ribcage & VAN bundles -> Visceral Organs) with scalpel audio and Cunningham's manual dissection pearls.
+  * 💡 **Topper Mnemonics Vault:** Searchable high-yield exam mnemonics (12 Cranial Nerves, 8 Carpal Bones, Femoral Triangle NAVEL, Rotator Cuff SITS, Spleen odd numbers, etc.) with 1-click 3D camera targeting.
+  * 🏆 **3D Spotter Speed Exam:** 30-second rapid timer spotter test with points, streak multiplier 🔥, and medical ranks (Intern -> Senior Resident -> Chief Surgeon).
+
+* **🫀 Clinical Photography & Diagnostics Suite (जांच व X-Ray):**
+  * High-risk early cardiac detection: **CT Calcium Scoring (CAC)**, **High-Sensitivity Troponin I (hs-cTnI)**, **CT Coronary Angiography (CTCA)**, **hs-CRP**, and **12-Lead ECG**.
+  * Complete radiology & imaging guide: **Chest X-Ray**, **Brain MRI**, **CT Abdomen**, and **Ultrasound (USG)** with normal vs abnormal values and preparation protocols.
 
 * **🎯 Student & NEET Exam Focus:**
   * High-yield clinical facts, organ locations, physiological roles, and fun memory tricks.

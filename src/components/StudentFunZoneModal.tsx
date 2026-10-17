@@ -460,7 +460,7 @@ export const StudentFunZoneModal: React.FC<StudentFunZoneModalProps> = ({
         <div className="student-modal-header">
           <div className="student-header-title-wrap">
             <div className="student-mascot-badge">
-              <Sparkles size={20} className="pulse-glow" />
+              <Sparkles size={20} className="text-warning" />
             </div>
             <div>
               <div className="student-header-title-row">

@@ -50,7 +50,7 @@ export const QuickOrganFocusBar: React.FC<Props> = ({
     <div className="quick-organ-focus-pill glass-panel fade-in">
       {/* Organ Title & System Icon */}
       <div className="focus-pill-meta">
-        <div className="focus-icon-wrap pulse-glow">
+        <div className="focus-icon-wrap">
           <Crosshair size={16} className="text-accent" />
         </div>
         <div className="focus-text-wrap">
@@ -106,7 +106,7 @@ export const QuickOrganFocusBar: React.FC<Props> = ({
         {/* Unhide All Parts (अगर कोई अंग छुपाया गया हो) */}
         {hiddenPartsCount > 0 && onUnhideAll && (
           <button
-            className="focus-action-btn unhide-all-btn pulse-glow"
+            className="focus-action-btn unhide-all-btn"
             onClick={onUnhideAll}
             title={`सभी ${hiddenPartsCount} छुपे हुए अंग वापस लाएं`}
           >
@@ -138,7 +138,7 @@ export const QuickOrganFocusBar: React.FC<Props> = ({
         {/* Student Fun Zone (Stethoscope, Cadaver Dissection, Mnemonics) */}
         {onOpenStudentZone && (
           <button
-            className="focus-action-btn student-pill-btn pulse-glow"
+            className="focus-action-btn student-pill-btn"
             onClick={onOpenStudentZone}
             title="स्टूडेंट ज़ोन: स्टेथोस्कोप, डिसेक्शन व टॉपर ट्रिक्स"
           >

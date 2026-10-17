@@ -164,7 +164,7 @@ export const ControlsOverlay: React.FC<ControlsOverlayProps> = ({
             {/* Hidden Parts Counter & Restore */}
             {hiddenPartsCount > 0 && onUnhideAllParts && (
               <button
-                className="layer-chip-btn unhide-alert-chip pulse-glow"
+                className="layer-chip-btn unhide-alert-chip"
                 onClick={onUnhideAllParts}
                 title={`सभी ${hiddenPartsCount} छुपे अंग वापस लाएं`}
               >

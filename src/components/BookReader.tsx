@@ -58,6 +58,7 @@ export const BookReader: React.FC<BookReaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [language, setLanguage] = useState<'hinglish' | 'hindi' | 'english'>('hinglish');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isClinicalExpanded, setIsClinicalExpanded] = useState(false);
 
   // Auto-switch to study tab if an organ was clicked in 3D
   React.useEffect(() => {
@@ -360,7 +361,7 @@ export const BookReader: React.FC<BookReaderProps> = ({
                 </button>
               </div>
 
-              {/* Detailed Educational Breakdown */}
+              {/* Clean Quick Summary Grid */}
               <div className="part-details-grid">
                 <div className="detail-item">
                   <span className="detail-label">📍 कहाँ स्थित है? (Location)</span>
@@ -371,141 +372,156 @@ export const BookReader: React.FC<BookReaderProps> = ({
                   <span className="detail-label">⚙️ मुख्य कार्य (Physiological Function)</span>
                   <p className="detail-text">{currentPart.functionHinglish}</p>
                 </div>
-
-                <div className="detail-item fun-fact-box">
-                  <span className="detail-label">💡 रोचक तथ्य (Fun Fact)</span>
-                  <p className="detail-text">{currentPart.funFactHinglish}</p>
-                </div>
-
-                <div className="detail-item clinical-box">
-                  <span className="detail-label">🩺 चिकित्सीय महत्व (Clinical Significance)</span>
-                  <p className="detail-text">{currentPart.clinicalNoteHinglish}</p>
-                </div>
               </div>
 
-              {/* Scientific Name Etymology & Root Word */}
-              {currentPart.rootWordEtymology && (
-                <div className="etymology-box highlight-border">
-                  <div className="etymology-header">
-                    <Brain size={16} className="text-accent" />
-                    <span className="etymology-heading">🔬 वैज्ञानिक नाम एवं शब्द की उत्पत्ति (Medical Etymology):</span>
-                  </div>
-                  <p className="etymology-content">{currentPart.rootWordEtymology}</p>
+              {/* Quick Highlight Tip */}
+              {(currentPart.funFactHinglish || currentPart.memoryTrickHindi) && (
+                <div className="quick-tip-card highlight-border">
+                  <span className="tip-badge">💡 {currentPart.memoryTrickHindi ? 'याद रखने की ट्रिक (Memory Trick)' : 'रोचक तथ्य (Fun Fact)'}:</span>
+                  <p className="tip-text">{currentPart.memoryTrickHindi || currentPart.funFactHinglish}</p>
                 </div>
               )}
 
-              {/* Memory Trick / Mnemonics */}
-              {currentPart.memoryTrickHindi && (
-                <div className="memory-trick-card highlight-border">
-                  <div className="trick-title-row">
-                    <Sparkles size={16} className="text-warning" />
-                    <span className="trick-heading">💡 याद रखने की धांसू ट्रिक (Memory Shortcut):</span>
-                  </div>
-                  <p className="trick-content">{currentPart.memoryTrickHindi}</p>
+              {/* Collapsible Detailed Clinical Guide & Treatments */}
+              <button
+                className={`clinical-accordion-toggle ${isClinicalExpanded ? 'expanded' : ''}`}
+                onClick={() => setIsClinicalExpanded(!isClinicalExpanded)}
+                type="button"
+                title={isClinicalExpanded ? 'विस्तृत विवरण छुपाएं' : 'विस्तृत चिकित्सीय विवरण व उपचार देखें'}
+              >
+                <div className="accordion-title-wrap">
+                  <Stethoscope size={15} />
+                  <span>{isClinicalExpanded ? 'गहन चिकित्सीय विवरण व उपचार छुपाएं' : 'गहन चिकित्सीय विवरण, दवाएं व उपचार (Clinical Guide)'}</span>
                 </div>
-              )}
+                <span className="toggle-badge">
+                  {isClinicalExpanded ? 'कम देखें ▴' : 'और जानें ▾'}
+                </span>
+              </button>
 
-              {/* Comprehensive Treatments, Medications & Home Remedies */}
-              {(currentPart.treatmentsHinglish || currentPart.medications || currentPart.homeRemedies || currentPart.researchHighlights) && (
-                <div className="part-treatments-container highlight-border">
-                  <div className="treatment-main-header">
-                    <Pill size={17} className="text-success" />
-                    <h4 className="treatment-main-title">💊 संपूर्ण उपचार, दवाएं एवं सावधानियां (Treatments & Care):</h4>
-                  </div>
-
-                  {currentPart.treatmentsHinglish && currentPart.treatmentsHinglish.length > 0 && (
-                    <div className="treatment-block">
-                      <span className="block-label">🩺 चिकित्सकीय इलाज एवं प्रक्रियाएं:</span>
-                      <ul className="block-list">
-                        {currentPart.treatmentsHinglish.map((t, idx) => (
-                          <li key={idx}>{t}</li>
-                        ))}
-                      </ul>
+              {isClinicalExpanded && (
+                <div className="clinical-expanded-section">
+                  {/* Clinical Significance */}
+                  {currentPart.clinicalNoteHinglish && (
+                    <div className="detail-item clinical-box">
+                      <span className="detail-label">🩺 चिकित्सीय महत्व (Clinical Significance)</span>
+                      <p className="detail-text">{currentPart.clinicalNoteHinglish}</p>
                     </div>
                   )}
 
-                  {currentPart.medications && currentPart.medications.length > 0 && (
-                    <div className="treatment-block">
-                      <span className="block-label">💊 मुख्य औषधियां (Standard Medications):</span>
-                      <div className="med-pills-wrap">
-                        {currentPart.medications.map((m, idx) => (
-                          <span key={idx} className="med-pill-tag">
-                            💊 {m}
-                          </span>
-                        ))}
+                  {/* Scientific Name Etymology & Root Word */}
+                  {currentPart.rootWordEtymology && (
+                    <div className="etymology-box highlight-border">
+                      <div className="etymology-header">
+                        <Brain size={16} className="text-accent" />
+                        <span className="etymology-heading">🔬 वैज्ञानिक नाम एवं शब्द की उत्पत्ति (Medical Etymology):</span>
                       </div>
+                      <p className="etymology-content">{currentPart.rootWordEtymology}</p>
                     </div>
                   )}
 
-                  {currentPart.homeRemedies && currentPart.homeRemedies.length > 0 && (
-                    <div className="treatment-block">
-                      <span className="block-label">🌿 घरेलू उपाय एवं सावधानियां (Home Care & Habits):</span>
-                      <ul className="block-list">
-                        {currentPart.homeRemedies.map((hr, idx) => (
-                          <li key={idx}>{hr}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {/* Comprehensive Treatments, Medications & Home Remedies */}
+                  {(currentPart.treatmentsHinglish || currentPart.medications || currentPart.homeRemedies || currentPart.researchHighlights) && (
+                    <div className="part-treatments-container highlight-border">
+                      <div className="treatment-main-header">
+                        <Pill size={17} className="text-success" />
+                        <h4 className="treatment-main-title">💊 संपूर्ण उपचार, दवाएं एवं सावधानियां (Treatments & Care):</h4>
+                      </div>
 
-                  {currentPart.researchHighlights && currentPart.researchHighlights.length > 0 && (
-                    <div className="treatment-block research-block">
-                      <span className="block-label">🔬 शोधकर्ता क्लिनिकल नोट्स (Clinical Research):</span>
-                      <ul className="block-list">
-                        {currentPart.researchHighlights.map((rh, idx) => (
-                          <li key={idx}>{rh}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* NEET / MBBS High-Yield Mnemonic & Pearls */}
-              {currentPart.highYieldMnemonic && (
-                <div className="high-yield-mnemonic-box">
-                  <div className="mnemonic-title-row">
-                    <GraduationCap size={16} className="text-warning" />
-                    <span className="mnemonic-heading">
-                      NEET / MBBS High-Yield Mnemonic (याद रखने की ट्रिक):
-                    </span>
-                  </div>
-                  <p className="mnemonic-content">{currentPart.highYieldMnemonic}</p>
-                  {currentPart.examPearls && currentPart.examPearls.length > 0 && (
-                    <ul className="exam-pearls-list">
-                      {currentPart.examPearls.map((pearl, pIdx) => (
-                        <li key={pIdx}>
-                          <span className="pearl-bullet">⚡</span>
-                          <span>{pearl}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {/* Real Medical Textbooks Citations */}
-              {currentPart.citations && currentPart.citations.length > 0 && (
-                <div className="textbook-citations-box">
-                  <div className="citations-header">
-                    <BookMarked size={16} className="text-accent" />
-                    <h5 className="citations-title">
-                      प्रामाणिक संदर्भ (Standard Medical Textbook Citations):
-                    </h5>
-                  </div>
-                  <div className="citations-cards-stack">
-                    {currentPart.citations.map((cite, cIdx) => (
-                      <div key={cIdx} className="single-citation-card">
-                        <div className="cite-book-title-row">
-                          <span className="cite-book-name">{cite.book}</span>
-                          <span className="cite-chapter-tag">{cite.citation}</span>
+                      {currentPart.treatmentsHinglish && currentPart.treatmentsHinglish.length > 0 && (
+                        <div className="treatment-block">
+                          <span className="block-label">🩺 चिकित्सकीय इलाज एवं प्रक्रियाएं:</span>
+                          <ul className="block-list">
+                            {currentPart.treatmentsHinglish.map((t, idx) => (
+                              <li key={idx}>{t}</li>
+                            ))}
+                          </ul>
                         </div>
-                        <p className="cite-takeaway">
-                          <strong>Takeaway:</strong> {cite.highYieldFact}
-                        </p>
+                      )}
+
+                      {currentPart.medications && currentPart.medications.length > 0 && (
+                        <div className="treatment-block">
+                          <span className="block-label">💊 मुख्य औषधियां (Standard Medications):</span>
+                          <div className="med-pills-wrap">
+                            {currentPart.medications.map((m, idx) => (
+                              <span key={idx} className="med-pill-tag">
+                                💊 {m}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {currentPart.homeRemedies && currentPart.homeRemedies.length > 0 && (
+                        <div className="treatment-block">
+                          <span className="block-label">🌿 घरेलू उपाय एवं सावधानियां (Home Care & Habits):</span>
+                          <ul className="block-list">
+                            {currentPart.homeRemedies.map((hr, idx) => (
+                              <li key={idx}>{hr}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {currentPart.researchHighlights && currentPart.researchHighlights.length > 0 && (
+                        <div className="treatment-block research-block">
+                          <span className="block-label">🔬 शोधकर्ता क्लिनिकल नोट्स (Clinical Research):</span>
+                          <ul className="block-list">
+                            {currentPart.researchHighlights.map((rh, idx) => (
+                              <li key={idx}>{rh}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* NEET / MBBS High-Yield Mnemonic & Pearls */}
+                  {currentPart.highYieldMnemonic && (
+                    <div className="high-yield-mnemonic-box">
+                      <div className="mnemonic-title-row">
+                        <GraduationCap size={16} className="text-warning" />
+                        <span className="mnemonic-heading">
+                          NEET / MBBS High-Yield Mnemonic (याद रखने की ट्रिक):
+                        </span>
                       </div>
-                    ))}
-                  </div>
+                      <p className="mnemonic-content">{currentPart.highYieldMnemonic}</p>
+                      {currentPart.examPearls && currentPart.examPearls.length > 0 && (
+                        <ul className="exam-pearls-list">
+                          {currentPart.examPearls.map((pearl, pIdx) => (
+                            <li key={pIdx}>
+                              <span className="pearl-bullet">⚡</span>
+                              <span>{pearl}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Real Medical Textbooks Citations */}
+                  {currentPart.citations && currentPart.citations.length > 0 && (
+                    <div className="textbook-citations-box">
+                      <div className="citations-header">
+                        <BookMarked size={16} className="text-accent" />
+                        <h5 className="citations-title">
+                          प्रामाणिक संदर्भ (Standard Medical Textbook Citations):
+                        </h5>
+                      </div>
+                      <div className="citations-cards-stack">
+                        {currentPart.citations.map((cite, cIdx) => (
+                          <div key={cIdx} className="single-citation-card">
+                            <div className="cite-book-title-row">
+                              <span className="cite-book-name">{cite.book}</span>
+                              <span className="cite-chapter-tag">{cite.citation}</span>
+                            </div>
+                            <p className="cite-takeaway">
+                              <strong>Takeaway:</strong> {cite.highYieldFact}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -7,49 +7,49 @@
   --font-serif: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Deep Space Obsidian Medical Canvas */
-  --bg-app: #060913;
-  --bg-stage: #070b16;
-  --bg-card: rgba(14, 22, 40, 0.72);
-  --bg-card-hover: rgba(22, 34, 60, 0.85);
-  --bg-input: rgba(12, 18, 34, 0.85);
+  /* Calm Medical Slate & Midnight Navy Theme */
+  --bg-app: #0b1120;
+  --bg-stage: #090e1a;
+  --bg-card: rgba(15, 23, 42, 0.78);
+  --bg-card-hover: rgba(30, 41, 59, 0.88);
+  --bg-input: rgba(15, 23, 42, 0.85);
   
-  --text-main: #f8fafc;
+  --text-main: #f1f5f9;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --text-contrast: #ffffff;
   
-  /* Bioluminescent Accent Palette */
-  --accent-cyan: #00f0ff;
+  /* Soothing Medical Azure Palette */
+  --accent-cyan: #0ea5e9;
   --accent-cyan-light: #38bdf8;
-  --accent-cyan-glow: rgba(0, 240, 255, 0.35);
-  --accent-cyan-bg: rgba(0, 240, 255, 0.08);
+  --accent-cyan-glow: rgba(14, 165, 233, 0.2);
+  --accent-cyan-bg: rgba(14, 165, 233, 0.1);
 
   --accent-indigo: #6366f1;
-  --accent-violet: #a855f7;
-  --accent-violet-glow: rgba(168, 85, 247, 0.35);
+  --accent-violet: #8b5cf6;
+  --accent-violet-glow: rgba(139, 92, 246, 0.2);
 
-  --color-danger: #f43f5e;
-  --color-danger-bg: rgba(244, 63, 94, 0.12);
-  --color-danger-glow: rgba(244, 63, 94, 0.35);
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-danger-glow: rgba(239, 68, 68, 0.2);
 
   --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.12);
-  --color-warning-glow: rgba(245, 158, 11, 0.35);
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-glow: rgba(245, 158, 11, 0.2);
 
   --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.12);
-  --color-success-glow: rgba(16, 185, 129, 0.35);
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-glow: rgba(16, 185, 129, 0.2);
 
-  /* Frosted Cyber-Glass tokens */
-  --glass-bg: rgba(9, 15, 28, 0.82);
-  --glass-bg-subtle: rgba(14, 22, 40, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.09);
-  --glass-border-subtle: rgba(255, 255, 255, 0.05);
-  --glass-border-accent: rgba(0, 240, 255, 0.35);
-  --glass-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --glass-shadow-glow: 0 0 25px -4px rgba(0, 240, 255, 0.25);
-  --glass-blur: blur(24px) saturate(190%);
+  /* Frosted Clinical-Glass tokens */
+  --glass-bg: rgba(15, 23, 42, 0.82);
+  --glass-bg-subtle: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(148, 163, 184, 0.12);
+  --glass-border-subtle: rgba(148, 163, 184, 0.08);
+  --glass-border-accent: rgba(14, 165, 233, 0.3);
+  --glass-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-shadow-glow: 0 4px 16px -2px rgba(14, 165, 233, 0.15);
+  --glass-blur: blur(20px);
 
   --radius-xs: 6px;
   --radius-sm: 10px;
@@ -139,7 +139,7 @@ html, body {
   width: 100vw;
   height: 100vh;
   position: relative;
-  background: radial-gradient(ellipse at 50% 25%, #0e1c34 0%, #070d18 55%, #04070e 100%);
+  background: radial-gradient(ellipse at 50% 25%, #131d33 0%, #0b1120 60%, #080d1a 100%);
   color: var(--text-main);
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -994,6 +994,106 @@ html, body {
 }
 [data-theme="light"] .clinical-box .detail-text {
   color: #14532d;
+}
+
+/* Quick Highlight Tip Card */
+.quick-tip-card {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-left: 3.5px solid #f59e0b;
+}
+
+[data-theme="light"] .quick-tip-card {
+  background: #fffbeb;
+  border-color: #fde68a;
+  border-left-color: #d97706;
+}
+
+.quick-tip-card .tip-badge {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fbbf24;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="light"] .quick-tip-card .tip-badge {
+  color: #b45309;
+}
+
+.quick-tip-card .tip-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #fef3c7;
+}
+
+[data-theme="light"] .quick-tip-card .tip-text {
+  color: #78350f;
+}
+
+/* Progressive Disclosure Collapsible Accordion Toggle */
+.clinical-accordion-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  border-radius: var(--radius-md);
+  color: var(--accent-cyan-light);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.clinical-accordion-toggle:hover {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.38);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .clinical-accordion-toggle {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0284c7;
+}
+
+[data-theme="light"] .clinical-accordion-toggle:hover {
+  background: #e0f2fe;
+}
+
+.accordion-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clinical-accordion-toggle .toggle-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(14, 165, 233, 0.15);
+  color: var(--accent-cyan-light);
+}
+
+[data-theme="light"] .clinical-accordion-toggle .toggle-badge {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284c7;
+}
+
+.clinical-expanded-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.22s ease-out;
 }
 
 .part-related-diseases {
@@ -2589,13 +2689,8 @@ html, body {
 }
 
 .pulse-glow {
-  animation: quiz-pulse 2.5s infinite;
-}
-
-@keyframes quiz-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  /* Subtle steady border without pulsating distracting animation */
+  border-color: rgba(14, 165, 233, 0.4) !important;
 }
 
 /* Book Tabs Header Row & Language Picker */
@@ -4801,6 +4896,164 @@ html, body {
 .coverage-pill.pill-partial-review {
   background: rgba(245, 158, 11, 0.15);
   color: #f59e0b;
+}
+
+/* ==========================================================================
+   CONSOLIDATED MEDICAL TOOLS DROPDOWN STYLES
+   ========================================================================== */
+.tools-selector-wrap {
+  position: relative;
+}
+
+.tools-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(14, 165, 233, 0.1) !important;
+  border-color: rgba(14, 165, 233, 0.25) !important;
+  color: var(--text-main) !important;
+}
+
+.tools-dropdown-btn:hover {
+  background: rgba(14, 165, 233, 0.18) !important;
+  border-color: rgba(14, 165, 233, 0.4) !important;
+}
+
+.tools-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.tools-chevron.open {
+  transform: rotate(180deg);
+}
+
+.tools-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 8px;
+  animation: dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme='light'] .tools-dropdown-menu {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+}
+
+.tools-dropdown-header {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: var(--text-main);
+}
+
+[data-theme='light'] .tools-dropdown-header {
+  border-bottom-color: #e2e8f0;
+}
+
+.tools-list-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tool-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.tool-menu-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(3px);
+}
+
+[data-theme='light'] .tool-menu-item:hover {
+  background: #f1f5f9;
+}
+
+.tool-menu-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tool-menu-icon-wrap.icon-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.tool-menu-icon-wrap.icon-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+}
+
+.tool-menu-icon-wrap.icon-info {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+.tool-menu-icon-wrap.icon-accent {
+  background: rgba(14, 165, 233, 0.12);
+  color: #38bdf8;
+}
+
+.tool-menu-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tool-menu-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.tool-menu-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-zone-nav-btn {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important;
+}
+
+.student-zone-nav-btn:hover {
+  background: rgba(245, 158, 11, 0.22) !important;
 }
 
 /* ==========================================================================

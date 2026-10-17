@@ -181,7 +181,7 @@ export class ThreeViewer {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     this.renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
     this.renderer.setSize(width, height);
-    this.renderer.setClearColor(0x070b16);
+    this.renderer.setClearColor(0x0b1120);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
@@ -1172,12 +1172,12 @@ export class ThreeViewer {
   public setTheme(theme: 'dark' | 'light') {
     if (!this.renderer) return;
     if (theme === 'dark') {
-      this.renderer.setClearColor(0x070b16);
+      this.renderer.setClearColor(0x0b1120);
       if (this.groundMesh) {
-        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0x070b16);
+        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0x0b1120);
       }
       if (this.pedestalMesh) {
-        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0x0f172a);
+        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0x111827);
       }
     } else {
       this.renderer.setClearColor(0xf8fafc);

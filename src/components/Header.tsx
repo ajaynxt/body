@@ -13,6 +13,7 @@ import {
   Layers,
   HeartPulse,
   Zap,
+  ChevronDown,
 } from 'lucide-react';
 import { useTranslation, SUPPORTED_LANGUAGES } from '../i18n';
 
@@ -53,7 +54,9 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { language, setLanguage, meta } = useTranslation();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -61,12 +64,15 @@ export const Header: React.FC<HeaderProps> = ({
       if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
         setIsLangMenuOpen(false);
       }
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(e.target as Node)) {
+        setIsToolsMenuOpen(false);
+      }
     };
-    if (isLangMenuOpen) {
+    if (isLangMenuOpen || isToolsMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isLangMenuOpen]);
+  }, [isLangMenuOpen, isToolsMenuOpen]);
 
   const isHindi = language === 'hi';
 
@@ -124,12 +130,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Center Actions / Mode Toggle */}
+      {/* Center Actions / Main Views */}
       <div className="header-center-modes">
         <button
           className={`mode-toggle-btn ${viewMode === 'book' ? 'active' : ''}`}
           onClick={() => onToggleViewMode('book')}
-          title={isHindi ? 'अध्ययन पुस्तक' : 'Book Study'}
+          title={isHindi ? 'सचित्र अध्ययन पुस्तक' : 'Book Study'}
         >
           <BookOpen size={14} />
           <span>{isHindi ? 'पुस्तक' : 'Book'}</span>
@@ -142,83 +148,141 @@ export const Header: React.FC<HeaderProps> = ({
           <Box size={14} />
           <span>{isHindi ? '3D एटलस' : '3D Atlas'}</span>
         </button>
-        <button
-          className={`mode-toggle-btn ${viewMode === 'library' ? 'active' : ''}`}
-          onClick={() => onToggleViewMode('library')}
-          title={isHindi ? 'लाइब्रेरी (PDF पुस्तकें)' : 'Study Library'}
-        >
-          <Library size={14} />
-          <span>{isHindi ? 'लाइब्रेरी' : 'Library'}</span>
-        </button>
-      </div>
-
-      {/* Right Tools */}
-      <div className="header-right-tools">
-        {/* Study Suite Modes Modal Trigger */}
-        {onOpenStudyModesModal && (
-          <button
-            className="tool-btn study-modes-btn"
-            onClick={onOpenStudyModesModal}
-            title={isHindi ? 'अध्ययन सूट (Flashcards, Layer Mode, Glossary)' : 'Study Modes'}
-          >
-            <Layers size={14} className="text-accent" />
-            <span className="tool-btn-label">{isHindi ? 'अध्ययन मोड' : 'Modes'}</span>
-          </button>
-        )}
-
-        {/* Compare Mode (Male vs Female) */}
-        <button
-          className="tool-btn compare-btn"
-          onClick={onOpenCompareModal}
-          title={isHindi ? 'पुरुष एवं महिला शरीर रचना तुलना' : 'Compare Sexes'}
-        >
-          <GitCompare size={14} className="text-info" />
-          <span className="tool-btn-label">{isHindi ? 'तुलना' : 'Compare'}</span>
-        </button>
-
-        {/* Active Recall Quiz Button */}
-        <button
-          className="tool-btn quiz-btn pulse-glow"
-          onClick={onOpenQuizModal}
-          title={isHindi ? '3D अंग पहचानो क्विज़' : 'Active Recall Quiz'}
-        >
-          <Brain size={14} className="text-warning" />
-          <span className="tool-btn-label">{isHindi ? 'क्विज़' : 'Quiz'}</span>
-        </button>
-
-        {/* Disease Encyclopedia Button */}
-        <button
-          className="tool-btn disease-btn"
-          onClick={onOpenDiseaseModal}
-          title={isHindi ? 'बीमारियों और लक्षणों की मार्गदर्शिका' : 'Disease Guide'}
-        >
-          <Stethoscope size={14} className="text-danger" />
-          <span className="tool-btn-label">{isHindi ? 'रोग कोश' : 'Diseases'}</span>
-        </button>
-
-        {/* Medical Imaging & Cardiac Diagnostics Suite */}
-        {onOpenDiagnosticsModal && (
-          <button
-            className="tool-btn diagnostics-btn pulse-glow"
-            onClick={onOpenDiagnosticsModal}
-            title={isHindi ? 'मेडिकल फोटोग्राफी, एक्स-रे, सीटी, एमआरआई व हार्ट अटैक जांच' : 'Medical Imaging & Heart Tests'}
-          >
-            <HeartPulse size={14} className="text-danger" />
-            <span className="tool-btn-label">{isHindi ? 'जांच व X-Ray' : 'Diagnostics'}</span>
-          </button>
-        )}
-
-        {/* Student Fun Zone (Stethoscope, Dissection, Mnemonics, Spotter) */}
         {onOpenStudentZoneModal && (
           <button
-            className="tool-btn student-zone-btn pulse-glow"
+            className="mode-toggle-btn student-zone-nav-btn"
             onClick={onOpenStudentZoneModal}
-            title={isHindi ? 'स्टूडेंट ज़ोन ⚡ (स्टेथोस्कोप, कैडेवर डिसेक्शन, निमोनिक्स व 3D स्पॉटिंग)' : 'Student Fun Zone ⚡'}
+            title={isHindi ? 'स्टूडेंट ज़ोन ⚡ (स्टेथोस्कोप, डिसेक्शन, निमोनिक्स)' : 'Student Zone ⚡'}
           >
             <Zap size={14} className="text-warning" />
-            <span className="tool-btn-label">{isHindi ? 'स्टूडेंट ज़ोन ⚡' : 'Student Zone ⚡'}</span>
+            <span>{isHindi ? 'स्टूडेंट ज़ोन ⚡' : 'Student Zone ⚡'}</span>
           </button>
         )}
+      </div>
+
+      {/* Right Tools & Dropdowns */}
+      <div className="header-right-tools">
+        {/* Consolidated Medical Tools Dropdown */}
+        <div className="tools-selector-wrap" ref={toolsMenuRef}>
+          <button
+            className={`tool-btn tools-dropdown-btn ${isToolsMenuOpen ? 'active' : ''}`}
+            onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+            title={isHindi ? 'चिकित्सीय टूल्स व जांच सूची' : 'Medical Tools & Tests'}
+          >
+            <Stethoscope size={14} className="text-accent" />
+            <span className="tool-btn-label">{isHindi ? 'टूल्स' : 'Tools'}</span>
+            <ChevronDown size={12} className={`tools-chevron ${isToolsMenuOpen ? 'open' : ''}`} />
+          </button>
+
+          {isToolsMenuOpen && (
+            <div className="tools-dropdown-menu glass-panel">
+              <div className="tools-dropdown-header">
+                <strong>{isHindi ? '🔬 चिकित्सीय टूल्स (Medical Tools)' : '🔬 Clinical & Learning Tools'}</strong>
+              </div>
+              <div className="tools-list-scroll">
+                {onOpenDiagnosticsModal && (
+                  <button
+                    className="tool-menu-item"
+                    onClick={() => {
+                      onOpenDiagnosticsModal();
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <div className="tool-menu-icon-wrap icon-danger">
+                      <HeartPulse size={16} />
+                    </div>
+                    <div className="tool-menu-text-col">
+                      <span className="tool-menu-title">{isHindi ? 'जांच, X-Ray व ECG' : 'Diagnostics & Imaging'}</span>
+                      <span className="tool-menu-desc">{isHindi ? 'हार्ट अटैक टेस्ट, MRI, CT स्कैन व एक्स-रे' : 'Cardiac biomarkers, MRI, CT & X-Ray'}</span>
+                    </div>
+                  </button>
+                )}
+
+                <button
+                  className="tool-menu-item"
+                  onClick={() => {
+                    onOpenDiseaseModal();
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <div className="tool-menu-icon-wrap icon-danger">
+                    <Stethoscope size={16} />
+                  </div>
+                  <div className="tool-menu-text-col">
+                    <span className="tool-menu-title">{isHindi ? 'रोग व निदान कोश' : 'Disease Encyclopedia'}</span>
+                    <span className="tool-menu-desc">{isHindi ? '100+ बीमारियां, लक्षण व मानक इलाज' : '100+ clinical diseases & treatments'}</span>
+                  </div>
+                </button>
+
+                <button
+                  className="tool-menu-item"
+                  onClick={() => {
+                    onOpenQuizModal();
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <div className="tool-menu-icon-wrap icon-warning">
+                    <Brain size={16} />
+                  </div>
+                  <div className="tool-menu-text-col">
+                    <span className="tool-menu-title">{isHindi ? 'अंग पहचान क्विज़' : 'Active Recall Quiz'}</span>
+                    <span className="tool-menu-desc">{isHindi ? '3D इंटरएक्टिव परीक्षा अभ्यास' : '3D anatomical structure test'}</span>
+                  </div>
+                </button>
+
+                <button
+                  className="tool-menu-item"
+                  onClick={() => {
+                    onOpenCompareModal();
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <div className="tool-menu-icon-wrap icon-info">
+                    <GitCompare size={16} />
+                  </div>
+                  <div className="tool-menu-text-col">
+                    <span className="tool-menu-title">{isHindi ? 'स्त्री-पुरुष रचना तुलना' : 'Sex Differences Comparison'}</span>
+                    <span className="tool-menu-desc">{isHindi ? 'शारीरिक व हार्मोनल अंतर' : 'Anatomical & physiological differences'}</span>
+                  </div>
+                </button>
+
+                <button
+                  className="tool-menu-item"
+                  onClick={() => {
+                    onToggleViewMode('library');
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <div className="tool-menu-icon-wrap icon-accent">
+                    <Library size={16} />
+                  </div>
+                  <div className="tool-menu-text-col">
+                    <span className="tool-menu-title">{isHindi ? 'ई-पुस्तकालय (PDFs)' : 'Medical PDF Library'}</span>
+                    <span className="tool-menu-desc">{isHindi ? 'मानक संदर्भ पुस्तकें व पाठ्यसामग्री' : 'Classic textbooks & reference guides'}</span>
+                  </div>
+                </button>
+
+                {onOpenStudyModesModal && (
+                  <button
+                    className="tool-menu-item"
+                    onClick={() => {
+                      onOpenStudyModesModal();
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <div className="tool-menu-icon-wrap icon-accent">
+                      <Layers size={16} />
+                    </div>
+                    <div className="tool-menu-text-col">
+                      <span className="tool-menu-title">{isHindi ? 'अध्ययन सूट' : 'Study Modes'}</span>
+                      <span className="tool-menu-desc">{isHindi ? 'फ्लैशकार्ड्स, लेयर्स व शब्दावली' : 'Flashcards, layers & anatomical glossary'}</span>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* 24-Language Selector Dropdown */}
         <div className="language-selector-wrap" ref={langMenuRef}>

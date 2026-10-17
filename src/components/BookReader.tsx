@@ -35,6 +35,8 @@ interface BookReaderProps {
   onToggleTour: () => void;
   onOpenAudioPlayer?: () => void;
   onOpenAITutor?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export const BookReader: React.FC<BookReaderProps> = ({
@@ -49,6 +51,8 @@ export const BookReader: React.FC<BookReaderProps> = ({
   onToggleTour,
   onOpenAudioPlayer,
   onOpenAITutor,
+  isCollapsed = false,
+  onToggleCollapse,
 }) => {
   const [activeTab, setActiveTab] = useState<'study' | 'diseases' | 'toc'>('study');
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,6 +108,24 @@ export const BookReader: React.FC<BookReaderProps> = ({
     }
   };
 
+  if (isCollapsed) {
+    return (
+      <aside
+        className="book-reader-collapsed-spine glass-panel pointer-events-auto"
+        onClick={onToggleCollapse}
+        title="📖 पाठ्यपुस्तक खोलें (Expand Textbook)"
+      >
+        <button className="spine-expand-btn" aria-label="Expand textbook">
+          <ChevronRight size={18} />
+        </button>
+        <div className="spine-vertical-label">
+          <BookOpen size={14} className="spine-icon text-accent" />
+          <span>{chapter.hindiTitle}</span>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="book-reader-container glass-panel">
       {/* Top Header / Book Tabs & Language Selector */}
@@ -132,30 +154,42 @@ export const BookReader: React.FC<BookReaderProps> = ({
           </button>
         </div>
 
-        {/* 3-Way Language Toggle */}
-        <div className="book-lang-picker">
-          <Languages size={13} className="lang-icon" />
-          <button
-            className={`lang-chip ${language === 'hinglish' ? 'active' : ''}`}
-            onClick={() => setLanguage('hinglish')}
-            title="NEET और मेडिकल छात्रों के लिए सरल भाषा"
-          >
-            Hinglish
-          </button>
-          <button
-            className={`lang-chip ${language === 'hindi' ? 'active' : ''}`}
-            onClick={() => setLanguage('hindi')}
-            title="शुद्ध हिंदी शब्दावली"
-          >
-            हिंदी
-          </button>
-          <button
-            className={`lang-chip ${language === 'english' ? 'active' : ''}`}
-            onClick={() => setLanguage('english')}
-            title="Standard International Medical English"
-          >
-            EN
-          </button>
+        {/* 3-Way Language Toggle & Collapse Button */}
+        <div className="book-lang-and-collapse">
+          <div className="book-lang-picker">
+            <Languages size={13} className="lang-icon" />
+            <button
+              className={`lang-chip ${language === 'hinglish' ? 'active' : ''}`}
+              onClick={() => setLanguage('hinglish')}
+              title="NEET और मेडिकल छात्रों के लिए सरल भाषा"
+            >
+              Hinglish
+            </button>
+            <button
+              className={`lang-chip ${language === 'hindi' ? 'active' : ''}`}
+              onClick={() => setLanguage('hindi')}
+              title="शुद्ध हिंदी चिकित्सा शब्दावली"
+            >
+              हिन्दी
+            </button>
+            <button
+              className={`lang-chip ${language === 'english' ? 'active' : ''}`}
+              onClick={() => setLanguage('english')}
+              title="Standard English Medical Terminology"
+            >
+              English
+            </button>
+          </div>
+
+          {onToggleCollapse && (
+            <button
+              className="sidebar-collapse-btn"
+              onClick={onToggleCollapse}
+              title="पाठ्यपुस्तक समेटें (Collapse to Fullscreen 3D)"
+            >
+              <ChevronLeft size={16} />
+            </button>
+          )}
         </div>
       </div>
 

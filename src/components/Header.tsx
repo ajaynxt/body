@@ -12,6 +12,8 @@ import {
   Globe,
   GitCompare,
   Layers,
+  HeartPulse,
+  Zap,
 } from 'lucide-react';
 import { useTranslation, SUPPORTED_LANGUAGES } from '../i18n';
 
@@ -25,6 +27,8 @@ interface HeaderProps {
   onOpenQuizModal: () => void;
   onOpenCompareModal: () => void;
   onOpenStudyModesModal?: () => void;
+  onOpenDiagnosticsModal?: () => void;
+  onOpenStudentZoneModal?: () => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   currentChapterTitle?: string;
@@ -41,6 +45,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenQuizModal,
   onOpenCompareModal,
   onOpenStudyModesModal,
+  onOpenDiagnosticsModal,
+  onOpenStudentZoneModal,
   theme,
   onToggleTheme,
   currentChapterTitle,
@@ -77,6 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="brand-title-wrap">
             <h1 className="brand-title">{isHindi ? 'सचित्र शरीर विज्ञान' : 'Human Anatomy Atlas'}</h1>
             <span className="edition-badge">3D Atlas</span>
+            <span className="creator-header-pill" title="Lead Architect & Developer: Ajay Saini">by AJAYNXT</span>
           </div>
           <p className="brand-meta">
             {currentChapterTitle ? (
@@ -185,6 +192,30 @@ export const Header: React.FC<HeaderProps> = ({
           <Stethoscope size={14} className="text-danger" />
           <span className="tool-btn-label">{isHindi ? 'रोग कोश' : 'Diseases'}</span>
         </button>
+
+        {/* Medical Imaging & Cardiac Diagnostics Suite */}
+        {onOpenDiagnosticsModal && (
+          <button
+            className="tool-btn diagnostics-btn pulse-glow"
+            onClick={onOpenDiagnosticsModal}
+            title={isHindi ? 'मेडिकल फोटोग्राफी, एक्स-रे, सीटी, एमआरआई व हार्ट अटैक जांच' : 'Medical Imaging & Heart Tests'}
+          >
+            <HeartPulse size={14} className="text-danger" />
+            <span className="tool-btn-label">{isHindi ? 'जांच व X-Ray' : 'Diagnostics'}</span>
+          </button>
+        )}
+
+        {/* Student Fun Zone (Stethoscope, Dissection, Mnemonics, Spotter) */}
+        {onOpenStudentZoneModal && (
+          <button
+            className="tool-btn student-zone-btn pulse-glow"
+            onClick={onOpenStudentZoneModal}
+            title={isHindi ? 'स्टूडेंट ज़ोन ⚡ (स्टेथोस्कोप, कैडेवर डिसेक्शन, निमोनिक्स व 3D स्पॉटिंग)' : 'Student Fun Zone ⚡'}
+          >
+            <Zap size={14} className="text-warning" />
+            <span className="tool-btn-label">{isHindi ? 'स्टूडेंट ज़ोन ⚡' : 'Student Zone ⚡'}</span>
+          </button>
+        )}
 
         {/* 24-Language Selector Dropdown */}
         <div className="language-selector-wrap" ref={langMenuRef}>

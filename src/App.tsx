@@ -8,8 +8,10 @@ import { BookReader } from './components/BookReader';
 import { ControlsOverlay } from './components/ControlsOverlay';
 import { SideOrganInspector } from './components/SideOrganInspector';
 import { GoogleAssistantAudioPlayer } from './components/GoogleAssistantAudioPlayer';
+import { QuickOrganFocusBar } from './components/QuickOrganFocusBar';
 import { fetchJsonWithCache } from './utils/cacheStorage';
 import { resolveAnatomicalPart } from './utils/anatomicalResolver';
+import { medicalAudio } from './utils/medicalAudio';
 
 // Code-split heavy modals and secondary views for instant first page load
 const DiseaseExplorerModal = lazy(() => import('./components/DiseaseExplorerModal').then(m => ({ default: m.DiseaseExplorerModal })));
@@ -20,6 +22,8 @@ const PDFBookReader = lazy(() => import('./components/PDFBookReader').then(m => 
 const CompareModal = lazy(() => import('./components/CompareModal').then(m => ({ default: m.CompareModal })));
 const StudySuiteModal = lazy(() => import('./components/StudySuiteModal').then(m => ({ default: m.StudySuiteModal })));
 const StepByStepAITutor = lazy(() => import('./components/StepByStepAITutor').then(m => ({ default: m.StepByStepAITutor })));
+const MedicalDiagnosticsModal = lazy(() => import('./components/MedicalDiagnosticsModal').then(m => ({ default: m.MedicalDiagnosticsModal })));
+const StudentFunZoneModal = lazy(() => import('./components/StudentFunZoneModal').then(m => ({ default: m.StudentFunZoneModal })));
 
 export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
@@ -71,6 +75,15 @@ export const App: React.FC = () => {
   const [isStudySuiteModalOpen, setIsStudySuiteModalOpen] = useState(false);
   const [isAudioPlayerOpen, setIsAudioPlayerOpen] = useState(false);
   const [isAITutorOpen, setIsAITutorOpen] = useState(false);
+  const [isDiagnosticsModalOpen, setIsDiagnosticsModalOpen] = useState(false);
+  const [isStudentZoneModalOpen, setIsStudentZoneModalOpen] = useState(false);
+
+  // Layout & Layer Visibilities
+  const [isBookReaderCollapsed, setIsBookReaderCollapsed] = useState(false);
+  const [hiddenPartsCount, setHiddenPartsCount] = useState(0);
+  const [visibleSystems, setVisibleSystems] = useState<Set<string>>(
+    () => new Set(['cardiac', 'skeletal', 'muscular', 'arterial', 'venous', 'nervous', 'respiratory', 'digestive', 'urinary', 'reproductive', 'integumentary', 'lymphatic'])
+  );
 
   // Handle URL Routing (Supports both HTML5 pathname and SPA hash fallback for GitHub Pages)
   const parseCurrentRoute = useCallback(() => {
@@ -159,7 +172,34 @@ export const App: React.FC = () => {
     if (viewerRef.current) {
       await viewerRef.current.switchGender(gender);
     }
-  }, []);
+    // Auto-focus female chapter when switching to female
+    if (gender === 'female') {
+      const femaleChapterIdx = BOOK_CHAPTERS.findIndex(c => c.id === 'chapter-female-reproductive');
+      if (femaleChapterIdx >= 0) {
+        setCurrentChapterIndex(femaleChapterIdx);
+        setCurrentPartIndex(0);
+        const femalePart = BOOK_CHAPTERS[femaleChapterIdx].parts[0];
+        if (femalePart) {
+          setSelectedPartItem(femalePart);
+          if (viewerRef.current) {
+            viewerRef.current.selectMultipleParts(femalePart.elements);
+            viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : -0.2);
+          }
+        }
+      }
+    } else {
+      setCurrentChapterIndex(0);
+      setCurrentPartIndex(0);
+      const malePart = BOOK_CHAPTERS[0]?.parts[0];
+      if (malePart) {
+        setSelectedPartItem(malePart);
+        if (viewerRef.current) {
+          viewerRef.current.selectMultipleParts(malePart.elements);
+          viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : -0.2);
+        }
+      }
+    }
+  }, [isBookReaderCollapsed]);
 
   // Handle selecting a part from Book Reader or Study Suite
   const handleSelectPart = useCallback((part: StudyPartItem) => {
@@ -178,9 +218,9 @@ export const App: React.FC = () => {
 
     if (viewerRef.current && part.elements.length > 0) {
       viewerRef.current.selectMultipleParts(part.elements);
-      viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
+      viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [viewMode]);
+  }, [viewMode, isBookReaderCollapsed]);
 
   // Handle isolating a part
   const handleIsolatePart = useCallback((part: StudyPartItem) => {
@@ -192,13 +232,14 @@ export const App: React.FC = () => {
     if (viewerRef.current && part.elements.length > 0) {
       viewerRef.current.selectMultipleParts(part.elements);
       viewerRef.current.setIsolated(true);
-      viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
+      viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [viewMode]);
+  }, [viewMode, isBookReaderCollapsed]);
 
   // Handle clicking directly in 3D viewport ("jis pr click kre vo hi name side me aaye")
   const handle3DPartClick = useCallback((partId: string) => {
     setSelectedPartId(partId);
+    medicalAudio.playScanBeep();
 
     const femaleAtlas = viewerRef.current?.getFemaleAtlas() || null;
     // Resolve organ details (Male, Female, Bones, Muscles, Vessels)
@@ -210,14 +251,66 @@ export const App: React.FC = () => {
         setCurrentPartIndex(resolved.partIndex);
       }
     } else {
-      setSelectedPartItem(null);
+      const cleanName = partId.replace(/^FJ|^HRAF/, '');
+      setSelectedPartItem({
+        id: partId,
+        name: `Anatomical Part ${cleanName}`,
+        hindiName: `शारीरिक संरचना (${cleanName})`,
+        latinName: `Pars anatomica ${cleanName}`,
+        pronunciation: `part ${cleanName}`,
+        system: partId.startsWith('HRAF') ? 'reproductive' : 'muscular',
+        elements: [partId],
+        locationHinglish: 'मानव 3D शारीरिक मॉडल का महत्वपूर्ण अंग अथवा पेशीय ऊतक',
+        functionHinglish: 'शारीरिक संरचनात्मक स्थिरता, गतिशीलता और आंतरिक अंगों की सुरक्षा प्रदान करना।',
+        funFactHinglish: 'शरीर का हर सूक्ष्म ऊतक लाखों विशेष कोशिकाओं से मिलकर बना है।',
+        clinicalNoteHinglish: 'रेडियोलॉजिकल इमेजिंग (सीटी/एमआरआई) द्वारा इसकी सटीक शारीरिक स्थिति का अध्ययन किया जाता है।',
+        relatedDiseases: ['मांसपेशीय खिंचाव (Strain)', 'सूजन (Inflammation)', 'संरचनात्मक क्षति (Structural lesion)'],
+      });
     }
 
     if (viewerRef.current) {
       viewerRef.current.selectPart(partId);
-      viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
+      viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [atlas, activeGender, viewMode]);
+  }, [atlas, activeGender, viewMode, isBookReaderCollapsed]);
+
+  // Handle Hiding specific part ("is ang ko chupaye")
+  const handleHidePart = useCallback(() => {
+    if (!selectedPartId || !viewerRef.current) return;
+    viewerRef.current.hidePart(selectedPartId);
+    setHiddenPartsCount(viewerRef.current.getHiddenPartsCount());
+    setSelectedPartId(null);
+    setSelectedPartItem(null);
+  }, [selectedPartId]);
+
+  // Handle Unhiding all hidden parts
+  const handleUnhideAll = useCallback(() => {
+    if (!viewerRef.current) return;
+    viewerRef.current.unhideAllParts();
+    setHiddenPartsCount(0);
+  }, []);
+
+  // Handle toggling major organ groups (Muscles, Skeleton, Viscera, Vascular, Nerves)
+  const handleToggleOrganGroup = useCallback((group: 'muscles' | 'skeleton' | 'viscera' | 'vascular' | 'nerves') => {
+    if (!viewerRef.current) return;
+    setVisibleSystems(prev => {
+      const next = new Set(prev);
+      let targetSystems: string[] = [];
+      if (group === 'muscles') targetSystems = ['muscular'];
+      else if (group === 'skeleton') targetSystems = ['skeletal'];
+      else if (group === 'viscera') targetSystems = ['cardiac', 'digestive', 'respiratory', 'urinary', 'reproductive', 'endocrine'];
+      else if (group === 'vascular') targetSystems = ['arterial', 'venous'];
+      else if (group === 'nerves') targetSystems = ['nervous', 'brain'];
+
+      const isCurrentlyVisible = targetSystems.some(s => next.has(s));
+      targetSystems.forEach(s => {
+        if (isCurrentlyVisible) next.delete(s);
+        else next.add(s);
+        viewerRef.current?.setSystemVisible(s, !isCurrentlyVisible);
+      });
+      return next;
+    });
+  }, []);
 
   // Handle toggling Solo Focus / Isolate from quick focus pill
   const handleToggleQuickIsolate = useCallback(() => {
@@ -226,10 +319,10 @@ export const App: React.FC = () => {
     if (viewerRef.current) {
       viewerRef.current.setIsolated(next);
       if (next) {
-        viewerRef.current.frameSelectedStructure(viewMode === 'book' ? -0.2 : 0);
+        viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
       }
     }
-  }, [isIsolated, viewMode]);
+  }, [isIsolated, viewMode, isBookReaderCollapsed]);
 
   // Handle selecting a disease from Disease modal or tab
   const handleSelectDisease = useCallback((disease: ClinicalDisease) => {
@@ -344,6 +437,8 @@ export const App: React.FC = () => {
         onOpenQuizModal={() => setIsQuizModalOpen(true)}
         onOpenCompareModal={() => setIsCompareModalOpen(true)}
         onOpenStudyModesModal={() => setIsStudySuiteModalOpen(true)}
+        onOpenDiagnosticsModal={() => setIsDiagnosticsModalOpen(true)}
+        onOpenStudentZoneModal={() => setIsStudentZoneModalOpen(true)}
         theme={theme}
         onToggleTheme={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}
         currentChapterTitle={
@@ -385,6 +480,8 @@ export const App: React.FC = () => {
                 currentChapterIndex={currentChapterIndex}
                 currentPartIndex={currentPartIndex}
                 selectedPart={selectedPartItem}
+                isCollapsed={isBookReaderCollapsed}
+                onToggleCollapse={() => setIsBookReaderCollapsed(!isBookReaderCollapsed)}
                 onSelectChapter={idx => {
                   setCurrentChapterIndex(idx);
                   setCurrentPartIndex(0);
@@ -422,6 +519,33 @@ export const App: React.FC = () => {
                 theme={theme}
               />
 
+              {/* Floating Quick Action & Organ Focus Pill ("JISPR CLICK KRE USKI DETAILS AAYE") */}
+              {selectedPartItem && (
+                <QuickOrganFocusBar
+                  part={selectedPartItem}
+                  isIsolated={isIsolated}
+                  onToggleIsolate={handleToggleQuickIsolate}
+                  onHidePart={handleHidePart}
+                  isPartHidden={selectedPartId ? viewerRef.current?.isPartHidden(selectedPartId) : false}
+                  hiddenPartsCount={hiddenPartsCount}
+                  onUnhideAll={handleUnhideAll}
+                  isMusclesVisible={visibleSystems.has('muscular')}
+                  onToggleMuscles={() => handleToggleOrganGroup('muscles')}
+                  onOpenAudioPlayer={() => setIsAudioPlayerOpen(true)}
+                  onOpenAITutor={() => setIsAITutorOpen(true)}
+                  onOpenStudentZone={() => setIsStudentZoneModalOpen(true)}
+                  onClose={() => {
+                    setSelectedPartId(null);
+                    setSelectedPartItem(null);
+                    setSelectedFemalePart(null);
+                    if (viewerRef.current) {
+                      viewerRef.current.selectPart(null);
+                      viewerRef.current.updateState();
+                    }
+                  }}
+                />
+              )}
+
               <ControlsOverlay
                 activeGender={activeGender}
                 skinOpacity={skinOpacity}
@@ -443,6 +567,10 @@ export const App: React.FC = () => {
                   if (viewerRef.current) viewerRef.current.setAutoRotate(next);
                 }}
                 onReset={handleReset}
+                visibleSystems={visibleSystems}
+                onToggleOrganGroup={handleToggleOrganGroup}
+                hiddenPartsCount={hiddenPartsCount}
+                onUnhideAllParts={handleUnhideAll}
               />
 
               {/* Dedicated Side Inspector Drawer on the side ("side me aaye vo") */}
@@ -474,6 +602,30 @@ export const App: React.FC = () => {
 
       {/* Code-Split Lazy Modals */}
       <Suspense fallback={null}>
+        {/* Medical Imaging & Heart Attack Prevention Diagnostics Modal */}
+        <MedicalDiagnosticsModal
+          isOpen={isDiagnosticsModalOpen}
+          onClose={() => setIsDiagnosticsModalOpen(false)}
+        />
+
+        {/* Student Fun Zone: 3D Stethoscope, Cadaver Dissection, Mnemonics & Spotter Challenge */}
+        <StudentFunZoneModal
+          isOpen={isStudentZoneModalOpen}
+          onClose={() => setIsStudentZoneModalOpen(false)}
+          onSelectOrgan={partId => {
+            handle3DPartClick(partId);
+          }}
+          onSetLayerSystem={sys => {
+            if (sys === 'all') {
+              handleUnhideAll();
+            } else if (sys === 'muscular') {
+              handleToggleOrganGroup('muscles');
+            } else if (sys === 'skeletal') {
+              handleToggleOrganGroup('skeleton');
+            }
+          }}
+        />
+
         {/* Compare Mode Modal (Male vs Female) */}
         <CompareModal
           isOpen={isCompareModalOpen}

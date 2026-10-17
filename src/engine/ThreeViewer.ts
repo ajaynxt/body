@@ -120,6 +120,7 @@ export class ThreeViewer {
   private currentExplodeDamped = 0;
   private visibleSystems = new Set<string>();
   private selectedPartIds = new Set<string>();
+  private hiddenPartIds = new Set<string>();
   private isIsolated = false;
   public currentView: 'three-quarter' | 'front' | 'side' | 'back' = 'three-quarter';
   public isAutoRotating = false;
@@ -808,7 +809,9 @@ export class ThreeViewer {
       const isSelected = this.selectedPartIds.has(part.id);
       let isVisible = false;
 
-      if (this.isIsolated) {
+      if (this.hiddenPartIds.has(part.id)) {
+        isVisible = false;
+      } else if (this.isIsolated) {
         isVisible = isSelected;
       } else {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
@@ -876,7 +879,9 @@ export class ThreeViewer {
       const isSelected = this.selectedPartIds.has(part.id) || this.selectedPartIds.has(part.conceptId);
       let isVisible = false;
 
-      if (isIso) {
+      if (this.hiddenPartIds.has(part.id) || this.hiddenPartIds.has(part.conceptId)) {
+        isVisible = false;
+      } else if (isIso) {
         isVisible = isSelected;
       } else {
         if (part.id === 'HRAF0003') {
@@ -1040,6 +1045,33 @@ export class ThreeViewer {
       this.visibleSystems.clear();
     }
     this.updateState();
+  }
+
+  public hidePart(partId: string) {
+    this.hiddenPartIds.add(partId);
+    this.updateState();
+  }
+
+  public unhidePart(partId: string) {
+    this.hiddenPartIds.delete(partId);
+    this.updateState();
+  }
+
+  public unhideAllParts() {
+    this.hiddenPartIds.clear();
+    this.updateState();
+  }
+
+  public isPartHidden(partId: string): boolean {
+    return this.hiddenPartIds.has(partId);
+  }
+
+  public getHiddenPartsCount(): number {
+    return this.hiddenPartIds.size;
+  }
+
+  public getVisibleSystems(): Set<string> {
+    return new Set(this.visibleSystems);
   }
 
   public selectPart(partId: string | null) {

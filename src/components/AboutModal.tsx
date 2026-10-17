@@ -38,6 +38,38 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
 
+          {/* CREATOR & ARCHITECT SHOWCASE */}
+          <div className="credit-section creator-highlight-section">
+            <div className="credit-badge creator-tag">🚀 प्रमुख निर्माता एवं आर्किटेक्ट (Lead Developer)</div>
+            <h4 className="credit-heading font-extrabold text-accent">Ajay Saini (AJAYNXT)</h4>
+            <p>
+              <strong>AJAYNXT Interactive Technologies</strong> · <code>body.ajaynxt.com</code>
+            </p>
+            <p className="text-muted-small">
+              भारत के मेडिकल, नर्सिंग, नीट (NEET) और जीवविज्ञान के विद्यार्थियों के लिए विश्वस्तरीय 3D संवादात्मक सचित्र शरीर विज्ञान, क्लिनिकल फोटोग्राफी, एक्स-रे, सीटी, एमआरआई और प्रिवेंटिव कार्डियोलॉजी मार्गदर्शिका की संकल्पना और विकास।
+            </p>
+            <div className="link-row">
+              <a
+                href="https://github.com/ajaynxt"
+                target="_blank"
+                rel="noreferrer"
+                className="ext-link highlight-link"
+              >
+                <span>GitHub @ajaynxt</span>
+                <ExternalLink size={13} />
+              </a>
+              <a
+                href="https://body.ajaynxt.com"
+                target="_blank"
+                rel="noreferrer"
+                className="ext-link"
+              >
+                <span>body.ajaynxt.com</span>
+                <ExternalLink size={13} />
+              </a>
+            </div>
+          </div>
+
           {/* 1. MALE DATASET ATTRIBUTION */}
           <div className="credit-section">
             <div className="credit-badge male-tag">♂ पुरुष 3D संदर्भ मॉडल (Male Dataset)</div>

@@ -815,4 +815,247 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       },
     ],
   },
+
+  // CHAPTER 9: ENDOCRINE SYSTEM & HORMONAL REGULATION
+  {
+    id: 'chapter-endocrine',
+    chapterNumber: 9,
+    systemId: 'endocrine',
+    title: 'The Endocrine System & Chemical Messengers',
+    hindiTitle: 'अध्याय 9: अंतःस्रावी तंत्र एवं हार्मोनल नियंत्रण',
+    subtitle: 'शरीर का रासायनिक सिग्नलिंग नेटवर्क — पीयूष ग्रंथि, एड्रिनल और मेटाबॉलिज्म',
+    recommendedBooks: [
+      "Guyton & Hall Physiology (Unit XIV: Endocrinology & Reproduction)",
+      "Williams Textbook of Endocrinology (14th Edition)",
+      "BD Chaurasia's Human Anatomy Vol 3 (Head & Neck: Pituitary & Thyroid)",
+      "Robbins Pathologic Basis of Disease (Endocrine System)"
+    ],
+    introductionHinglish: 'अंतःस्रावी तंत्र (Endocrine System) नलिकाविहीन (Ductless) ग्रंथियों का वह जाल है जो रासायनिक संदेशवाहक यानी हार्मोन सीधे रक्तप्रवाह में छोड़ता है। ये हार्मोन वृद्धि, विकास, रक्तचाप, मेटाबॉलिज्म, नींद और तनाव को नियंत्रित करते हैं। मस्तिष्क का हाइपोथैलेमस और पीयूष ग्रंथि (Pituitary Gland) इस पूरे तंत्र के सर्वोच्च कमांडर हैं।',
+    howItWorksHinglish: 'पीयूष ग्रंथि अन्य सभी ग्रंथियों को TSH, ACTH, LH, FSH जैसे प्रेरक हार्मोन भेजती है। जब रक्त में किसी हार्मोन का स्तर बढ़ जाता है, तो नेगेटिव फीडबैक लूप (Negative Feedback Mechanism) द्वारा हाइपोथैलेमस उसका स्राव रोक देता है। एड्रिनल ग्रंथि आपातकाल में एड्रेनालाईन छोड़ती है जिसे "फाइट या फ्लाइट" रिस्पॉन्स कहते हैं।',
+    introductionHindi: 'अंतःस्रावी तंत्र डक्टलेस ग्रंथियों का समूह है जो विभिन्न जैव-रासायनिक क्रियाओं के नियमन हेतु हार्मोन्स का सीधे रुधिर में विसर्जन करता है। पीयूष ग्रंथि समस्त कायिक ग्रंथियों का मास्टर रेगुलेटर है।',
+    introductionEn: 'The endocrine system comprises ductless glandular tissues synthesizing peptide and steroid hormones directly into systemic circulation, regulating homeostasis via exquisitely tuned negative feedback loops.',
+    howItWorksHindi: 'हाइपोथैलेमो-पिट्यूटरी अक्ष द्वारा नियंत्रित फीडबैक पाथवे से लक्ष्य अंग सक्रिय होते हैं तथा उपापचय, खनिज संतुलन व तनाव का नियंत्रण होता है।',
+    howItWorksEn: 'Hypothalamic releasing factors direct pituitary trophic hormone secretion, which stimulates target endocrine glands to release effector hormones governed by negative feedback.',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'diabetes-type2' || d.id === 'hypothyroidism'),
+    parts: [
+      {
+        id: 'pituitary-gland',
+        name: 'Pituitary Gland (Hypophysis)',
+        hindiName: 'पीयूष ग्रंथि (मास्टर ग्रंथि / हाइपोफिसिस)',
+        latinName: 'Glandula pituitaria / Hypophysis cerebri',
+        pronunciation: 'pi-TOO-i-tair-ee GLAND',
+        system: 'nervous',
+        elements: ['FJ1796'],
+        rootWordEtymology: "ग्रीक 'Hypo' (नीचे) + 'Physis' (वृद्धि)। लैटिन 'Pituita' (कफ/म्यूकस) से उत्पन्न, प्राचीन काल में इसे मस्तिष्क का स्रावक माना जाता था।",
+        memoryTrickHindi: "ट्रिक: \"FLAT PIG\" (एंटीरियर पिट्यूटरी के हार्मोन) — FSH, LH, ACTH, TSH, Prolactin, (Ignore), Growth Hormone।",
+        locationHinglish: 'मस्तिष्क के आधार पर, स्फेनॉइड हड्डी के एक विशेष गड्ढे (Sella Turcica) में एक मटर के दाने के आकार की ग्रंथि।',
+        functionHinglish: 'मास्टर ग्लैंड: थायरॉयड, एड्रिनल, अंडाशय और वृषण को नियंत्रित करने वाले 8 से अधिक महत्वपूर्ण हार्मोन्स का स्राव।',
+        funFactHinglish: 'यह ग्रंथि केवल 0.5 ग्राम वजनी मटर के दाने जितनी होती है, लेकिन पूरे शरीर के विकास और जीवन की गति को यही तय करती है!',
+        clinicalNoteHinglish: 'पिट्यूटरी ट्यूमर ऑप्टिक चियाज्म (Optic Chiasm) को दबाता है, जिससे बाइ-टेम्पोरल हेमीएनोपिया (दोनों आंखों के बाहरी तरफ का दिखना बंद होना) हो जाता है।',
+        highYieldMnemonic: 'FLAT PIG: FSH, LH, ACTH, TSH, Prolactin, GH (Anterior Pituitary Hormones)',
+        examPearls: [
+          'पोस्टीरियर पिट्यूटरी (Neurohypophysis) दो हार्मोन छोड़ती है: Oxytocin (दूध व गर्भाशय संकुचन) और ADH/Vasopressin (जल प्रतिधारण)।',
+          'एंटीरियर पिट्यूटरी राथके की थैली (Rathke\'s pouch - ओरल एक्टोडर्म) से विकसित होती है।'
+        ],
+        citations: [
+          {
+            book: "Guyton and Hall Textbook of Medical Physiology",
+            citation: "Unit XIV, Chapter 76 (Pituitary Hormones and Their Control by the Hypothalamus), pp. 939–952",
+            highYieldFact: "Hypothalamic-hypophyseal portal venous system delivers high concentrations of hypothalamic releasing hormones directly to the anterior pituitary without systemic dilution."
+          }
+        ],
+        relatedDiseases: ['Pituitary Adenoma', 'Diabetes Insipidus', 'Acromegaly'],
+      },
+      {
+        id: 'adrenal-glands',
+        name: 'Adrenal Glands (Suprarenal)',
+        hindiName: 'अधिवृक्क ग्रंथि (एड्रिनल ग्लैंड - जीवनरक्षक ग्रंथि)',
+        latinName: 'Glandulae suprarenales',
+        pronunciation: 'uh-DREE-nuhl GLAND',
+        system: 'urinary',
+        elements: ['FJ3129', 'FJ3130'],
+        rootWordEtymology: "लैटिन 'Ad' (पास) + 'Ren' (गुर्दा)। गुर्दे के ऊपर मुकुट की तरह स्थित होने के कारण इसे Suprarenal भी कहा जाता है।",
+        memoryTrickHindi: "ट्रिक: \"GFR = Salt, Sugar, Sex\" — Zona Glomerulosa (Aldosterone/Salt), Zona Fasciculata (Cortisol/Sugar), Zona Reticularis (Androgens/Sex)।",
+        locationHinglish: 'दोनों गुर्दों (Kidneys) के ऊपरी सिरे पर टोपी की तरह चिपकी हुई दो त्रिकोणीय पीले रंग की ग्रंथियां।',
+        functionHinglish: 'कोर्टिसोल (तनाव हार्मोन), एल्डोस्टेरोन (बीपी व नमक संतुलन) और एड्रेनालाईन (इमरजेंसी एनर्जी) बनाना।',
+        funFactHinglish: 'जब आप किसी खतरे या डर का सामना करते हैं, तो एड्रिनल ग्रंथि 1 सेकंड में एड्रेनालाईन पंप कर हृदय गति 150+ कर देती है ताकि आप लड़ सकें या भाग सकें!',
+        clinicalNoteHinglish: 'कोर्टिसोल की अत्यधिक अधिकता से कुशिंग सिंड्रोम (Cushing\'s syndrome - मून फेस व पेट का मोटापा) और कमी से एडिसन रोग होता है।',
+        highYieldMnemonic: 'GFR: Go Find Rex = Glomerulosa, Fasciculata, Reticularis (बाहर से अंदर की 3 कॉर्टेक्स परतें)',
+        examPearls: [
+          'एड्रिनल मेडुला वास्तव में एक रूपांतरित पोस्ट-गैंग्लिओनिक सिम्पैथेटिक गैन्ग्लियन है जो एड्रेनालाईन (80%) और नॉर-एड्रेनालाईन (20%) छोड़ता है।',
+          'दाएं एड्रिनल का आकार त्रिकोणीय (Pyramidal) और बाएं का अर्धचंद्राकार (Semilunar) होता है।'
+        ],
+        citations: [
+          {
+            book: "Gray's Anatomy (42nd Edition)",
+            citation: "Section 8: Abdomen, Chapter 67 (Suprarenal Glands), pp. 1198–1205",
+            highYieldFact: "Right suprarenal vein drains directly into the Inferior Vena Cava (very short, prone to surgical avulsion), whereas the left drains into the left renal vein."
+          }
+        ],
+        relatedDiseases: ['Addison\'s Disease', 'Cushing\'s Syndrome', 'Pheochromocytoma'],
+      },
+    ],
+  },
+
+  // CHAPTER 10: MUSCULAR SYSTEM & DIAPHRAGM
+  {
+    id: 'chapter-muscular',
+    chapterNumber: 10,
+    systemId: 'muscular',
+    title: 'The Muscular Engine & Respiratory Mechanics',
+    hindiTitle: 'अध्याय 10: पेशी तंत्र, डायफ्राम एवं गतिविज्ञान',
+    subtitle: '400+ कंकाल पेशियों का संकुचन, मायोफिलामेंट्स और श्वास का मुख्य पर्दा',
+    recommendedBooks: [
+      "BD Chaurasia's Human Anatomy Vol 1 & 2 (General Anatomy & Myology)",
+      "Gray's Anatomy 42nd Ed (Section 2: Musculoskeletal System)",
+      "Guyton & Hall Physiology (Unit II: Membrane & Muscle Physiology)",
+      "Netter's Atlas of Human Anatomy (Muscular Plates)"
+    ],
+    introductionHinglish: 'मानव पेशी तंत्र (Muscular System) शरीर के कुल भार का लगभग 40% से 50% हिस्सा बनाता है। इसमें 650 से अधिक कंकाल मांसपेशियां होती हैं जो एक्टिन और मायोसिन प्रोटीन के स्लाइडिंग फिलामेंट मॉडल द्वारा सिकुड़कर हड्डियां चलाती हैं, मुद्रा (Posture) बनाए रखती हैं और शरीर का तापमान 37°C बनाए रखने के लिए गर्मी (Body Heat) पैदा करती हैं।',
+    howItWorksHinglish: 'मस्तिष्क से मोटर न्यूरॉन द्वारा एसिटाइलकोलीन न्यूरोट्रांसमीटर निकलता है। यह सार्कोप्लाज्मिक रेटिकुलम से कैल्शियम आयन मुक्त कराता है। कैल्शियम ट्रोपोनिन से जुड़ता है, जिससे एक्टिन-मायोसिन क्रॉस-ब्रिज बनते हैं और एटीपी (ATP) ऊर्जा खर्च करके मांसपेशी संकुचित होती है।',
+    introductionHindi: 'पेशी तंत्र संकुचनशील ऊतकों का विशाल समूह है जो एटीपी ऊर्जा को यांत्रिक ऊर्जा में बदलकर चलन, रक्त प्रवाह व श्वसन को संभव बनाता है।',
+    introductionEn: 'Skeletal muscles generate contractile force via cyclic interaction of actin and myosin myofilaments powered by ATP hydrolysis under somatic motor innervation.',
+    howItWorksHindi: 'मोटर एंड-प्लेट पर तंत्रिका आवेग से कैल्शियम मुक्त होकर मायोसिन क्रॉस-ब्रिज साइकिलिंग को ट्रिगर करता है, जिससे सार्कोमियर लंबाई घटती है।',
+    howItWorksEn: 'Depolarization triggers sarcoplasmic calcium release, binding troponin-C to expose actin-binding sites for cyclic power strokes of myosin heads.',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'myasthenia-gravis' || d.id === 'diaphragmatic-hernia'),
+    parts: [
+      {
+        id: 'diaphragm-muscle',
+        name: 'Thoracoabdominal Diaphragm',
+        hindiName: 'मध्यच्छद (डायफ्राम - मुख्य श्वसन पेशी)',
+        latinName: 'Diaphragma',
+        pronunciation: 'DY-uh-fram',
+        system: 'muscular',
+        elements: ['FJ3131'],
+        rootWordEtymology: "ग्रीक 'Dia' (आर-पार) + 'Phragma' (बाड़/दीवार)। छाती और पेट के बीच विभाजन रेखा बनाने वाला गुंबदनुमा पर्दा।",
+        memoryTrickHindi: "ट्रिक: \"C3, 4, 5 Keeps the Diaphragm Alive\" — डायफ्राम की एकमात्र मोटर तंत्रिका Phrenic Nerve सर्वाइकल स्पाइन C3, C4, C5 से निकलती है।",
+        locationHinglish: 'छाती की गुहा (Thorax) और पेट की गुहा (Abdomen) के बीच फैला गुंबद के आकार का विशाल पेशीय पर्दा।',
+        functionHinglish: 'श्वास लेने की 75% शक्ति यही पेशी देती है। जब यह नीचे सिकुड़ती है, तो छाती में वैक्यूम बनता है और फेफड़ों में हवा भर जाती है।',
+        funFactHinglish: 'हिचकी (Hiccups) वास्तव में डायफ्राम पेशी का अचानक अनियंत्रित संकुचन है, जिसके बाद वोकल कॉर्ड्स अचानक बंद होकर \"हिक\" की आवाज निकालते हैं!',
+        clinicalNoteHinglish: 'डायफ्राम के कमजोर हिस्से से पेट के अंगों का छाती में खिसकना हायटस हर्निया (Hiatus Hernia) कहलाता है जिससे गंभीर एसिडिटी होती है।',
+        highYieldMnemonic: 'I 8 10 Eggs At 12: T8 = IVC, T10 = Esophagus, T12 = Aorta (डायफ्राम के 3 प्रमुख छिद्र)',
+        examPearls: [
+          'T8 स्तर पर: Inferior Vena Cava और दायां फ्रेनिक नर्व गुजरती है।',
+          'T10 स्तर पर: Esophagus (ग्रासनली) और दोनों Vagus nerves गुजरती हैं।',
+          'T12 स्तर पर: Abdominal Aorta, Thoracic duct और Azygos vein गुजरती हैं।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 1",
+            citation: "Section II: Thorax, Chapter 16 (Thoracic Wall & Diaphragm), pp. 235–250",
+            highYieldFact: "Referred pain from diaphragmatic pleura or peritoneum is felt at the tip of the shoulder (dermatome C4) because the phrenic and supraclavicular nerves share common spinal segments."
+          }
+        ],
+        relatedDiseases: ['Hiatal Hernia', 'Diaphragmatic Rupture', 'Phrenic Nerve Palsy'],
+      },
+    ],
+  },
+
+  // CHAPTER 11: IMMUNE & LYMPHATIC SYSTEM
+  {
+    id: 'chapter-lymphatic',
+    chapterNumber: 11,
+    systemId: 'lymphatic',
+    title: 'The Lymphatic System & Immune Defense',
+    hindiTitle: 'अध्याय 11: लसिका तंत्र एवं रोग-प्रतिरोधक रक्षा प्रणाली',
+    subtitle: 'शरीर की आंतरिक सुरक्षा सेना — प्लीहा (तिल्ली), थाइमस और लसिका वाहिकाएं',
+    recommendedBooks: [
+      "Gray's Anatomy 42nd Ed (Sec. 8: Lymphatic System & Spleen)",
+      "BD Chaurasia's Human Anatomy Vol 2 (Abdomen: Spleen & Portal Circulation)",
+      "Kuby Immunology (8th Edition)",
+      "Guyton & Hall Physiology (Unit VI: Blood Cells, Immunity & Blood Clotting)"
+    ],
+    introductionHinglish: 'लसिका तंत्र (Lymphatic System) शरीर का सीवरेज और सुरक्षा नेटवर्क दोनों है। यह ऊतकों से अतिरिक्त तरल पदार्थ छानकर रक्त में वापस भेजता है और बैक्टीरिया, वायरस और कैंसर कोशिकाओं को नष्ट करने के लिए टी-लिम्फोसाइट्स व बी-लिम्फोसाइट्स की सेना तैनात करता है। प्लीहा (Spleen) शरीर का सबसे बड़ा लसिका अंग है।',
+    howItWorksHinglish: 'रक्त केशिकाओं से जो 2 से 3 लीटर तरल प्रतिदिन छनकर ऊतकों में रह जाता है, लसिका वाहिकाएं उसे सोखकर लिंफ नोड्स में लाती हैं। नोड्स में मैक्रोफेज कीटाणुओं को खा जाते हैं। अंत में थोरेसिक डक्ट द्वारा यह शुद्ध तरल बाएं सबक्लेवियन वेन में छोड़ दिया जाता है।',
+    introductionHindi: 'लसिका तंत्र अतिरिक्त ऊतकीय द्रव का पुनर्चक्रण करने तथा लिम्फोसाइट्स द्वारा रोगाणुओं का भक्षण कर दैहिक प्रतिरक्षा प्रदान करने वाला जटिल संवहनी तंत्र है।',
+    introductionEn: 'The lymphatic system maintains fluid homeostasis by returning extravasated interstitial fluid to the vascular tree while orchestrating antigen surveillance across secondary lymphoid organs.',
+    howItWorksHindi: 'लिम्फ नोड्स और प्लीहा की रेटिकुलो-एंडोथीलियल कोशिकाएं रुधिर में उपस्थित विजातीय पदार्थों व जीर्ण रक्त कणिकाओं को नष्ट करती हैं।',
+    howItWorksEn: 'Afferent lymphatics deliver antigens to nodal germinal centers for clonal expansion of B and T lymphocytes, while the thoracic duct restores lymph to systemic veins.',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'splenomegaly' || d.id === 'lymphoma'),
+    parts: [
+      {
+        id: 'spleen-organ',
+        name: 'Spleen (Lien / तिल्ली)',
+        hindiName: 'प्लीहा (तिल्ली / आरबीसी का कब्रिस्तान)',
+        latinName: 'Lien / Splen',
+        pronunciation: 'SPLEEN',
+        system: 'lymphatic',
+        elements: ['FJ2561'],
+        rootWordEtymology: "ग्रीक 'Splen' और लैटिन 'Lien' से उत्पन्न। स्प्लेनेक्टॉमी (Spleen हटाना) और स्प्लेनोमेगाली (Spleen का बढ़ना)।",
+        memoryTrickHindi: "ट्रिक: \"हैरिस का नियम (1, 3, 5, 7, 9, 11)\" — मोटाई 1 इंच, चौड़ाई 3 इंच, लंबाई 5 इंच, वजन 7 औंस, पसलियां 9 से 11 के बीच स्थित।",
+        locationHinglish: 'पेट के ऊपरी बाएं कोने में (Left Hypochondrium), आमाशय के पीछे और 9वीं से 11वीं पसली के नीचे सुरक्षित।',
+        functionHinglish: '1. पुरानी 120 दिन की घिसी-पिटी RBCs को छानकर नष्ट करना। 2. आपातकाल के लिए लगभग 200-300 मिली खून का भंडार रखना। 3. एंटीबॉडीज बनाना।',
+        funFactHinglish: 'प्लीहा इतनी नाजुक होती है कि सड़क दुर्घटना में पसली टूटने पर यह फट सकती है, जिससे पेट में भारी आंतरिक रक्तस्राव होता है!',
+        clinicalNoteHinglish: 'मलेरिया, कालाजार या टाइफाइड में प्लीहा बहुत बढ़ जाती है (Splenomegaly); सामान्य स्थिति में यह पसली के नीचे नहीं छूई जा सकती।',
+        highYieldMnemonic: 'Odd numbers 1 to 11: 1 x 3 x 5 inches, 7 oz weight, relations with 9th-11th ribs',
+        examPearls: [
+          'सफेद गूदा (White Pulp): टी और बी लिम्फोसाइट्स की प्रतिरक्षा चौकी है।',
+          'लाल गूदा (Red Pulp): कॉर्ड्स ऑफ बिलरोथ (Cords of Billroth) जहां वृद्ध आरबीसी को छाना जाता है।',
+          'स्प्लेनेक्टॉमी के बाद इनकैप्सुलेटेड बैक्टीरिया (Strep. pneumoniae, H. influenzae) से ओवरव्हेल्मिंग पोस्ट-स्प्लेनेक्टॉमी इन्फेक्शन (OPSI) का जोखिम रहता है।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 2",
+            citation: "Abdomen: Spleen and Coeliac Trunk, pp. 315–328",
+            highYieldFact: "The gastrosplenic ligament contains the short gastric vessels and left gastroepiploic vessels; the lienorenal ligament contains the splenic vessels and tail of the pancreas."
+          }
+        ],
+        relatedDiseases: ['Splenomegaly', 'Splenic Rupture', 'Hypersplenism'],
+      },
+    ],
+  },
+
+  // CHAPTER 12: SENSORY ORGANS & VISION
+  {
+    id: 'chapter-sensory',
+    chapterNumber: 12,
+    systemId: 'sensory',
+    title: 'The Sensory Windows & Visual Apparatus',
+    hindiTitle: 'अध्याय 12: संवेदी अंग, नेत्र एवं दृष्टि विज्ञान',
+    subtitle: 'संसार को देखने की खिड़की — कॉर्निया, रेटिना और ऑप्टिक पाथवे',
+    recommendedBooks: [
+      "Gray's Anatomy 42nd Ed (Sec. 4: Sensory Organs - The Eye)",
+      "AK Khurana's Comprehensive Ophthalmology",
+      "BD Chaurasia's Human Anatomy Vol 3 (Head & Neck: Orbit & Eyeball)",
+      "Guyton & Hall Physiology (Unit X: The Special Senses - Optics of Vision)"
+    ],
+    introductionHinglish: 'मानव नेत्र (Human Eye) प्रकृति का सबसे परिष्कृत ऑप्टिकल कैमरा है। यह 1.2 करोड़ से अधिक फोटोरिसेप्टर्स (Rods and Cones) की मदद से प्रकाश की तरंगों को विद्युत तरंगों में बदलकर मस्तिष्क के ऑक्सिपिटल लोब में भेजता है, जहां हम रंग, गहराई, गति और चेहरों की पहचान कर पाते हैं।',
+    howItWorksHinglish: 'प्रकाश कॉर्निया से होकर पुतली (Pupil) से आंख में प्रवेश करता है। क्रिस्टलीय लेंस प्रकाश को रेटिना के केंद्र (Fovea Centralis) पर फोकस करता है। रेटिना में रॉड्स रात के अंधेरे में और कोन्स दिन के रंगों को पकड़ते हैं। ऑप्टिक तंत्रिका (Optic Nerve - Cranial Nerve II) यह सिग्नल मस्तिष्क तक ले जाती है।',
+    introductionHindi: 'नेत्र एक जटिल द्वि-उत्तल प्रकाशिक अंग है जो प्रकाश किरणों को रेटिना पर अभिसरित कर प्रकाश-रासायनिक आवेगों में परिवर्तित करता है।',
+    introductionEn: 'The human eyeball functions as an adaptable photoreceptor camera focusing optical wavefronts via cornea and crystalline lens onto the neurosensory retina.',
+    howItWorksHindi: 'कॉर्निया और लेंस द्वारा अपवर्तित प्रकाश रेटिना के फोविया सेंट्रेलिस पर तीक्ष्ण छवि बनाता है, जिसे ऑप्टिक नर्व विजुअल कॉर्टेक्स में संप्रेषित करती है।',
+    howItWorksEn: 'Photons isomerize 11-cis-retinal in rhodopsin, triggering a transducin-mediated cGMP cascade that hyperpolarizes photoreceptors and propagates signals down the optic nerve.',
+    commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'cataract' || d.id === 'glaucoma'),
+    parts: [
+      {
+        id: 'eyeball-organ',
+        name: 'Eyeball (Bulbus Oculi)',
+        hindiName: 'मानव नेत्र गोलक (आंख / रेटिना व कॉर्निया)',
+        latinName: 'Bulbus oculi',
+        pronunciation: 'EYE-ball',
+        system: 'sensory',
+        elements: ['FJ1282'],
+        rootWordEtymology: "ग्रीक 'Ophthalmos' और लैटिन 'Oculus' (आंख)। ऑप्थैल्मोलॉजी (नेत्र विज्ञान), ओकुलिस्ट, इंट्रोकुलर प्रेशर।",
+        memoryTrickHindi: "ट्रिक: \"LR6 SO4 All the rest 3\" — Lateral Rectus को 6th Cranial nerve (Abducens), Superior Oblique को 4th nerve (Trochlear), और बाकी सभी मांसपेशियों को 3rd nerve (Oculomotor) चलाती है।",
+        locationHinglish: 'खोपड़ी के फेशियल कंकाल के ऑर्बिटल कैविटी (अक्षि गुहा) में सुरक्षित रूप से स्थित लगभग 24 मिमी व्यास का गोलक।',
+        functionHinglish: 'विजुअल इनपुट: 100 लाख से अधिक रंगों को विभेदित करना और त्रि-आयामी (3D Stereoscopic) दृष्टि प्रदान करना।',
+        funFactHinglish: 'आपकी आंख की मांसपेशियां शरीर की सबसे सक्रिय मांसपेशियां हैं — वे दिन में 1,00,000 से अधिक बार सूक्ष्म हलचलें (Saccades) करती हैं!',
+        clinicalNoteHinglish: 'आंख के अंदर का दबाव (IOP - Intraocular Pressure) 21 mmHg से अधिक होने पर ग्लूकोमा (काला मोतिया) हो सकता है जिससे स्थायी अंधापन आ सकता है।',
+        highYieldMnemonic: 'LR6(SO4)3: आंख की 6 एक्स्ट्राओकुलर पेशियों का नर्व सप्लाई फॉर्मूला',
+        examPearls: [
+          'फोविया सेंट्रेलिस (Fovea Centralis): रेटिना का वह बिंदु जहां केवल Cones होते हैं और दृष्टि की तीक्ष्णता (Visual Acuity) सर्वाधिक होती है।',
+          'ब्लाइंड स्पॉट (Optic Disc): वह स्थान जहां से ऑप्टिक नर्व निकलती है; यहां कोई रॉड या कोन नहीं होता।'
+        ],
+        citations: [
+          {
+            book: "AK Khurana's Comprehensive Ophthalmology",
+            citation: "Chapter 1: Anatomy and Development of the Eye, pp. 3–28",
+            highYieldFact: "Cornea provides approximately +43 Diopters (nearly 70%) of the total +60 D refractive power of the human eye, largely at the air-tear film anterior interface."
+          }
+        ],
+        relatedDiseases: ['Glaucoma', 'Cataract', 'Diabetic Retinopathy'],
+      },
+    ],
+  },
 ];
+

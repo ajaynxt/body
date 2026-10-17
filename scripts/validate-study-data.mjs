@@ -117,6 +117,9 @@ assert.match(anatomyVisualSource, /getFocusableElements/, 'The diagram lightbox 
 assert.match(anatomyVisualSource, /document\.body\.style\.overflow = 'hidden'/, 'Opening a zoomed diagram must prevent background page scrolling.');
 assert.match(headerSource, /aria-expanded=\{isToolsMenuOpen\}/, 'Medical tools menu must expose its expanded state.');
 assert.match(headerSource, /aria-expanded=\{isLangMenuOpen\}/, 'Language menu must expose its expanded state.');
+assert.match(headerSource, /event\.key !== 'Escape'/, 'Header dropdowns must close on Escape.');
+assert.match(headerSource, /langTriggerRef\.current\?\.focus\(\)/, 'Closing the language dropdown must restore keyboard focus.');
+assert.match(headerSource, /toolsTriggerRef\.current\?\.focus\(\)/, 'Closing the tools dropdown must restore keyboard focus.');
 assert.match(indexCssSource, /diagnostics-list-pane[\s\S]*?flex: 0 0 clamp\(176px, 30dvh, 260px\)/, 'Stacked diagnostics view must bound the list pane so the details remain reachable.');
 assert.match(indexCssSource, /input,[\s\S]*?font-size: 16px/, 'Mobile form controls must avoid browser focus zoom.');
 assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');

@@ -32,6 +32,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<ThreeViewer | null>(null);
+  const previousGenderRef = useRef<'male' | 'female'>(activeGender);
 
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -44,7 +45,12 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       atlas,
       onSelectPart,
       onProgress: pct => setLoadingProgress(pct),
-      onError: err => setErrorMessage(err),
+      onError: err => {
+        const isFemaleLoadError = err.startsWith('महिला 3D मॉडल लोड करने में त्रुटि:');
+        // Ignore a late female-load failure after the user has already returned to male mode.
+        if (isFemaleLoadError && viewerRef.current?.getActiveGender() === 'male') return;
+        setErrorMessage(err);
+      },
     });
 
     viewer.setTheme(theme);
@@ -59,12 +65,18 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
     };
   }, [atlas]);
 
-  // Sync active gender with ThreeViewer. Clear a stale female-load warning when leaving that mode.
+  // Sync gender when either the selection changes or atlas loading finishes.
   useEffect(() => {
     if (!viewerRef.current) return;
-    if (activeGender === 'male') setErrorMessage(null);
+    const previousGender = previousGenderRef.current;
+    previousGenderRef.current = activeGender;
+    if (activeGender === 'male' && previousGender === 'female') {
+      setErrorMessage(null);
+      // The female loader may have stopped before 100%; don't leave its spinner over the male model.
+      setLoadingProgress(100);
+    }
     void viewerRef.current.switchGender(activeGender);
-  }, [activeGender]);
+  }, [activeGender, atlas]);
 
   // Sync skin opacity
   useEffect(() => {

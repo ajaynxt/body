@@ -712,16 +712,32 @@ export class ThreeViewer {
 
       // Limit decompression concurrency: the female reference contains multiple large geometry chunks,
       // and decoding all of them at once can cause avoidable memory spikes on laptops/mobile devices.
+      // If one chunk fails, let in-flight workers finish but do not start more chunks; await every
+      // worker before entering catch so a retry cannot race with the failed attempt.
       let nextChunkToLoad = 0;
+      let chunkLoadFailed = false;
+      let chunkLoadError: unknown;
       const workerCount = Math.min(4, targetChunkIndices.length);
       await Promise.all(
         Array.from({ length: workerCount }, async () => {
-          while (nextChunkToLoad < targetChunkIndices.length) {
+          while (!chunkLoadFailed && nextChunkToLoad < targetChunkIndices.length) {
             const chunkIndex = targetChunkIndices[nextChunkToLoad++];
-            await loadSingleFemaleChunk(chunkIndex);
+            try {
+              await loadSingleFemaleChunk(chunkIndex);
+            } catch (error) {
+              if (!chunkLoadFailed) {
+                chunkLoadFailed = true;
+                chunkLoadError = error;
+              }
+            }
           }
         })
       );
+      if (chunkLoadFailed) {
+        throw chunkLoadError instanceof Error
+          ? chunkLoadError
+          : new Error(String(chunkLoadError ?? 'Failed to load a female anatomy chunk'));
+      }
 
       // 4. Merge geometries per system into single draw calls
       systemGeometries.forEach((geos, sysId) => {
@@ -763,7 +779,35 @@ export class ThreeViewer {
       }
     } catch (err) {
       this.femaleLoading = false;
-      this.onError('महिला 3D मॉडल लोड करने में त्रुटि: ' + (err as Error).message);
+      this.femaleLoaded = false;
+      this.femaleAtlas = null;
+      this.femaleRoot.visible = false;
+
+      // Remove partial meshes/materials so a later retry starts cleanly and cannot leave
+      // half a female model layered over the shared fallback anatomy.
+      this.femaleRoot.traverse(object => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.geometry.dispose();
+        if (Array.isArray(object.material)) {
+          object.material.forEach(material => material.dispose());
+        } else {
+          object.material.dispose();
+        }
+      });
+      this.femaleRoot.clear();
+      this.femaleSystemMeshes.clear();
+      this.femaleSystemMaterials.forEach(material => material.dispose());
+      this.femaleSystemMaterials.clear();
+      this.femaleSkinMesh = null;
+      this.femaleIndividualMeshes = [];
+      this.femalePartCentroids = [];
+      this.femalePartBoundingBoxes = [];
+      this.femaleReplacedMaleMuscleIds.clear();
+      this.femalePartStateTexture?.dispose();
+      this.femaleSelectionTexture?.dispose();
+
+      const message = err instanceof Error ? err.message : String(err);
+      this.onError('महिला 3D मॉडल लोड करने में त्रुटि: ' + message);
     }
   }
 
@@ -882,14 +926,19 @@ export class ThreeViewer {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
       }
 
-      // In female mode, replace all male-native systems for which HRA female meshes are loaded.
-      // This prevents male heart, lungs, brain, vessels and digestive/urinary organs showing underneath.
+      // Always suppress male genitalia in female mode. Hide matching male systems/muscles only
+      // after the female atlas has loaded successfully; otherwise keep a usable fallback model visible.
       if (
         this.activeGender === 'female' &&
         (
-          FEMALE_REPLACED_MALE_SYSTEMS.has(part.system) ||
           MALE_GENITALIA_IDS.has(part.id) ||
-          this.femaleReplacedMaleMuscleIds.has(part.id)
+          (
+            this.femaleLoaded &&
+            (
+              FEMALE_REPLACED_MALE_SYSTEMS.has(part.system) ||
+              this.femaleReplacedMaleMuscleIds.has(part.id)
+            )
+          )
         )
       ) {
         isVisible = false;

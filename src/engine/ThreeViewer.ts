@@ -60,11 +60,31 @@ export const FEMALE_SPECIFIC_PARTS = new Set([
   'HRAF0438', 'HRAF0439', 'HRAF0440', 'HRAF0441', 'HRAF0442', 'HRAF0443'
 ]);
 
-// Female reference meshes that should replace the corresponding shared male anatomy.
-const FEMALE_FITTED_SYSTEMS = new Set(['skeletal', 'borrowed', 'donor-muscle']);
+// The HRA female atlas is the source of truth for female skin and native organs.
+// Muscular coverage is partial, so shared male muscles remain only as a fallback.
+const FEMALE_REPLACED_MALE_SYSTEMS = new Set([
+  'integumentary',
+  'sensory',
+  'nervous',
+  'brain',
+  'digestive',
+  'urinary',
+  'cardiac',
+  'arterial',
+  'venous',
+  'respiratory',
+  'lymphatic',
+  'skeletal',
+  'reproductive',
+]);
 
 function isFemaleRenderablePart(part: { id: string; system: string }): boolean {
-  return FEMALE_SPECIFIC_PARTS.has(part.id) || FEMALE_FITTED_SYSTEMS.has(part.system);
+  // Pregnancy-only meshes are excluded from the standard non-pregnant female body view.
+  return part.system !== 'pregnancy';
+}
+
+function isFemaleBreastPart(partId: string): boolean {
+  return partId >= 'HRAF0004' && partId <= 'HRAF0019';
 }
 
 function normalizeMuscleName(name: string): string {
@@ -493,7 +513,7 @@ export class ThreeViewer {
     }
   }
 
-  // --- FEMALE 3D MODEL LOADING (Complete Standalone HuBMAP Female Reference Atlas) ---
+  // --- FEMALE 3D MODEL LOADING (HRA female-native organs with a shared-muscle fallback) ---
 
   private async loadFemaleModel(): Promise<void> {
     if (this.femaleLoaded || this.femaleLoading) return;
@@ -506,8 +526,8 @@ export class ThreeViewer {
       const femaleData = await fetchJsonWithCache<AtlasData>(femaleAtlasUrl);
       this.femaleAtlas = femaleData;
 
-      // Fit the female body with female-reference bones and lower-limb muscles.
-      // Where an identically named male muscle exists, suppress that duplicate in female mode.
+      // Prefer all female-reference systems that are available in HRA v1.10.
+      // Keep shared male muscles only where the female atlas has partial coverage, avoiding exact duplicates.
       const femaleMuscleNames = new Set(
         femaleData.parts
           .filter(part => part.system === 'donor-muscle')
@@ -607,8 +627,8 @@ export class ThreeViewer {
         this.femaleSystemMaterials.set(sysId, mat);
       });
 
-      // Load only chunks containing female skin, reproductive structures, fitted bones and donor muscles.
-      // This keeps the first female switch lighter than loading all 1,220 reference meshes.
+      // Load every chunk needed for the female-reference body, organs, and available musculoskeletal meshes.
+      // Pregnancy-only meshes remain excluded from the default female model.
       const targetChunkIndices = [...new Set(
         femaleData.parts
           .filter(isFemaleRenderablePart)
@@ -632,7 +652,7 @@ export class ThreeViewer {
 
         femaleData.parts.forEach((part, partIdx) => {
           if (part.chunk !== chunkIndex) return;
-          // Keep female-specific organs plus the fitted female skeleton and donor lower-limb muscles.
+          // Use the female atlas for all non-pregnancy anatomy, not only skin/reproductive/skeletal parts.
           if (!isFemaleRenderablePart(part)) return;
 
           const geo = new THREE.BufferGeometry();
@@ -737,11 +757,12 @@ export class ThreeViewer {
     if (this.activeGender === gender) return;
     this.activeGender = gender;
 
-    // The complete human musculoskeletal system (all 206 bones and 400+ muscles) is shared across male and female
+    // Retain the shared root only for anatomy not supplied by the female reference, especially missing muscles.
+    // updateStateTextures hides male-native organs where the female atlas provides a replacement.
     this.maleRoot.visible = true;
 
     if (gender === 'female') {
-      this.femaleRoot.visible = true; // Show female breasts, reproductive organs & contour
+      this.femaleRoot.visible = true; // Female surface, native organs, fitted bones and available muscles
       if (!this.femaleLoaded) {
         await this.loadFemaleModel();
       } else {
@@ -751,7 +772,7 @@ export class ThreeViewer {
       this.femaleRoot.visible = false;
     }
 
-    // Update GPU state texture to hide male genitalia in female mode, or restore them in male mode
+    // Update visibility so the female atlas, rather than male organ meshes, provides the native organs.
     this.updateStateTextures();
   }
 
@@ -847,13 +868,12 @@ export class ThreeViewer {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
       }
 
-      // Female mode uses the fitted female skeleton, female reproductive parts, and matching donor muscles.
-      // Hide male equivalents to avoid male-shaped bones or reproductive anatomy showing through.
+      // In female mode, replace all male-native systems for which HRA female meshes are loaded.
+      // This prevents male heart, lungs, brain, vessels and digestive/urinary organs showing underneath.
       if (
         this.activeGender === 'female' &&
         (
-          part.system === 'skeletal' ||
-          part.system === 'reproductive' ||
+          FEMALE_REPLACED_MALE_SYSTEMS.has(part.system) ||
           MALE_GENITALIA_IDS.has(part.id) ||
           this.femaleReplacedMaleMuscleIds.has(part.id)
         )
@@ -927,13 +947,20 @@ export class ThreeViewer {
           isVisible = this.skinOpacity > 0.02 && this.visibleSystems.has('integumentary');
         } else if (part.system === 'skeletal' || part.system === 'borrowed') {
           isVisible = this.visibleSystems.has('skeletal') || isSelected;
-        } else if (part.system === 'donor-muscle') {
+        } else if (part.system === 'connective') {
+          isVisible = this.visibleSystems.has('connective') || this.visibleSystems.has('skeletal') || isSelected;
+        } else if (part.system === 'donor-muscle' || part.system === 'muscular') {
           isVisible = this.visibleSystems.has('muscular') || isSelected;
-        } else if (part.system === 'reproductive' || part.system === 'pregnancy') {
+        } else if (part.system === 'brain' || part.system === 'sensory') {
+          isVisible = this.visibleSystems.has('nervous') || this.visibleSystems.has(part.system) || isSelected;
+        } else if (part.system === 'pregnancy') {
+          isVisible = isSelected;
+        } else if (part.system === 'reproductive') {
           isVisible = this.visibleSystems.has('reproductive') || isSelected;
-        } else {
-          // Female breasts & mammary gland structures
+        } else if (isFemaleBreastPart(part.id)) {
           isVisible = this.visibleSystems.has('integumentary') || this.visibleSystems.has('muscular') || isSelected;
+        } else {
+          isVisible = this.visibleSystems.has(part.system) || isSelected;
         }
       }
 

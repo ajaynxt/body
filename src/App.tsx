@@ -32,7 +32,24 @@ export const App: React.FC = () => {
   // App & View State
   const [viewMode, setViewMode] = useState<'book' | 'explorer' | 'library' | 'reader'>('book');
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('anatomy_atlas_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    }
+    return 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('anatomy_atlas_theme', theme);
+    } catch {
+      // ignore
+    }
+  }, [theme]);
+
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
   const [selectedFemalePart, setSelectedFemalePart] = useState<StudyPartItem | null>(null);

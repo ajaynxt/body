@@ -47,6 +47,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       onError: err => setErrorMessage(err),
     });
 
+    viewer.setTheme(theme);
     viewerRef.current = viewer;
     if (onViewerReady) {
       onViewerReady(viewer);

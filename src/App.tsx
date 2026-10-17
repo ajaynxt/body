@@ -171,35 +171,20 @@ export const App: React.FC = () => {
     setIsIsolated(false);
     if (viewerRef.current) {
       await viewerRef.current.switchGender(gender);
+      // Keep full body standing in full view - no sudden zoom in
+      viewerRef.current.resetView();
     }
-    // Auto-focus female chapter when switching to female
     if (gender === 'female') {
       const femaleChapterIdx = BOOK_CHAPTERS.findIndex(c => c.id === 'chapter-female-reproductive');
       if (femaleChapterIdx >= 0) {
         setCurrentChapterIndex(femaleChapterIdx);
         setCurrentPartIndex(0);
-        const femalePart = BOOK_CHAPTERS[femaleChapterIdx].parts[0];
-        if (femalePart) {
-          setSelectedPartItem(femalePart);
-          if (viewerRef.current) {
-            viewerRef.current.selectMultipleParts(femalePart.elements);
-            viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : -0.2);
-          }
-        }
       }
     } else {
       setCurrentChapterIndex(0);
       setCurrentPartIndex(0);
-      const malePart = BOOK_CHAPTERS[0]?.parts[0];
-      if (malePart) {
-        setSelectedPartItem(malePart);
-        if (viewerRef.current) {
-          viewerRef.current.selectMultipleParts(malePart.elements);
-          viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : -0.2);
-        }
-      }
     }
-  }, [isBookReaderCollapsed]);
+  }, []);
 
   // Handle selecting a part from Book Reader or Study Suite
   const handleSelectPart = useCallback((part: StudyPartItem) => {

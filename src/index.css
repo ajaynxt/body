@@ -532,14 +532,15 @@ html, body {
   overflow: hidden;
 }
 
-/* Book Reader (Left Pane) */
+/* Book Reader (Fixed Left Side Study Material Pane) */
 .book-reader-container {
-  width: 460px;
-  min-width: 380px;
-  max-width: 520px;
+  width: 380px;
+  min-width: 320px;
+  max-width: 420px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
@@ -2375,19 +2376,25 @@ html, body {
 
 @media (max-width: 768px) {
   .app-main-workspace {
-    flex-direction: column-reverse;
+    flex-direction: row;
+    position: relative;
   }
 
   .book-reader-container {
-    width: 100%;
-    max-width: none;
-    height: 48%;
-    border-right: none;
-    border-top: 1px solid var(--glass-border-subtle);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 330px;
+    max-width: 86vw;
+    height: 100%;
+    z-index: 40;
+    box-shadow: 15px 0 45px rgba(0, 0, 0, 0.75);
   }
 
   .three-viewport-section {
-    height: 52%;
+    width: 100%;
+    height: 100%;
   }
 
   .app-header {

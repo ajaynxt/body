@@ -174,6 +174,7 @@ export class ThreeViewer {
   private animationFrameId = 0;
   private resizeObserver!: ResizeObserver;
   private isDestroyed = false;
+  private initialized = false;
 
   constructor(options: ViewerOptions) {
     this.container = options.container;
@@ -190,13 +191,27 @@ export class ThreeViewer {
     // Use the same default visibility set as the React controls.
     DEFAULT_VISIBLE_SYSTEM_IDS.forEach(systemId => this.visibleSystems.add(systemId));
 
-    this.initScene();
-    this.initStage();
-    this.initStateTextures();
-    this.initMaterials();
-    this.setupEvents();
-    this.loadChunks();
-    this.animate();
+    try {
+      this.initScene();
+      // initScene reports WebGL creation failures via onError; stop before touching uninitialized fields.
+      if (!this.renderer || !this.scene || !this.camera || !this.controls) return;
+
+      this.initStage();
+      this.initStateTextures();
+      this.initMaterials();
+      this.setupEvents();
+      this.initialized = true;
+      this.loadChunks();
+      this.animate();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.onError(`The 3D anatomy viewer could not be initialized: ${message}`);
+      this.destroy();
+    }
+  }
+
+  public isReady(): boolean {
+    return this.initialized && !this.isDestroyed;
   }
 
   private initScene() {
@@ -1401,7 +1416,9 @@ export class ThreeViewer {
   };
 
   public destroy() {
+    if (this.isDestroyed) return;
     this.isDestroyed = true;
+    this.initialized = false;
     cancelAnimationFrame(this.animationFrameId);
     this.resizeObserver?.disconnect();
     this.controls?.dispose();

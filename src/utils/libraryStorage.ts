@@ -31,7 +31,7 @@ export interface BookNote {
 }
 
 const DB_NAME = 'HumanBodyStudyLibraryDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -69,6 +69,11 @@ export const initLibraryDB = (): Promise<IDBDatabase> => {
       if (!db.objectStoreNames.contains('notes')) {
         const noteStore = db.createObjectStore('notes', { keyPath: 'id' });
         noteStore.createIndex('bookId', 'bookId', { unique: false });
+      }
+
+      // Track one-time starter-book seeding so upgrades preserve user deletions and uploads.
+      if (!db.objectStoreNames.contains('meta')) {
+        db.createObjectStore('meta', { keyPath: 'key' });
       }
     };
 
@@ -352,19 +357,33 @@ export const STARTER_BOOKS: StudyBook[] = [
 ];
 
 export const ensureStarterBooksSeeded = async (): Promise<StudyBook[]> => {
-  const existing = await getAllBooks();
-  if (existing.length === 0) {
-    const db = await initLibraryDB();
-    const tx = db.transaction('books', 'readwrite');
-    const store = tx.objectStore('books');
-    for (const book of STARTER_BOOKS) {
-      store.put(book);
-    }
-    await new Promise<void>((resolve, reject) => {
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-    return STARTER_BOOKS;
-  }
-  return existing;
+  const db = await initLibraryDB();
+  return new Promise<StudyBook[]>((resolve, reject) => {
+    const tx = db.transaction(['books', 'meta'], 'readwrite');
+    const booksStore = tx.objectStore('books');
+    const metaStore = tx.objectStore('meta');
+    let resultBooks: StudyBook[] = [];
+
+    const markerRequest = metaStore.get('starter-books-v1');
+    markerRequest.onsuccess = () => {
+      const booksRequest = booksStore.getAll();
+      booksRequest.onsuccess = () => {
+        const existing = (booksRequest.result || []) as StudyBook[];
+        resultBooks = existing;
+
+        // Run once for both fresh installs and users upgrading from older library versions.
+        if (markerRequest.result?.value !== true) {
+          const existingIds = new Set(existing.map(book => book.id));
+          const missingStarterBooks = STARTER_BOOKS.filter(book => !existingIds.has(book.id));
+          missingStarterBooks.forEach(book => booksStore.put(book));
+          metaStore.put({ key: 'starter-books-v1', value: true, updatedAt: Date.now() });
+          resultBooks = [...existing, ...missingStarterBooks];
+        }
+      };
+    };
+
+    tx.oncomplete = () => resolve(resultBooks);
+    tx.onerror = () => reject(tx.error || new Error('Unable to seed study reference books.'));
+    tx.onabort = () => reject(tx.error || new Error('Study reference-book seeding was cancelled.'));
+  });
 };

@@ -56,6 +56,8 @@ function findStudyLocation(
 
 export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
+  const [atlasLoadError, setAtlasLoadError] = useState<string | null>(null);
+  const [atlasLoadAttempt, setAtlasLoadAttempt] = useState(0);
   const viewerRef = useRef<ThreeViewer | null>(null);
 
   // Active Gender Model ('male' = BodyParts3D 4.0, 'female' = Human Reference Atlas v1.10)
@@ -67,8 +69,12 @@ export const App: React.FC = () => {
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('anatomy_atlas_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
+      try {
+        const saved = window.localStorage.getItem('anatomy_atlas_theme');
+        if (saved === 'dark' || saved === 'light') return saved;
+      } catch {
+        // Private browsing or browser policy can disable storage; the app still starts with defaults.
+      }
     }
     return 'light';
   });
@@ -186,18 +192,32 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // Fetch atlas.json (Male reference metadata)
+  // Fetch atlas.json (Male reference metadata), and surface failures with a retry action.
   useEffect(() => {
+    let isMounted = true;
     const base = import.meta.env.BASE_URL || './';
     const atlasUrl = `${base.replace(/\/$/, '')}/models/atlas.json`;
+    setAtlasLoadError(null);
+
     fetchJsonWithCache<AtlasData>(atlasUrl)
       .then((data: AtlasData) => {
+        if (!data || !Array.isArray(data.parts) || !Array.isArray(data.chunks) || data.parts.length === 0) {
+          throw new Error('The anatomy model metadata is incomplete.');
+        }
+        if (!isMounted) return;
         setAtlas(data);
+        setAtlasLoadError(null);
       })
       .catch(err => {
+        if (!isMounted) return;
         console.error('Failed to load atlas.json:', err);
+        setAtlasLoadError('The 3D anatomy metadata could not be loaded. Check your connection and retry.');
       });
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [atlasLoadAttempt]);
 
   const activeChapters = useMemo(() => getChaptersForGender(activeGender), [activeGender]);
   const currentChapter = activeChapters[currentChapterIndex] || activeChapters[0];
@@ -536,6 +556,8 @@ export const App: React.FC = () => {
             <section className={`three-viewport-section ${viewMode === 'explorer' ? 'fullscreen-mode' : 'split-mode'}`}>
               <ThreeCanvas
                 atlas={atlas}
+                atlasLoadError={atlasLoadError}
+                onRetryAtlas={() => setAtlasLoadAttempt(attempt => attempt + 1)}
                 activeGender={activeGender}
                 skinOpacity={skinOpacity}
                 onViewerReady={viewer => {

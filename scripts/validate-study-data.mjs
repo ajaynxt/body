@@ -2,18 +2,25 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
-const [femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource, bookReaderSource, anatomyVisualSource, librarySource, starterContentSource] =
-  await Promise.all([
-    read('../public/models/atlas-female.json'),
-    read('../src/data/chapters.ts'),
-    read('../src/data/questionBankEngine.ts'),
-    read('../src/components/StudentQuizModal.tsx'),
-    read('../src/App.tsx'),
-    read('../src/components/BookReader.tsx'),
-    read('../src/components/AnatomyStudyVisual.tsx'),
-    read('../src/utils/libraryStorage.ts'),
-    read('../src/data/starterBookContents.ts'),
-  ]);
+const [
+  femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource,
+  bookReaderSource, anatomyVisualSource, librarySource, starterContentSource,
+  threeViewerSource, threeCanvasSource, cacheSource, studyLibrarySource,
+] = await Promise.all([
+  read('../public/models/atlas-female.json'),
+  read('../src/data/chapters.ts'),
+  read('../src/data/questionBankEngine.ts'),
+  read('../src/components/StudentQuizModal.tsx'),
+  read('../src/App.tsx'),
+  read('../src/components/BookReader.tsx'),
+  read('../src/components/AnatomyStudyVisual.tsx'),
+  read('../src/utils/libraryStorage.ts'),
+  read('../src/data/starterBookContents.ts'),
+  read('../src/engine/ThreeViewer.ts'),
+  read('../src/components/ThreeCanvas.tsx'),
+  read('../src/utils/cacheStorage.ts'),
+  read('../src/components/StudyLibrary.tsx'),
+]);
 
 const femaleAtlas = JSON.parse(femaleAtlasText);
 assert.equal(femaleAtlas.sex, 'female', 'The female anatomy model must identify its reference sex.');
@@ -67,6 +74,18 @@ assert.match(appSource, /<StudentQuizModal[\s\S]*?chapters=\{activeChapters\}/, 
 assert.match(bookReaderSource, /AnatomyStudyVisual/, 'Each individual Study page must include its anatomy visual.');
 assert.match(anatomyVisualSource, /mammaryGland/, 'Mammary study topics must use a dedicated mammary anatomy diagram.');
 assert.match(anatomyVisualSource, /mammary|breast|nipple|areola/, 'Female breast structures must resolve to the mammary diagram.');
+assert.match(appSource, /try\s*\{\s*const saved = window\.localStorage\.getItem\('anatomy_atlas_theme'\)/, 'Theme initialization must survive disabled browser storage.');
+assert.match(appSource, /atlasLoadError/, 'Atlas load failures must be tracked instead of leaving a spinner forever.');
+assert.match(appSource, /onRetryAtlas=\{\(\) => setAtlasLoadAttempt/, 'Atlas loading must offer a retry action.');
+assert.match(threeViewerSource, /public isReady\(\): boolean/, 'ThreeViewer must expose initialization state.');
+assert.match(threeViewerSource, /if \(!this\.renderer \|\| !this\.scene \|\| !this\.camera \|\| !this\.controls\) return/, 'ThreeViewer must stop safely when WebGL initialization fails.');
+assert.match(threeCanvasSource, /if \(!viewer\.isReady\(\)\)/, 'Canvas must not register a partially initialized viewer.');
+assert.match(cacheSource, /anatomy-models-v2/, 'Model-cache version must change when stale model assets could be reused.');
+assert.match(librarySource, /const DB_VERSION = 2/, 'Study library schema must migrate existing users safely.');
+assert.match(librarySource, /starter-books-v1/, 'Starter-book migration must be tracked in IndexedDB.');
+assert.match(librarySource, /missingStarterBooks = STARTER_BOOKS\.filter/, 'Migration must add only missing starter books and preserve user books.');
+assert.match(studyLibrarySource, /MAX_PDF_SIZE_BYTES = 150 \* 1024 \* 1024/, 'PDF upload must enforce its advertised 150 MB limit.');
+assert.match(studyLibrarySource, /valid, non-password-protected PDF/, 'Invalid PDFs must be rejected before saving instead of being recorded as readable.');
 assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');
 assert.match(questionBankSource, /hasMnemonicParts = eligibleParts\.some/, 'Mnemonic questions must only be selected when data exists.');
 assert.match(questionBankSource, /new Set\([\s\S]*treatment !== correctTreatment/, 'Treatment answer choices must not duplicate the correct answer.');

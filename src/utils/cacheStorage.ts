@@ -3,7 +3,7 @@
  * Stores heavy .bin.gz chunks and .glb models in disk cache for instant (<200ms) reloads.
  */
 
-const CACHE_NAME = 'anatomy-models-v1';
+const CACHE_NAME = 'anatomy-models-v2';
 
 export async function fetchWithCache(url: string): Promise<ArrayBuffer> {
   if (typeof window !== 'undefined' && 'caches' in window) {

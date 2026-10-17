@@ -35,6 +35,7 @@ const CATEGORIES: CategoryType[] = [
 ];
 
 const PRESET_COLORS = ['#7c3aed', '#c026d3', '#8b5cf6', '#d946ef', '#be185d', '#4f46e5', '#6d28d9'];
+const MAX_PDF_SIZE_BYTES = 150 * 1024 * 1024;
 
 export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo3D }) => {
   const [books, setBooks] = useState<StudyBook[]>([]);
@@ -98,20 +99,31 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
 
   // Handle File Selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type !== 'application/pdf') {
-        setUploadError('कृपया एक वैध PDF फ़ाइल चुनें (Only valid .pdf files are supported).');
-        return;
-      }
-      setUploadError(null);
-      setUploadFile(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      // Auto-populate title from filename if empty
-      if (!bookTitle) {
-        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-        setBookTitle(cleanName);
-      }
+    const hasPdfExtension = file.name.toLowerCase().endsWith('.pdf');
+    const hasPdfMime = !file.type || file.type === 'application/pdf' || file.type === 'application/x-pdf';
+    if (!hasPdfExtension && !hasPdfMime) {
+      setUploadFile(null);
+      setUploadError('कृपया एक वैध PDF फ़ाइल चुनें (Only PDF files are supported).');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_PDF_SIZE_BYTES) {
+      setUploadFile(null);
+      setUploadError('PDF 150 MB से बड़ी है। कृपया छोटी फ़ाइल चुनें (Maximum upload size: 150 MB).');
+      e.target.value = '';
+      return;
+    }
+
+    setUploadError(null);
+    setUploadFile(file);
+
+    // Auto-populate title from filename if empty
+    if (!bookTitle) {
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      setBookTitle(cleanName);
     }
   };
 
@@ -131,15 +143,22 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
       setIsSubmitting(true);
       setUploadError(null);
 
-      // Read total pages if possible using PDF.js or fallback to estimated
-      let detectedPages = 10;
+      // Parse the PDF before saving so corrupt, unsupported, or password-locked files aren't added as broken books.
+      let detectedPages = 0;
       try {
         const pdfjsLib = await import('pdfjs-dist');
         const arrayBuffer = await uploadFile.arrayBuffer();
         const doc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
         detectedPages = doc.numPages;
+        await doc.destroy();
+        if (!Number.isFinite(detectedPages) || detectedPages < 1) {
+          throw new Error('The PDF has no readable pages.');
+        }
       } catch (err) {
-        console.warn('Could not pre-read page count with PDF.js, using default:', err);
+        console.error('Could not validate the selected PDF:', err);
+        setUploadError('यह PDF खुल नहीं सकी। कृपया valid, non-password-protected PDF चुनें (Choose a readable PDF).');
+        setIsSubmitting(false);
+        return;
       }
 
       const formattedSize =

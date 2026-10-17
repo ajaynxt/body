@@ -5,6 +5,8 @@ import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ThreeCanvasProps {
   atlas: AtlasData | null;
+  atlasLoadError?: string | null;
+  onRetryAtlas?: () => void;
   activeGender?: 'male' | 'female';
   skinOpacity?: number;
   onViewerReady?: (viewer: ThreeViewer) => void;
@@ -19,6 +21,8 @@ interface ThreeCanvasProps {
 
 export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
   atlas,
+  atlasLoadError = null,
+  onRetryAtlas,
   activeGender = 'male',
   skinOpacity = 0.2,
   onViewerReady,
@@ -54,6 +58,12 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
         setErrorMessage(err);
       },
     });
+
+    // WebGL can be unavailable or blocked. Do not expose a partially initialized viewer.
+    if (!viewer.isReady()) {
+      viewer.destroy();
+      return;
+    }
 
     viewer.setTheme(theme);
     viewerRef.current = viewer;
@@ -127,7 +137,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       <div ref={containerRef} className="three-canvas-mount" />
 
       {/* Loading Bar Overlay */}
-      {loadingProgress < 100 && !errorMessage && (
+      {loadingProgress < 100 && !errorMessage && !atlasLoadError && (
         <div className="loading-glass-overlay">
           <div className="loading-card glass-panel">
             <Loader2 size={24} className="spinning-loader text-accent" />
@@ -150,6 +160,19 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
                 />
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {atlasLoadError && !atlas && (
+        <div className="error-glass-overlay">
+          <div className="error-card glass-panel">
+            <AlertTriangle size={26} className="text-danger" />
+            <p className="error-msg">{atlasLoadError}</p>
+            <button className="reload-btn" onClick={onRetryAtlas} disabled={!onRetryAtlas}>
+              <RefreshCw size={15} />
+              <span>Retry 3D model</span>
+            </button>
           </div>
         </div>
       )}

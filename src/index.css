@@ -95,7 +95,7 @@
   --color-danger-bg: rgba(251, 113, 133, 0.12);
   --color-danger-glow: rgba(251, 113, 133, 0.24);
 
-  --color-warning: #fbbf24;
+  --color-warning: #d7ff42;
   --color-warning-bg: rgba(251, 191, 36, 0.12);
   --color-warning-glow: rgba(251, 191, 36, 0.22);
 
@@ -279,7 +279,7 @@ html, body {
 }
 
 [data-theme="light"] .brand-title {
-  background: linear-gradient(135deg, #0c261b 40%, #7c3aed 100%);
+  background: linear-gradient(135deg, #211438 40%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -412,7 +412,7 @@ html, body {
 }
 
 .mode-toggle-btn.active {
-  background: linear-gradient(135deg, rgba(192, 132, 252, 0.22), rgba(5, 150, 105, 0.22));
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.22), rgba(255, 79, 216, 0.22));
   color: #e879f9;
   border: 1px solid rgba(192, 132, 252, 0.4);
   box-shadow: 0 0 14px rgba(192, 132, 252, 0.22);
@@ -507,7 +507,7 @@ html, body {
 .tool-btn.study-modes-btn {
   background: rgba(245, 158, 11, 0.12);
   border-color: rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 .tool-btn.study-modes-btn:hover {
@@ -518,7 +518,7 @@ html, body {
 .tool-btn.theme-toggle-btn {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--glass-border);
-  color: #facc15;
+  color: #d7ff42;
 }
 
 .tool-btn.icon-only {
@@ -575,7 +575,7 @@ html, body {
 }
 
 [data-theme="dark"] .book-tabs-nav-row {
-  background: rgba(10, 24, 18, 0.95);
+  background: rgba(18, 10, 31, 0.95);
   border-color: rgba(192, 132, 252, 0.2);
 }
 
@@ -657,7 +657,7 @@ html, body {
 }
 
 [data-theme="dark"] .book-sub-toolbar-row {
-  background: rgba(13, 31, 23, 0.9);
+  background: rgba(23, 13, 40, 0.92);
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -723,7 +723,7 @@ html, body {
 }
 
 [data-theme="dark"] .sidebar-collapse-btn {
-  background: rgba(20, 48, 36, 0.8);
+  background: rgba(48, 25, 67, 0.88);
   border-color: rgba(255, 255, 255, 0.1);
   color: #cbd5e1;
 }
@@ -768,7 +768,7 @@ html, body {
 }
 
 [data-theme="dark"] .chapter-banner-card {
-  background: rgba(13, 31, 23, 0.88);
+  background: rgba(23, 13, 40, 0.9);
   border-color: rgba(192, 132, 252, 0.25);
 }
 
@@ -865,7 +865,7 @@ html, body {
 }
 
 [data-theme="dark"] .standard-books-badge-row {
-  background: rgba(10, 24, 18, 0.8);
+  background: rgba(18, 10, 31, 0.84);
 }
 
 .books-badge-label {
@@ -896,7 +896,7 @@ html, body {
 }
 
 [data-theme="dark"] .book-ref-pill {
-  background: rgba(20, 48, 36, 0.8);
+  background: rgba(48, 25, 67, 0.88);
   color: #cde0d5;
 }
 
@@ -910,7 +910,7 @@ html, body {
 }
 
 [data-theme="dark"] .book-card {
-  background: rgba(13, 31, 23, 0.88);
+  background: rgba(23, 13, 40, 0.9);
   border-color: rgba(192, 132, 252, 0.25);
 }
 
@@ -964,7 +964,7 @@ html, body {
 }
 
 [data-theme="dark"] .part-study-card {
-  background: rgba(13, 31, 23, 0.88);
+  background: rgba(23, 13, 40, 0.9);
   border-color: rgba(192, 132, 252, 0.25);
 }
 
@@ -1114,7 +1114,7 @@ html, body {
 }
 
 [data-theme="dark"] .part-nav-toolbar {
-  background: rgba(10, 24, 18, 0.85);
+  background: rgba(18, 10, 31, 0.88);
   border-color: rgba(192, 132, 252, 0.25);
 }
 
@@ -1306,7 +1306,7 @@ html, body {
 }
 
 [data-theme="dark"] .part-treatments-container {
-  background: rgba(13, 31, 23, 0.88);
+  background: rgba(23, 13, 40, 0.9);
 }
 
 .treatment-main-header {
@@ -1434,7 +1434,7 @@ html, body {
 }
 
 [data-theme="dark"] .textbook-citations-box {
-  background: rgba(10, 24, 18, 0.85);
+  background: rgba(18, 10, 31, 0.88);
 }
 
 .citations-header {
@@ -1466,7 +1466,7 @@ html, body {
 }
 
 [data-theme="dark"] .single-citation-card {
-  background: rgba(20, 48, 36, 0.8);
+  background: rgba(48, 25, 67, 0.88);
 }
 
 .cite-book-title-row {
@@ -1686,7 +1686,7 @@ html, body {
 
 .severity-badge.chronic {
   background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  color: #d7ff42;
   border: 1px solid rgba(245, 158, 11, 0.35);
   box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
 }
@@ -2648,7 +2648,7 @@ html, body {
 }
 .severity-tag.chronic {
   background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  color: #d7ff42;
   border: 1px solid rgba(245, 158, 11, 0.35);
   box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
 }
@@ -3225,7 +3225,7 @@ html, body {
 .quiz-btn {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(124, 58, 237, 0.2)) !important;
   border: 1px solid rgba(245, 158, 11, 0.4) !important;
-  color: #fbbf24 !important;
+  color: #d7ff42 !important;
   font-weight: 700 !important;
   gap: 6px;
   position: relative;
@@ -3431,7 +3431,7 @@ html, body {
 }
 
 [data-theme="dark"] .mnemonic-heading {
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 .mnemonic-content {
@@ -4660,7 +4660,7 @@ html, body {
 }
 
 [data-theme="dark"] .study-section-card {
-  background: rgba(13, 31, 23, 0.88);
+  background: rgba(23, 13, 40, 0.9);
   border-color: rgba(192, 132, 252, 0.25);
 }
 
@@ -5573,7 +5573,7 @@ html, body {
 
 .tool-menu-icon-wrap.icon-warning {
   background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 .tool-menu-icon-wrap.icon-info {
@@ -5612,7 +5612,7 @@ html, body {
 .student-zone-nav-btn {
   background: rgba(245, 158, 11, 0.12) !important;
   border-color: rgba(245, 158, 11, 0.3) !important;
-  color: #fbbf24 !important;
+  color: #d7ff42 !important;
 }
 
 .student-zone-nav-btn:hover {
@@ -6471,7 +6471,7 @@ html, body {
 }
 
 .focus-action-btn.solo-btn {
-  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(5, 150, 105, 0.3));
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2), rgba(255, 79, 216, 0.3));
   border-color: rgba(192, 132, 252, 0.4);
   color: #e879f9;
 }
@@ -7071,7 +7071,7 @@ html, body {
 .quiz-head h4 {
   font-size: 14px;
   font-weight: 700;
-  color: #fbbf24;
+  color: #d7ff42;
   margin: 0;
 }
 
@@ -7229,7 +7229,7 @@ html, body {
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: rgba(13, 31, 23, 0.7);
+  background: rgba(23, 13, 40, 0.78);
   border: 1px solid rgba(192, 132, 252, 0.28);
   display: flex;
   flex-direction: column;
@@ -7265,7 +7265,7 @@ html, body {
 }
 
 [data-theme="light"] .etymology-content {
-  color: #0c261b;
+  color: #211438;
   font-weight: 500;
 }
 
@@ -7273,7 +7273,7 @@ html, body {
   margin-top: 14px;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(13, 31, 23, 0.8));
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(23, 13, 40, 0.86));
   border: 1px solid rgba(245, 158, 11, 0.35);
   display: flex;
   flex-direction: column;
@@ -7294,7 +7294,7 @@ html, body {
 .trick-heading {
   font-size: 12px;
   font-weight: 800;
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 [data-theme="light"] .trick-heading {
@@ -7309,7 +7309,7 @@ html, body {
 }
 
 [data-theme="light"] .trick-content {
-  color: #0c261b;
+  color: #211438;
   font-weight: 500;
 }
 
@@ -7317,7 +7317,7 @@ html, body {
   margin-top: 14px;
   padding: 14px;
   border-radius: var(--radius-md);
-  background: rgba(13, 31, 23, 0.7);
+  background: rgba(23, 13, 40, 0.78);
   border: 1px solid rgba(192, 132, 252, 0.3);
   display: flex;
   flex-direction: column;
@@ -7377,7 +7377,7 @@ html, body {
 }
 
 [data-theme="light"] .block-list li {
-  color: #0c261b;
+  color: #211438;
   font-weight: 500;
 }
 
@@ -7392,7 +7392,7 @@ html, body {
   margin-top: 12px;
   padding: 12px;
   border-radius: 8px;
-  background: rgba(13, 31, 23, 0.7);
+  background: rgba(23, 13, 40, 0.78);
   border: 1px solid rgba(192, 132, 252, 0.3);
   display: flex;
   flex-direction: column;
@@ -8261,7 +8261,7 @@ html, body {
 
 .creator-highlight-section {
   border: 1px solid rgba(192, 132, 252, 0.3) !important;
-  background: rgba(13, 31, 23, 0.7) !important;
+  background: rgba(23, 13, 40, 0.78) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -9011,7 +9011,7 @@ html, body {
 }
 
 .preparation-tip-box strong {
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 @media (max-width: 900px) {
@@ -9465,7 +9465,7 @@ html, body {
 
 .point-sound-badge.sound-wheeze {
   background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  color: #d7ff42;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
@@ -9496,7 +9496,7 @@ html, body {
 .banner-left h3 {
   font-size: 16px;
   font-weight: 800;
-  color: #fbbf24;
+  color: #d7ff42;
   margin: 0;
 }
 
@@ -9513,7 +9513,7 @@ html, body {
   gap: 6px;
   font-size: 12px;
   font-weight: 700;
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 .progress-bar-bg {
@@ -9572,7 +9572,7 @@ html, body {
 .step-number-badge {
   font-size: 11px;
   font-weight: 800;
-  color: #fbbf24;
+  color: #d7ff42;
   padding: 2px 6px;
   border-radius: 4px;
   background: rgba(245, 158, 11, 0.15);
@@ -9623,7 +9623,7 @@ html, body {
   border-radius: 6px;
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
+  color: #d7ff42;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -9722,7 +9722,7 @@ html, body {
 .mnemonic-badge {
   font-size: 11px;
   font-weight: 800;
-  color: #fbbf24;
+  color: #d7ff42;
   margin-bottom: 2px;
   display: inline-block;
 }
@@ -9801,7 +9801,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #fbbf24;
+  color: #d7ff42;
   margin-bottom: 4px;
 }
 
@@ -9857,7 +9857,7 @@ html, body {
 .score-val {
   font-size: 18px;
   font-weight: 900;
-  color: #fbbf24;
+  color: #d7ff42;
 }
 
 .streak-badge {
@@ -10055,7 +10055,7 @@ html, body {
 .spotter-victory-card h2 {
   font-size: 22px;
   font-weight: 900;
-  color: #fbbf24;
+  color: #d7ff42;
   margin: 0;
 }
 

@@ -92,7 +92,9 @@ function normalizeMuscleName(name: string): string {
   return name
     .toLowerCase()
     .replace(/\([^)]*\)/g, ' ')
-    .replace(/\b(left|right|muscle|muscles|musculus)\b/g, ' ')
+    .replace(/\b(left|right|muscle|muscles|musculus|extraocular|oculi|oculus|eyes?|of)\b/g, ' ')
+    .replace(/\bmedialis\b/g, 'medial')
+    .replace(/\blateralis\b/g, 'lateral')
     .replace(/[^a-z0-9]+/g, '');
 }
 
@@ -531,7 +533,7 @@ export class ThreeViewer {
       // Keep shared male muscles only where the female atlas has partial coverage, avoiding exact duplicates.
       const femaleMuscleNames = new Set(
         femaleData.parts
-          .filter(part => part.system === 'donor-muscle')
+          .filter(part => part.system === 'donor-muscle' || part.system === 'muscular')
           .map(part => normalizeMuscleName(part.name))
           .filter(Boolean)
       );
@@ -708,7 +710,18 @@ export class ThreeViewer {
         }
       };
 
-      await Promise.all(targetChunkIndices.map(loadSingleFemaleChunk));
+      // Limit decompression concurrency: the female reference contains multiple large geometry chunks,
+      // and decoding all of them at once can cause avoidable memory spikes on laptops/mobile devices.
+      let nextChunkToLoad = 0;
+      const workerCount = Math.min(4, targetChunkIndices.length);
+      await Promise.all(
+        Array.from({ length: workerCount }, async () => {
+          while (nextChunkToLoad < targetChunkIndices.length) {
+            const chunkIndex = targetChunkIndices[nextChunkToLoad++];
+            await loadSingleFemaleChunk(chunkIndex);
+          }
+        })
+      );
 
       // 4. Merge geometries per system into single draw calls
       systemGeometries.forEach((geos, sysId) => {

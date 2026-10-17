@@ -181,7 +181,7 @@ export class ThreeViewer {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     this.renderer.setPixelRatio(isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5));
     this.renderer.setSize(width, height);
-    this.renderer.setClearColor(0x0b1120);
+    this.renderer.setClearColor(0xffffff);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
@@ -223,33 +223,33 @@ export class ThreeViewer {
   private initStage() {
     this.floorStage = new THREE.Group();
 
-    // Circular ground plane - deep cyber obsidian stage
+    // Circular ground plane - crisp clinical white / light mint stage
     const groundGeo = new THREE.CircleGeometry(30, 96);
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x070b16, roughness: 0.95 });
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0xf8faf9, roughness: 0.95 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.019;
     this.groundMesh = ground;
     this.floorStage.add(ground);
 
-    // Stage pedestal
+    // Stage pedestal - pure clinical white
     const pedestalGeo = new THREE.CylinderGeometry(0.68, 0.7, 0.028, 100);
     const pedestalMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a,
-      metalness: 0.2,
-      roughness: 0.6,
+      color: 0xffffff,
+      metalness: 0.1,
+      roughness: 0.55,
     });
     const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
     pedestal.position.y = -0.016;
     this.pedestalMesh = pedestal;
     this.floorStage.add(pedestal);
 
-    // Concentric shadow accent rings - bioluminescent cyan & electric azure
+    // Concentric shadow accent rings - surgical emerald green & subtle mint
     const ring1Geo = new THREE.RingGeometry(0.63, 0.635, 128);
     const ring1Mat = new THREE.MeshBasicMaterial({
-      color: 0x00f0ff,
+      color: 0x15803d,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.55,
       side: THREE.DoubleSide,
     });
     const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
@@ -259,9 +259,9 @@ export class ThreeViewer {
 
     const ring2Geo = new THREE.RingGeometry(0.55, 0.553, 128);
     const ring2Mat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+      color: 0x10b981,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.35,
       side: THREE.DoubleSide,
     });
     const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
@@ -1172,20 +1172,20 @@ export class ThreeViewer {
   public setTheme(theme: 'dark' | 'light') {
     if (!this.renderer) return;
     if (theme === 'dark') {
-      this.renderer.setClearColor(0x0b1120);
+      this.renderer.setClearColor(0x081611);
       if (this.groundMesh) {
-        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0x0b1120);
+        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0x05100c);
       }
       if (this.pedestalMesh) {
-        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0x111827);
+        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0x0c2219);
       }
     } else {
-      this.renderer.setClearColor(0xf8fafc);
+      this.renderer.setClearColor(0xffffff);
       if (this.groundMesh) {
-        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0xe2e8f0);
+        (this.groundMesh.material as THREE.MeshStandardMaterial).color.setHex(0xf8faf9);
       }
       if (this.pedestalMesh) {
-        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0xf1f5f9);
+        (this.pedestalMesh.material as THREE.MeshStandardMaterial).color.setHex(0xffffff);
       }
     }
   }

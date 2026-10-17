@@ -100,8 +100,8 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <span>
                 {activeGender === 'female'
-                  ? 'HuBMAP VHF 1.5 · 888 संरचनाएं'
-                  : `${totalPartsCount.toLocaleString()} अंग · BodyParts3D`}
+                  ? (isHindi ? 'HuBMAP VHF 1.5 · 888 संरचनाएं' : 'HuBMAP VHF 1.5 · 888 Structures')
+                  : (isHindi ? `${totalPartsCount.toLocaleString()} अंग · BodyParts3D` : `${totalPartsCount.toLocaleString()} Organs · BodyParts3D`)}
               </span>
             )}
           </p>
@@ -299,7 +299,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isLangMenuOpen && (
             <div className="language-dropdown-menu glass-panel">
               <div className="lang-dropdown-header">
-                <strong>भाषा चुनें (24 Languages)</strong>
+                <strong>{isHindi ? 'भाषा चुनें (24 Languages)' : 'Select Language (24 Languages)'}</strong>
                 <span className="lang-count-badge">24</span>
               </div>
               <div className="lang-list-scroll">
@@ -330,12 +330,12 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Theme Toggle (Dark Cyber-Anatomy vs Clean Light Mode) */}
+        {/* Theme Toggle (Clinical Green & White vs Surgical Night Mode) */}
         <button
           className="tool-btn icon-only theme-btn"
           onClick={onToggleTheme}
           aria-label="Toggle Dark / Light Theme"
-          title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          title={theme === 'dark' ? 'Clinical Green & White Mode' : 'Surgical Dark Mode'}
         >
           {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
         </button>
@@ -345,7 +345,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="tool-btn icon-only"
           onClick={onOpenAboutModal}
           aria-label="About and credits"
-          title="स्रोत, डेटासेट लाइसेंस एवं श्रेय"
+          title={isHindi ? 'स्रोत, डेटासेट लाइसेंस एवं श्रेय' : 'Sources, Dataset Licenses & Credits'}
         >
           <Info size={15} />
         </button>

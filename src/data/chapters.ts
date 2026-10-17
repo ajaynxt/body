@@ -665,7 +665,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     systemId: 'reproductive',
     title: 'The Female Reproductive System & Embryology',
     hindiTitle: 'अध्याय 7: महिला प्रजनन एवं भ्रूण विकास तंत्र',
-    subtitle: 'जीवन की उत्पत्ति की जननी — गर्भाशय, अंडाशय और मासिक धर्म चक्र',
+    subtitle: 'जीवन की उत्पत्ति की जननी — गर्भाशय, अंडाशय, फैलोपियन ट्यूब व स्तन ग्रंथियां',
     recommendedBooks: [
       "Gray's Anatomy 42nd Ed (Sec. 9: Female Reproductive System)",
       "BD Chaurasia's Human Anatomy Vol 2 (Pelvis: Uterus, Ovaries & Vagina)",
@@ -674,6 +674,8 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
     introductionHinglish: 'महिला प्रजनन तंत्र (Female Reproductive System) नए मानव जीवन को उत्पन्न करने, पोषित करने और जन्म देने के लिए प्रकृति का सबसे विस्मयकारी तंत्र है। इसमें आंतरिक अंग (गर्भाशय, दो अंडाशय, दो फैलोपियन ट्यूब, योनि) और स्तन ग्रंथियां शामिल हैं। यह मासिक धर्म चक्र (Menstrual Cycle) और गर्भावस्था (Pregnancy) के लिए एस्ट्रोजन और प्रोजेस्टेरोन हार्मोन का स्राव करता है।',
     howItWorksHinglish: 'प्रत्येक माह अंडाशय से एक परिपक्व अंडाणु (Ovum) ओव्यूलेशन द्वारा बाहर निकलता है और फैलोपियन ट्यूब में आता है। यदि 24 घंटे में शुक्राणु द्वारा निषेचन (Fertilization) हो जाता है, तो बनने वाला जाइगोट गर्भाशय में आकर प्रत्यारोपित (Implant) होता है और 9 माह तक प्लेसेंटा द्वारा विकसित होकर शिशु बनता है। निषेचन न होने पर गर्भाशय की आंतरिक परत (Endometrium) टूटकर माहवारी के रूप में बाहर निकल जाती है।',
+    introductionEn: 'The female reproductive system is specialized to produce maternal gametes (oocytes), synthesize gonadal steroids (estrogens and progesterone), provide an optimal environment for fertilization and gestation, and lactate to nourish the neonate.',
+    howItWorksEn: 'Cyclic follicular maturation within ovaries culminates in ovulation. The ovum is guided by fimbriae into the fallopian tube for fertilization. The blastocyst implants into the secretory endometrium of the uterus. Unfertilized cycles culminate in endometrial sloughing (menstruation).',
     commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'pcos-pcod' || d.id === 'endometriosis'),
     parts: [
       {
@@ -684,15 +686,22 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'YOO-ter-us',
         system: 'reproductive',
         elements: ['FJ2750', 'FJ2751'],
+        rootWordEtymology: "ग्रीक 'Metra' और लैटिन 'Uterus' (थैली)। इसी से बने शब्द: Endometrium, Myometrium, Hysterectomy (गर्भाशय निष्कासन), Metritis।",
+        memoryTrickHindi: "ट्रिक: \"AV & AF\" — सामान्य शारीरिक स्थिति: Anteverted on vagina (90° कोण), Anteflexed on cervix (120-170° कोण)। मैकरोड्ट्स लिगामेंट्स पेल्विस का मुख्य सहारा हैं।",
+        locationEn: 'Located in the true pelvis between the urinary bladder anteriorly and the rectum posteriorly; typically anteverted (~90°) and anteflexed (~120-170°).',
         locationHinglish: 'महिला श्रोणि गुहा (Pelvic cavity) में मूत्राशय के पीछे और मलाशय के आगे स्थित नाशपाती के आकार का खोखला पेशीय अंग।',
+        functionEn: 'Houses, nourishes, and protects the developing fetus throughout gestation; contracts powerfully under oxytocin during parturition.',
         functionHinglish: 'निषेचित भ्रूण को 9 महीने तक सुरक्षित रखना, प्लेसेंटा से पोषण देना, और प्रसव के समय शक्तिशाली संकुचन (Oxytocin द्वारा) से शिशु को जन्म देना।',
+        funFactEn: 'During pregnancy, the uterine volume increases over 500-fold from ~10 mL to 5,000 mL — more than any other smooth muscle organ!',
         funFactHinglish: 'गर्भावस्था के दौरान गर्भाशय अपने सामान्य आकार से लगभग 500 गुना अधिक फैल सकता है — मानव शरीर की किसी भी अन्य मांसपेशी से अधिक!',
+        clinicalNoteEn: 'Endometrial thickness dynamically varies with menstrual cycle (1-4 mm in early follicular, up to 14 mm in secretory phase). Fibroids (leiomyomas) are common benign smooth muscle tumors.',
         clinicalNoteHinglish: 'गर्भाशय की आंतरिक एंडोमेट्रियल परत की मोटाई अल्ट्रासाउंड से मापी जाती है; फाइब्रॉएड (Fibroids) गर्भाशय की मांसपेशियों में बनने वाली हानिरहित रसौली हैं।',
-        highYieldMnemonic: 'Antiverted & Antiflexed (AV & AF): गर्भाशय की सामान्य शारीरिक स्थिति (Angle of Anteversion ~90°, Angle of Anteflexion ~120-170°)',
+        highYieldMnemonic: 'Antiverted & Antiflexed (AV & AF): Angle of Anteversion ~90°, Angle of Anteflexion ~120-170°',
         examPearls: [
           'गर्भाशय की 3 परतें होती हैं: Endometrium (आंतरिक), Myometrium (मोटी पेशीय दीवार), Perimetrium (बाहरी सीरस परत)।',
           'गर्भाशय की रक्त आपूर्ति: Uterine Artery (Internal Iliac Artery की पूर्ववर्ती शाखा) द्वारा होती है।',
-          'Mackrodt\'s / Cardinal ligaments गर्भाशय को पेल्विस में सहारा देने वाले सबसे मुख्य लिगामेंट्स हैं।'
+          'Mackrodt\'s / Cardinal ligaments गर्भाशय को पेल्विस में सहारा देने वाले सबसे मुख्य लिगामेंट्स हैं।',
+          'Water runs under the bridge: Ureter गर्भाशय ग्रीवा से 1.5 सेमी दूरी पर गर्भाशयी धमनी के ठीक नीचे से गुजरता है।'
         ],
         citations: [
           {
@@ -706,6 +715,17 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "The LH Surge (Luteinizing Hormone peak) triggers rupture of the mature Graafian follicle and ovulation precisely 24 to 36 hours later, initiating the luteal secretory phase."
           }
         ],
+        treatmentsHinglish: [
+          "मायोमेक्टॉमी (Myomectomy) रसौली निकालने हेतु अथवा हिस्टेरेक्टॉमी (Hysterectomy) गंभीर एंडोमेट्रियोसिस या फाइब्रॉएड में।",
+          "पेल्विक फ्लोर फिजियोथेरेपी एवं कीगल व्यायाम (Kegel exercises) गर्भाशय प्रोलैप्स रोकने हेतु।",
+          "हार्मोनल अंतर्गर्भाशयी उपकरण (Levonorgestrel IUD - Mirena) अत्यधिक रक्तस्राव नियंत्रण के लिए।"
+        ],
+        medications: ["Tranexamic acid", "Mefenamic acid", "Levonorgestrel IUD", "GnRH Agonists (Leuprolide)"],
+        homeRemedies: [
+          "नियमित पेल्विक फ्लोर व्यायाम (Kegels) मांसपेशियों की मजबूती के लिए।",
+          "संतुलित आयरन-युक्त आहार माहवारी के रक्तस्राव से होने वाले एनीमिया से बचाव हेतु।",
+          "भारी वजन उठाने से परहेज ताकि पेल्विक ऑर्गन प्रोलैप्स न हो।"
+        ],
         relatedDiseases: ['Endometriosis', 'Uterine Fibroids', 'Cervical Cancer'],
       },
       {
@@ -716,14 +736,21 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'oh-VAIR-ee-uh',
         system: 'reproductive',
         elements: ['FJ2760', 'FJ2761'],
+        rootWordEtymology: "ग्रीक 'Oophoron' (अंडे वहन करने वाली) और लैटिन 'Ovarium' (अंडाशय)। Oophorectomy = अंडाशय निकालने का ऑपरेशन, Oophoritis = अंडाशय की सूजन।",
+        memoryTrickHindi: "ट्रिक: \"OVARY DOUBLE BLOOD\" — Ovarian Artery सीधे Abdominal Aorta से L2 स्तर पर आती है तथा Uterine Artery की आरोही शाखाएं दूसरा रक्त संचार देती हैं।",
+        locationEn: 'Located in the ovarian fossa on the lateral pelvic wall on either side of the uterus, suspended by the infundibulopelvic and ovarian ligaments.',
         locationHinglish: 'गर्भाशय के दोनों तरफ पेल्विक दीवार में स्थित बादाम के आकार की दो प्राथमिक जनन ग्रंथियां।',
+        functionEn: 'Dual endocrine and gametogenic organ: produces mature oocytes (ova) and synthesizes estrogen and progesterone in cyclical monthly rhythms.',
         functionHinglish: 'दोहरा जीवन-कार्य: 1. डिंब/अंडाणु (Ova) का उत्पादन। 2. महिला सेक्स हार्मोन एस्ट्रोजन और प्रोजेस्टेरोन का निरंतर संश्लेषण।',
+        funFactEn: 'A female is born with all 1-2 million primordial follicles she will ever possess; only about 400 will ever undergo mature ovulation during her reproductive lifespan!',
         funFactHinglish: 'एक बालिका अपने दोनों अंडाशयों में लगभग 10 से 20 लाख अपरिपक्व अंडों के साथ जन्म लेती है, जिनमें से पूरे जीवनकाल में केवल लगभग 400 अंडे ही परिपक्व होकर ओव्यूलेट होते हैं!',
+        clinicalNoteEn: 'PCOS affects ~10% of women, marked by hyperandrogenism, chronic anovulation, and polycystic ovarian appearance on pelvic ultrasound.',
         clinicalNoteHinglish: 'अंडाशय में हार्मोन असंतुलन से PCOS (पॉलीसिस्टिक ओवरी सिंड्रोम) होता है, जिससे चेहरे पर अनचाहे बाल, मुंहासे और अनियमित माहवारी होती है।',
         highYieldMnemonic: 'Ovary Double Blood Supply: Ovarian Artery (Abdominal Aorta से L2 स्तर पर) और Uterine Artery की शाखाएं',
         examPearls: [
           'अंडाशय का लिगामेंट (Ovarian Ligament) इसे गर्भाशय से और सस्पेंसरी लिगामेंट (Infundibulopelvic) इसे पेल्विक दीवार से जोड़ता है।',
-          'कॉर्पस ल्यूटियम (Corpus Luteum): ओव्यूलेशन के बाद बनने वाली पीली ग्रंथि जो गर्भावस्था बनाए रखने के लिए प्रोजेस्टेरोन बनाती है।'
+          'कॉर्पस ल्यूटियम (Corpus Luteum): ओव्यूलेशन के बाद बनने वाली पीली ग्रंथि जो गर्भावस्था बनाए रखने के लिए प्रोजेस्टेरोन बनाती है।',
+          'लिम्फैटिक ड्रेनेज: Para-aortic lymph nodes (L2 स्तर) में जाता है।'
         ],
         citations: [
           {
@@ -732,7 +759,147 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Ovarian lymphatic drainage flows primarily upward along the ovarian vessels directly to para-aortic lymph nodes near the origin of renal arteries, distinct from cervical lymphatics."
           }
         ],
+        treatmentsHinglish: [
+          "PCOS प्रबंधन: वजन नियंत्रण, इंसुलिन संवेदीकरण (Metformin), और मासिक चक्र नियमितीकरण।",
+          "लेप्रोस्कोपिक ओवेरियन सिस्टेक्टॉमी (Cystectomy) जटिल सिस्ट्स या एंडोमेट्रियोमा हेतु।",
+          "ओव्यूलेशन इंडक्शन एवं आईवीएफ (IVF) गर्भधारण सहायता के लिए।"
+        ],
+        medications: ["Combined Oral Contraceptives", "Metformin", "Letrozole", "Clomiphene citrate", "Spironolactone"],
+        homeRemedies: [
+          "कम ग्लाइसेमिक इंडेक्स (Low GI) आहार इंसुलिन रेजिस्टेंस कम करने हेतु।",
+          "नियमित 30 मिनट एरोबिक व्यायाम हार्मोन संतुलन बनाए रखने के लिए।",
+          "ओमेगा-3 फैटी एसिड और विटामिन डी सप्लीमेंट।"
+        ],
         relatedDiseases: ['Polycystic Ovary Syndrome (PCOS)', 'Ovarian Cyst', 'Ovarian Cancer'],
+      },
+      {
+        id: 'fallopian-tubes',
+        name: 'Fallopian Tubes (Oviducts / Salpinx)',
+        hindiName: 'फैलोपियन ट्यूब (डिंबवाहिनी नलिकाएं / साल्पिंक्स)',
+        latinName: 'Tubae uterinae',
+        pronunciation: 'fuh-LOH-pee-uhn toobs',
+        system: 'reproductive',
+        elements: ['FJ2770', 'FJ2771'],
+        rootWordEtymology: "16वीं सदी के इटैलियन एनाटोमिस्ट Gabriele Falloppio के नाम पर; ग्रीक 'Salpinx' (तुरही)। Salpingectomy = ट्यूब हटाना, Salpingitis = नलिका की सूजन।",
+        memoryTrickHindi: "ट्रिक: \"FAMP\" — Fimbriae (अंडे पकड़ना) -> Ampulla (सबसे चौड़ा, Fertilization स्थल!) -> Isthmus (संकरा) -> Interstitial (गर्भाशय दीवार के अंदर)।",
+        locationEn: 'Pair of 10-12 cm muscular tubes extending laterally from the uterine horns to the peritoneal cavity adjacent to the ovaries within the mesosalpinx.',
+        locationHinglish: 'गर्भाशय के दोनों कोनों (Cornua) से निकलकर अंडाशय तक फैली लगभग 10-12 सेमी लंबी पेशीय नलिकाएं।',
+        functionEn: 'Captures the ovulated ovum with its fimbriae, provides the normal site of fertilization (Ampulla), and transports the blastocyst to the uterine cavity via ciliated peristalsis.',
+        functionHinglish: 'अंडाशय से निकले डिंब को झालरदार सिरों (Fimbriae) से पकड़ना, शुक्राणु और अंडे का निषेचन (Fertilization) कराना, और भ्रूण को गर्भाशय में पहुंचाना।',
+        funFactEn: 'The inner lining contains microscopic cilia beating ~1,000 times a minute in synchronized waves to escort the egg gently towards the womb!',
+        funFactHinglish: 'ट्यूब के अंदर हजारों सूक्ष्म सिलिया (Cilia) प्रति मिनट 1000 बार तरंगों की तरह गति करते हैं ताकि अंडा धीरे-धीरे गर्भाशय की ओर बढ़ सके!',
+        clinicalNoteEn: 'Ectopic pregnancy occurs most commonly (>95%) in the ampulla of the fallopian tube; tubal rupture is a surgical emergency with severe internal hemorrhage.',
+        clinicalNoteHinglish: 'अस्थानिक गर्भावस्था (Ectopic Pregnancy): 95% मामलों में भ्रूण ट्यूब के एम्पुला में ही फंस जाता है, जिससे ट्यूब फटने और आंतरिक रक्तस्राव का गंभीर खतरा रहता है।',
+        highYieldMnemonic: 'FAMP: Fimbriae -> Ampulla (Fertilization site!) -> Isthmus -> Interstitial',
+        examPearls: [
+          'निषेचन स्थल (Site of Fertilization): Ampulla of the uterine tube (सबसे चौड़ा और लंबा 5-7 सेमी भाग)।',
+          'Fimbria ovarica: सबसे लंबा झालरदार सिरा जो सीधे अंडाशय से जुड़ा रहता है।',
+          'Ciliated columnar epithelium: सिलिया की तरंगीय गति अंडे को गर्भाशय की ओर धकेलती है।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 2",
+            citation: "Pelvis: Fallopian Tubes and Ovaries, pp. 420–428",
+            highYieldFact: "The ampulla is the widest and longest section (5-7 cm) of the uterine tube and represents the normal biological site of human fertilization."
+          }
+        ],
+        treatmentsHinglish: [
+          "लेप्रोस्कोपिक साल्पिंगोस्टॉमी अथवा साल्पिंगेक्टॉमी एक्टोपिक प्रेग्नेंसी में।",
+          "ट्यूब ब्लॉकेज जांच: हिस्टेरोसाल्पिंगोग्राफी (HSG) या लेप्रोस्कोपिक क्रोमोट्यूबेशन।",
+          "स्थायी नसबंदी: ट्यूबल लिगेशन (Tubal Ligation - महिला नलबंदी)।"
+        ],
+        medications: ["Methotrexate (प्रारंभिक एक्टोपिक गर्भ में)", "Ceftriaxone + Doxycycline (Salpingitis / PID में)"],
+        homeRemedies: [
+          "पेल्विक स्वच्छता और सुरक्षित यौन संबंध (PID संक्रमण से बचाव हेतु)।",
+          "अनियमित तीव्र एकतरफा पेल्विक दर्द होने पर तत्काल इमरजेंसी जांच।"
+        ],
+        relatedDiseases: ['Ectopic Pregnancy', 'Pelvic Inflammatory Disease (PID)', 'Tubal Infertility'],
+      },
+      {
+        id: 'mammary-glands',
+        name: 'Mammary Glands (Breasts)',
+        hindiName: 'स्तन ग्रंथियां (मेमरी ग्लैंड्स / ब्रेस्ट)',
+        latinName: 'Glandulae mammariae',
+        pronunciation: 'MAM-uh-ree glandz',
+        system: 'reproductive',
+        elements: ['FJ2800', 'FJ2801'],
+        rootWordEtymology: "लैटिन 'Mamma' (स्तन/मां)। Mammography (स्तन एक्स-रे), Mastitis (स्तन में सूजन), Mastectomy (स्तन हटाने की सर्जरी)।",
+        memoryTrickHindi: "ट्रिक: \"PROLACTIN Produces milk; OXYTOCIN Outflows milk\" — कूपर के लिगामेंट्स (Cooper's ligaments) स्तनों को त्वचा से जोड़कर सीधा रखते हैं।",
+        locationEn: 'Subcutaneous modified sweat glands overlying the pectoralis major muscle from the 2nd to 6th ribs vertically, and sternal edge to midaxillary line horizontally.',
+        locationHinglish: 'छाती के सामने पेक्टोरलिस मेजर पेशी के ऊपर दूसरी से छठी पसली (2nd to 6th rib) तक फैली रूपांतरित स्वेद ग्रंथियां।',
+        functionEn: 'Lactation: synthesizes, secretes, and ejects nutrient-rich breast milk containing immunoglobulins (IgA) for infant nutrition and passive immunity.',
+        functionHinglish: 'शिशु के पोषण और रोग प्रतिरोधक क्षमता (IgA एंटीबॉडीज) के लिए मां का अमृततुल्य दूध (Lactation) उत्पन्न और स्रावित करना।',
+        funFactEn: 'Breast milk contains hundreds of bioactive components including maternal stem cells, oligosaccharides, and protective antibodies that adapt to the baby\'s health!',
+        funFactHinglish: 'मां के दूध में सैकड़ों सुरक्षात्मक एंटीबॉडीज (विशेषकर IgA) और स्टेम सेल्स होते हैं जो बच्चे की जरूरत के अनुसार स्वतः बदल जाते हैं!',
+        clinicalNoteEn: 'Breast cancer is the most common cancer in women. The Upper Outer Quadrant contains ~60% of breast glandular tissue and is the most common site of malignancy.',
+        clinicalNoteHinglish: 'स्तन कैंसर महिलाओं में सबसे आम कैंसर है; 60% गांठें ऊपरी बाहरी हिस्से (Upper Outer Quadrant) में पाई जाती हैं। मासिक धर्म के बाद स्तन की सेल्फ-जांच (BSE) अनिवार्य है।',
+        highYieldMnemonic: 'Axillary Quadrant: 75% Lymphatic drainage goes to Axillary lymph nodes (Pectoral group)',
+        examPearls: [
+          'लिम्फैटिक ड्रेनेज: 75% लिम्फ Axillary lymph nodes (विशेषकर Anterior/Pectoral group) में जाता है।',
+          'Suspensory ligaments of Cooper: कैंसर में इनके सिकुड़ने से त्वचा में गड्ढे (Peau d\'orange) पड़ते हैं।',
+          'Axillary tail of Spence: स्तन का वह उभार जो डीप फेशिया को भेदकर बगल (Axilla) में जाता है।'
+        ],
+        citations: [
+          {
+            book: "Gray's Anatomy (42nd Edition)",
+            citation: "Section 7: Thorax, Chapter 50 (Pectoral Girdle and Breast), pp. 912–928",
+            highYieldFact: "Subareolar lymphatic plexus of Sappey drains primarily into anterior (pectoral) axillary lymph nodes; sentinel lymph node biopsy guides surgical staging in breast carcinoma."
+          }
+        ],
+        treatmentsHinglish: [
+          "ट्रिपल असेसमेंट (Triple Assessment): क्लिनिकल परीक्षण + मैमोग्राफी/अल्ट्रासाउंड + कोर नीडल बायोप्सी (CNB)।",
+          "ब्रेस्ट कंजर्विंग सर्जरी (Lumpectomy) अथवा मास्टेक्टॉमी + सेंटिनल लिम्फ नोड बायोप्सी।",
+          "हार्मोन थेरेपी: ER/PR पॉजिटिव मामलों में Tamoxifen या Aromatase Inhibitors।"
+        ],
+        medications: ["Tamoxifen (SERM)", "Trastuzumab (Herceptin)", "Cabergoline", "Cloxacillin (Mastitis हेतु)"],
+        homeRemedies: [
+          "मासिक धर्म समाप्त होने के 7 दिन बाद नियमित ब्रेस्ट सेल्फ एग्जामिनेशन (BSE)।",
+          "40 वर्ष की आयु के बाद हर 1-2 वर्ष में स्क्रीनिंग मैमोग्राफी।"
+        ],
+        relatedDiseases: ['Breast Cancer', 'Fibroadenoma', 'Mastitis'],
+      },
+      {
+        id: 'cervix-vagina',
+        name: 'Cervix & Vagina (Colpos)',
+        hindiName: 'गर्भाशय ग्रीवा एवं योनि (सर्विक्स व वैजाइना)',
+        latinName: 'Cervix uteri et Vagina',
+        pronunciation: 'SUR-viks and vuh-JYE-nuh',
+        system: 'reproductive',
+        elements: ['FJ2752', 'FJ2753'],
+        rootWordEtymology: "लैटिन 'Cervix' (गर्दन) + 'Vagina' (म्यान)। ग्रीक 'Colpos' (योनि)। Colposcopy (सूक्ष्मदर्शी ग्रीवा परीक्षण), Cervicitis।",
+        memoryTrickHindi: "ट्रिक: \"SCJ Transformation Zone\" — Squamocolumnar Junction वह जगह है जहां HPV वायरस कैंसर पूर्व बदलाव लाता है, पैप स्मीयर इसी जगह से लिया जाता है।",
+        locationEn: 'The cervix is the lower cylindrical segment of the uterus projecting into the vaginal vault; the vagina is an 8-10 cm fibromuscular canal extending to the vulval vestibule.',
+        locationHinglish: 'गर्भाशय का निचला संकरा सिरा (सर्विक्स) जो योनि मार्ग में खुलता है; योनि मूत्राशय के पीछे और मलाशय के आगे स्थित 8-10 सेमी लंबी पेशीय नलिका है।',
+        functionEn: 'Passageway for menstrual flow, female copulatory organ, and the distensible birth canal through which the fetus is delivered.',
+        functionHinglish: 'माहवारी रक्तस्राव का निकास मार्ग, संभोग अंग, तथा प्रसव के समय अत्यधिक फैलकर शिशु को बाहर निकालने वाली जन्म नली (Birth Canal)।',
+        funFactEn: 'During natural childbirth, the cervix dilates from a closed pinhole up to a full 10 centimeters to allow the fetal head to pass through!',
+        funFactHinglish: 'प्रसव के दौरान गर्भाशय ग्रीवा एक सुई के छेद जैसी बंद अवस्था से पूरी तरह 10 सेंटीमीटर तक फैल जाती है ताकि शिशु का सिर बाहर आ सके!',
+        clinicalNoteEn: 'High-risk HPV types 16 and 18 cause >70% of cervical cancers globally; highly preventable through adolescent HPV vaccination and routine Pap smear screening.',
+        clinicalNoteHinglish: 'ह्यूमन पैपिलोमा वायरस (HPV 16 & 18) सर्वाइकल कैंसर का मुख्य कारण है; 9 से 14 वर्ष की बालिकाओं में HPV टीका लगवाने से 90% से अधिक बचाव होता है।',
+        highYieldMnemonic: 'Vaginal Acid: Doderlein\'s lactobacilli maintain acidic pH 3.8-4.5',
+        examPearls: [
+          'योनि का सामान्य pH: 3.8 - 4.5 (अम्लीय), Doderlein\'s lactobacilli द्वारा लैक्टिक एसिड बनने से।',
+          'Vaginal fornices: Posterior fornix सबसे गहरा होता है और सीधे Douglas pouch से सटा होता है (Culdocentesis site)।',
+          'पैप स्मीयर (Pap Smear): Transformation Zone से एंडोसर्विकल ब्रश और आयरे स्पैटुला से कोशिकाएं एकत्र की जाती हैं।'
+        ],
+        citations: [
+          {
+            book: "DC Dutta's Textbook of Gynecology",
+            citation: "Chapter 15: Benign and Malignant Lesions of the Cervix, pp. 280–305",
+            highYieldFact: "The squamocolumnar junction undergoes continuous physiological metaplasia; HPV integration into host genome at this transformation zone induces E6/E7 oncoproteins inactivating p53 and Rb tumor suppressors."
+          }
+        ],
+        treatmentsHinglish: [
+          "स्क्रीनिंग: 25-65 वर्ष की महिलाओं में हर 3-5 वर्ष पर पैप स्मीयर (Pap Smear) एवं HPV DNA टेस्ट।",
+          "पूर्व-कैंसर अवस्था (CIN): LEEP (Loop Electrosurgical Excision Procedure) अथवा कोन बायोप्सी।",
+          "संक्रमण नियंत्रण: कैंडिडा (यीस्ट) और बैक्टीरियल वेजिनोसिस का लक्षित रोगाणुरोधी उपचार।"
+        ],
+        medications: ["HPV Vaccine (Gardasil-9 / Cervavac)", "Metronidazole vaginal gel", "Fluconazole", "Clindamycin"],
+        homeRemedies: [
+          "कपास (Cotton) के अंतःवस्त्र का प्रयोग और योनि में हार्श साबुन या डौचिंग (Douching) से परहेज।",
+          "सुरक्षित यौन संबंध और समय पर नियमित पैप स्मीयर जांच।"
+        ],
+        relatedDiseases: ['Cervical Cancer', 'Bacterial Vaginosis', 'Cervicitis'],
       },
     ],
   },
@@ -753,6 +920,8 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
     introductionHinglish: 'पुरुष प्रजनन तंत्र (Male Reproductive System) शुक्राणुओं (Spermatozoa) के उत्पादन, पोषण और स्थानांतरण के लिए उत्तरदायी है। इसमें दो वृषण (Testes), अधिवृषण (Epididymis), शुक्रवाहक नलिका (Vas Deferens), प्रोस्टेट ग्रंथि, सेमिनल वेसिकल्स और शिश्न (Penis) शामिल हैं। यह मुख्य पुरुष सेक्स हार्मोन टेस्टोस्टेरोन (Testosterone) का उत्पादन करता है।',
     howItWorksHinglish: 'वृषण शरीर के बाहर अंडकोष (Scrotum) में स्थित होते हैं क्योंकि शुक्राणु बनने (Spermatogenesis) के लिए शरीर के आंतरिक तापमान (37°C) से 2 से 3 डिग्री सेल्सियस कम तापमान जरूरी होता है। शुक्राणु सेमिनिफेरस नलिकाओं में बनते हैं और एपिडिडीमिस में परिपक्व होते हैं। वीर्यस्खलन के समय प्रोस्टेट और सेमिनल वेसिकल्स का पोषक द्रव मिलकर वीर्य (Semen) बनाता है जो मूत्रमार्ग द्वारा उत्सर्जित होता है।',
+    introductionEn: 'The male reproductive system consists of the testes, epididymides, vasa deferentia, accessory sex glands (prostate, seminal vesicles, bulbourethral glands), and the penis. It performs spermatogenesis and androgen steroidogenesis.',
+    howItWorksEn: 'Spermatogenesis occurs in the seminiferous tubules at 34-35°C, supported by Sertoli cells and driven by Leydig cell testosterone. Sperm mature in the epididymis and are propelled during emission through the vas deferens, mixing with seminal and prostatic fluids to form semen.',
     commonDiseases: CLINICAL_DISEASES.filter(d => d.id === 'bph-prostate' || d.id === 'varicocele'),
     parts: [
       {
@@ -763,15 +932,22 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'TES-teez',
         system: 'reproductive',
         elements: ['FJ2780', 'FJ2781'],
-        locationHinglish: 'शरीर के बाहर स्थित अंडकोष (Scrotum) की थैली के अंदर लटके दो अंडाकार अंग।',
+        rootWordEtymology: "लैटिन 'Testis' (साक्षी/गवाह)। इसी से बने शब्द: Testosterone (पुरुष हार्मोन), Testicular torsion, Orchidectomy (ग्रीक 'Orchis' = वृषण)।",
+        memoryTrickHindi: "ट्रिक: \"SEVEN UP\" — शुक्राणु का पूरा मार्ग: Seminiferous tubules -> Epididymis -> Vas deferens -> Ejaculatory duct -> (Nothing) -> Urethra -> Penis।",
+        locationEn: 'Suspended outside the abdominopelvic cavity within the cutaneous scrotal sac, with the left testis typically hanging slightly lower than the right.',
+        locationHinglish: 'शरीर के बाहर स्थित अंडकोष (Scrotum) की थैली के अंदर लटके दो अंडाकार अंग; बायां वृषण आमतौर पर दाएं से थोड़ा नीचे लटकता है।',
+        functionEn: 'Produces 200-300 million spermatozoa daily and synthesizes >95% of circulating testosterone, driving virilization, muscle mass, and libido.',
         functionHinglish: 'प्रतिदिन लगभग 20 से 30 करोड़ शुक्राणु बनाना और टेस्टोस्टेरोन हार्मोन स्रावित करना जो पौरुष लक्षण, दाढ़ी-मूंछ, आवाज भारी होना और मांसपेशियों का विकास करता है।',
+        funFactEn: 'If all the microscopic seminiferous tubules in both testes were uncoiled and laid end-to-end, they would stretch over 500 meters (half a kilometer)!',
         funFactHinglish: 'प्रत्येक वृषण के अंदर अगर सभी सूक्ष्म सेमिनिफेरस नलिकाओं को सीधा फैलाया जाए, तो उनकी कुल लंबाई लगभग 250 मीटर (एक चौथाई किलोमीटर) होगी!',
+        clinicalNoteEn: 'Sudden severe scrotal pain suggests testicular torsion: twisting of spermatic cord resulting in ischemia. A true surgical emergency requiring detorsion within 6 hours.',
         clinicalNoteHinglish: 'अंडकोष में अचानक तेज दर्द टेस्टिकुलर टॉर्शन (Testicular Torsion) का संकेत हो सकता है — यह मेडिकल इमरजेंसी है जिसमें 6 घंटे के अंदर सर्जरी अनिवार्य होती है।',
-        highYieldMnemonic: 'SEVEN UP: शुक्राणु का मार्ग — Seminiferous tubules -> Epididymis -> Vas deferens -> Ejaculatory duct -> (Nothing) -> Urethra -> Penis',
+        highYieldMnemonic: 'SEVEN UP: Seminiferous tubules -> Epididymis -> Vas deferens -> Ejaculatory duct -> (Nothing) -> Urethra -> Penis',
         examPearls: [
           'लेडिग कोशिकाएं (Leydig cells): LH हार्मोन के प्रभाव में टेस्टोस्टेरोन बनाती हैं।',
           'सर्टोली कोशिकाएं (Sertoli cells): "नर्स सेल्स" जो विकासशील शुक्राणुओं को पोषण देती हैं और ब्लड-टेस्टिस बैरियर (Blood-Testis Barrier) बनाती हैं।',
-          'Pampiniform venous plexus टेस्टिकुलर आर्टरी के खून को ठंडा करने के लिए काउंटर-करेंट हीट एक्सचेंजर का काम करता है।'
+          'Pampiniform venous plexus टेस्टिकुलर आर्टरी के खून को ठंडा करने के लिए काउंटर-करेंट हीट एक्सचेंजर का काम करता है।',
+          'बायां टेस्टिकुलर वेन 90° कोण पर लेफ्ट रीनल वेन में ड्रेन करता है — इसलिए 85% वैरीकोसील बाईं ओर होती हैं।'
         ],
         citations: [
           {
@@ -785,6 +961,16 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Left testicular vein drains vertically at a right angle into the left renal vein, causing higher hydrostatic retrograde pressure and explaining why >85% of varicoceles occur on the left side."
           }
         ],
+        treatmentsHinglish: [
+          "टेस्टिकुलर टॉर्शन: तत्काल 6 घंटे के भीतर इमरजेंसी ऑपेरशन (Orchiopexy)।",
+          "वैरीकोसील (Varicocele): माइक्रोस्कोपिक सब-इंग्वाइनल वैरीकोसीलेक्टॉमी या एम्बोलाइजेशन।",
+          "पुरुष बांझपन: सीमेन एनालिसिस जांच और हार्मोनल संतुलन उपचार।"
+        ],
+        medications: ["Testosterone replacement therapy (Hypogonadism में)", "Anastrozole", "Clomiphene (शुक्राणु गणना सुधारने हेतु)"],
+        homeRemedies: [
+          "अंडकोष को अत्यधिक गर्मी से बचाएं (लैपटॉप को गोद में रखकर देर तक काम न करें, टाइट सिंथेटिक अंडरवियर से बचें)।",
+          "जिंक, सेलेनियम और एंटीऑक्सीडेंट से भरपूर आहार लें।"
+        ],
         relatedDiseases: ['Varicocele', 'Testicular Torsion', 'Testicular Cancer'],
       },
       {
@@ -795,14 +981,21 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         pronunciation: 'PROS-tayt',
         system: 'reproductive',
         elements: ['FJ2790'],
+        rootWordEtymology: "ग्रीक 'Prostates' (अग्रणी रक्षक / आगे खड़ा रहने वाला)। Prostatitis (प्रोस्टेट में सूजन), Prostatectomy (प्रोस्टेट की सर्जरी)।",
+        memoryTrickHindi: "ट्रिक: \"BPH = Transitional Zone\" (मूत्रमार्ग को दबाता है); \"Prostate Cancer = Peripheral Zone\" (DRE डिजिटल रेक्टल परीक्षण पर गांठ महसूस होती है)।",
+        locationEn: 'Inverted cone-shaped fibromuscular gland situated immediately inferior to the bladder neck, encircling the prostatic urethra.',
         locationHinglish: 'मूत्राशय (Urinary bladder) के ठीक नीचे स्थित अखरोट के आकार की ग्रंथि, जिसके बीच से मूत्रमार्ग (Urethra) गुजरता है।',
+        functionEn: 'Secretes a slightly alkaline, thin milky fluid (~30% of semen) rich in citric acid, zinc, and PSA that liquefies clotted semen and neutralizes vaginal acidity.',
         functionHinglish: 'दूधिया, थोड़ा क्षारीय (Alkaline) प्रोस्टेटिक द्रव बनाना जो वीर्य का 30% हिस्सा होता है; यह योनि के अम्लीय वातावरण को निष्क्रिय कर शुक्राणुओं को जीवित रखता है।',
+        funFactEn: 'The prostate gland contains the highest concentration of elemental zinc of any soft tissue in the human body, acting as a potent natural antibacterial shield!',
         funFactHinglish: 'प्रोस्टेट में सिट्रिक एसिड, जिंक और प्रोस्टेट स्पेसिफिक एंटीजन (PSA) प्रचुर मात्रा में होते हैं जो थक्के वाले वीर्य को पतला (Liquefaction) करते हैं!',
+        clinicalNoteEn: 'Benign Prostatic Hyperplasia (BPH) affects >50% of men over 60, arising in the transition zone and causing lower urinary tract symptoms (hesitancy, nocturia).',
         clinicalNoteHinglish: 'उम्रदराज पुरुषों में प्रोस्टेट बढ़ने (BPH) से पेशाब की धार कमजोर हो जाती है और रात में बार-बार उठना पड़ता है।',
-        highYieldMnemonic: 'BPH = Transitional Zone (मूत्रमार्ग को दबाता है); Prostate Cancer = Peripheral Zone (DRE पर गांठ महसूस होती है)',
+        highYieldMnemonic: 'BPH = Transitional Zone; Prostate Cancer = Peripheral Zone',
         examPearls: [
-          'मैकनील के अनुसार प्रोस्टेट 4 ज़ोन में बंटा है: Peripheral, Central, Transition, और Anterior fibromuscular stroma।',
-          'PSA (Prostate Specific Antigen) एक सेरीन प्रोटीज है जो वीर्य को तरल बनाता है; 4 ng/mL से अधिक स्तर कैंसर या BPH का संकेत है।'
+          'मैकनील के अनुसार प्रोस्टेट 4 ज़ोन में बंटा है: Peripheral (कैंसर 70%), Transition (BPH 95%), Central, और Anterior stroma।',
+          'PSA (Prostate Specific Antigen) एक सेरीन प्रोटीज है जो वीर्य को तरल बनाता है; 4 ng/mL से अधिक स्तर कैंसर या BPH का संकेत है।',
+          'Batson\'s venous plexus: प्रोस्टैटिक वीनस प्लेक्सस बिना वाल्व के रीढ़ की हड्डियों के प्लेक्सस से जुड़ा है, जिससे प्रोस्टेट कैंसर सीधे रीढ़ में फैलता है।'
         ],
         citations: [
           {
@@ -811,11 +1004,149 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             highYieldFact: "Prostatic venous plexus communicates freely with the internal vertebral venous plexus of Batson without valves, explaining why prostatic carcinoma metastases rapidly spread to lumbar vertebrae."
           }
         ],
+        treatmentsHinglish: [
+          "दवा चिकित्सा: अल्फा-1 ब्लॉकर्स (Tamsulosin) मूत्र प्रवाह सुधारने हेतु + 5-ARIs (Finasteride) प्रोस्टेट आकार घटाने हेतु।",
+          "दूरबीन सर्जरी: टीयूआरपी (TURP - Transurethral Resection of Prostate) या लेजर इन्यूक्लिएशन (HoLEP)।",
+          "कैंसर स्क्रीनिंग: 50 वर्ष बाद सीरम PSA टेस्ट और डिजिटल रेक्टल एग्जामिनेशन (DRE)।"
+        ],
+        medications: ["Tamsulosin (Flomax)", "Finasteride / Dutasteride", "Silodosin", "Bicalutamide (Anti-androgen)"],
+        homeRemedies: [
+          "रात को सोने से 2 घंटे पहले पानी या चाय-कॉफी का सेवन सीमित रखें।",
+          "कब्ज से बचें और पेल्विक फ्लोर व्यायाम करें; टमाटर (लाइकोपीन) का सेवन प्रोस्टेट स्वास्थ्य के लिए उत्तम है।"
+        ],
         relatedDiseases: ['Benign Prostatic Hyperplasia (BPH)', 'Prostatitis', 'Prostate Cancer'],
+      },
+      {
+        id: 'epididymis-vas',
+        name: 'Epididymis & Vas Deferens',
+        hindiName: 'अधिवृषण एवं शुक्रवाहक नलिका (एपिडिडिमिस व वास डिफेरेन्स)',
+        latinName: 'Epididymis et Ductus deferens',
+        pronunciation: 'ep-i-DID-i-mis and vas DEF-uh-renz',
+        system: 'reproductive',
+        elements: ['FJ2782', 'FJ2783'],
+        rootWordEtymology: "ग्रीक 'Epi' (ऊपर) + 'Didymos' (जुड़वां/वृषण)। Vas (नलिका) + Deferens (ले जाने वाली)। Vasectomy = पुरुष नसबंदी।",
+        memoryTrickHindi: "ट्रिक: \"VAS = 45 CM LONG CORD\" — 45 सेमी लंबी मजबूत पेशीय नली; उंगलियों से छूने पर कड़े धागे (Whipcord) जैसी महसूस होती है। पुरुष नसबंदी का मुख्य लक्ष्य।",
+        locationEn: 'The epididymis sits crescent-shaped along the posterolateral border of each testis; the vas deferens is a 45 cm muscular cord running through the inguinal canal to the posterior bladder.',
+        locationHinglish: 'वृषण के पिछले हिस्से पर स्थित अर्धचंद्राकार अंग (एपिडिडिमिस) तथा वहां से निकलकर वंक्षण नलिका (Inguinal canal) से होते हुए मूत्राशय के पीछे तक जाने वाली 45 सेमी लंबी मजबूत पेशीय नली।',
+        functionEn: 'Epididymis matures spermatozoa over 12-14 days conferring forward motility; vas deferens forcefully propels sperm into the ejaculatory duct via sympathetic peristalsis during emission.',
+        functionHinglish: 'शुक्राणुओं को 2 सप्ताह तक सुरक्षित रखकर परिपक्व बनाना और तैरने की क्षमता (Motility) देना; संभोग के चरम पर तीव्र संकुचन से शुक्राणुओं को आगे बढ़ाना।',
+        funFactEn: 'The microscopic epididymal duct is tightly coiled into a 5-centimeter organ, but unraveled it measures an astonishing 6 meters (20 feet) in length!',
+        funFactHinglish: 'एपिडिडिमिस की सूक्ष्म नली केवल 5 सेमी के अंग में लिपटी होती है, लेकिन अगर इसे सीधा खोला जाए तो यह 6 मीटर (20 फीट) लंबी निकलती है!',
+        clinicalNoteEn: 'Vasectomy is a safe, outpatient permanent male contraception wherein both vasa deferentia are severed and ligated under local anesthesia.',
+        clinicalNoteHinglish: 'पुरुष नसबंदी (No-Scalpel Vasectomy - NSV): स्थानीय सुन्नता में केवल 10 मिनट में दोनों वास डिफेरेन्स को काटकर बांध दिया जाता है — बिना टांके और बिना दर्द के।',
+        highYieldMnemonic: '45 CM CLUB: Vas deferens, Femur, Spinal cord, Thoracic duct are all ~45 cm!',
+        examPearls: [
+          'लंबाई: Vas deferens 45 cm (18 inches) लंबी होती है।',
+          'त्रितंत्रीय पेशी दीवार: Outer longitudinal, middle circular, inner longitudinal — संकुचन अत्यंत तीव्र होता है।',
+          'Ampulla of vas deferens सेमिनल वेसिकल की डक्ट से मिलकर Ejaculatory duct बनाती है।'
+        ],
+        citations: [
+          {
+            book: "BD Chaurasia's Human Anatomy Vol 2",
+            citation: "Pelvis: Spermatic Cord & Vas Deferens, pp. 385–395",
+            highYieldFact: "The vas deferens is easily palpable within the spermatic cord as a firm, whipcord-like structure due to its thick, smooth muscle coat and pinhole lumen."
+          }
+        ],
+        treatmentsHinglish: [
+          "नो-स्कैलपेल वासेक्टॉमी (NSV) स्थायी पुरुष परिवार नियोजन हेतु।",
+          "रिवर्सल सर्जरी: माइक्रोस्कोपिक वासोवासोस्टॉमी (Vasovasostomy) नसबंदी खोलने हेतु।",
+          "एपिडिडिमाइटिस सूजन में स्क्रोटल सपोर्ट, एंटीबायोटिक और दर्द निवारक।"
+        ],
+        medications: ["Ofloxacin / Levofloxacin", "Ibuprofen (सूजन रोधी)", "Doxycycline"],
+        homeRemedies: [
+          "टाइट स्क्रोटल सपोर्टर का उपयोग, संक्रमण से बचाव, भारी वजन उठाने से परहेज।",
+          "वासेक्टॉमी के 3 महीने बाद सीमेन एनालिसिस जांच ताकि स्पर्म काउंट शून्य प्रमाणित हो सके।"
+        ],
+        relatedDiseases: ['Epididymitis', 'Male Infertility', 'Spermatocele'],
+      },
+      {
+        id: 'penis-erectile',
+        name: 'Penis & Erectile Bodies (Corpora Cavernosa)',
+        hindiName: 'शिश्न एवं उत्थानशील ऊतक (पेनिस व कॉर्पोरा कैवरनोसा)',
+        latinName: 'Penis et Corpora cavernosa',
+        pronunciation: 'PEE-nis and KOR-per-uh kav-er-NOH-suh',
+        system: 'reproductive',
+        elements: ['FJ2792'],
+        rootWordEtymology: "लैटिन 'Penis' (पूंछ) + 'Corpora' (शरीर/ऊतक) + 'Cavernosa' (गुहाओं/गुफाओं से भरा स्पंज)। Priapism = लगातार दर्दनाक इरेक्शन।",
+        memoryTrickHindi: "ट्रिक: \"POINT & SHOOT\" — Parasympathetic = Point (Nitric Oxide से इरेक्शन); Sympathetic = Shoot (T11-L2 रिफ्लेक्स से वीर्यस्खलन)।",
+        locationEn: 'External male copulatory and urinary organ attached to the perineal membrane and pubic bones; comprises paired dorsolateral corpora cavernosa and ventral corpus spongiosum.',
+        locationHinglish: 'पेल्विस के सामने स्थित बाह्य जननांग; तीन स्पंज जैसी उत्थानशील सिलेंडरों (दो कॉर्पोरा कैवरनोसा और एक कॉर्पस स्पॉन्जियोसम) से निर्मित।',
+        functionEn: 'Dual copulatory and excretory pathway: achieves high rigidity through arterial inflow and venous occlusion (erection), and conduits urine from bladder.',
+        functionHinglish: 'मूत्र त्याग का अंतिम मार्ग तथा प्रजनन हेतु संभोग के समय रक्त प्रवाह भरकर कठोर होना (Erection) और वीर्य स्खलन कराना।',
+        funFactEn: 'Penile erection is a pure hydraulic phenomenon: arterial inflow surges up to 8-fold while venous outflow is mechanically compressed shut by the rigid tunica albuginea!',
+        funFactHinglish: 'इरेक्शन पूरी तरह से एक हाइड्रोलिक चमत्कार है: धमनियों से रक्त प्रवाह 8 गुना बढ़ जाता है जबकि नसों का निकास पूरी तरह लॉक हो जाता है!',
+        clinicalNoteEn: 'Erectile Dysfunction (ED) often serves as an early vascular indicator of Coronary Artery Disease (CAD) due to penile artery diameter (1-2 mm vs 3-4 mm coronary).',
+        clinicalNoteHinglish: 'इरेक्टाइल डिसफंक्शन (ED) अक्सर दिल की बीमारियों और डायबिटीज का पहला संकेत होता है, क्योंकि शिश्न की सूक्ष्म धमनियां ब्लॉक होने लगती हैं।',
+        highYieldMnemonic: 'Point and Shoot: Parasympathetic (Point/Erect) & Sympathetic (Shoot/Ejaculate)',
+        examPearls: [
+          'Tunica albuginea: कॉर्पोरा कैवरनोसा को घेरने वाला मजबूत फाइब्रस आवरण; इरेक्शन में वेंस को दबाकर रक्त को बाहर जाने से रोकता है।',
+          'Deep dorsal vein of penis: प्रोस्टैटिक वीनस प्लेक्सस में ड्रेन करती है।',
+          'Helicine arteries: घुमावदार धमनी शाखाएं जो नाइट्रिक ऑक्साइड के प्रभाव में चौड़ी होकर रक्त से भर जाती हैं।'
+        ],
+        citations: [
+          {
+            book: "Campbell-Walsh Urology (12th Edition)",
+            citation: "Chapter 68: Physiology of Penile Erection and Pathophysiology of ED, pp. 1502–1530",
+            highYieldFact: "Nitric oxide released from non-adrenergic non-cholinergic (NANC) parasympathetic nerves stimulates guanylyl cyclase, elevating cGMP to relax cavernous vascular smooth muscle."
+          }
+        ],
+        treatmentsHinglish: [
+          "जीवनशैली सुधार: धूम्रपान व शराब बंद करना, कार्डियो व्यायाम, डायबिटीज व बीपी का कड़ा नियंत्रण।",
+          "दवा चिकित्सा: PDE-5 इन्हिबिटर्स (Sildenafil, Tadalafil) जो नाइट्रिक ऑक्साइड पाथवे को सक्रिय करते हैं।",
+          "गंभीर मामलों में: वैक्यूम इरेक्शन डिवाइस (VED) अथवा इन्फ्लेटेबल पेनाइल प्रोस्थेसिस सर्जरी।"
+        ],
+        medications: ["Sildenafil (Viagra)", "Tadalafil (Cialis)", "Avanafil", "Alprostadil (PGE1)"],
+        homeRemedies: [
+          "धूम्रपान का पूर्ण त्याग, नियमित एरोबिक कसरत (रक्त संचार सुधारने हेतु)।",
+          "मानसिक तनाव व परफॉर्मेंस एंग्जायटी प्रबंधन।"
+        ],
+        relatedDiseases: ['Erectile Dysfunction', 'Peyronie Disease', 'Priapism'],
+      },
+      {
+        id: 'seminal-vesicles',
+        name: 'Seminal Vesicles & Bulbourethral Glands',
+        hindiName: 'शुक्राशय एवं स्खलन नलिकाएं (सेमिनल वेसिकल्स)',
+        latinName: 'Vesiculae seminales',
+        pronunciation: 'SEM-uh-nuhl VES-i-kuhlz',
+        system: 'reproductive',
+        elements: ['FJ2791'],
+        rootWordEtymology: "लैटिन 'Semen' (बीज) + 'Vesicula' (छोटी थैली)। Vesiculitis = शुक्राशय की सूजन।",
+        memoryTrickHindi: "ट्रिक: \"SEMEN = 60-70% FRUCTOSE FUEL\" — सेमिनल वेसिकल्स वीर्य का 65% हिस्सा बनाती हैं और फ्रुक्टोज प्रदान करती हैं जो शुक्राणुओं की ऊर्जा का मुख्य स्रोत है।",
+        locationEn: 'Pair of 5 cm convoluted saccular pouches situated between the posterior base of the bladder and the rectum, superior to the prostate gland.',
+        locationHinglish: 'मूत्राशय के आधार के पीछे और मलाशय के सामने प्रोस्टेट ग्रंथि के ऊपर स्थित लगभग 5 सेमी लंबी दो घुमावदार थैलियां।',
+        functionEn: 'Produces ~60-70% of semen volume: a thick, yellowish, alkaline fluid rich in fructose, prostaglandins, and semenogelin that nourishes and mobilizes sperm.',
+        functionHinglish: 'वीर्य का 60 से 70% पोषक हिस्सा बनाना; इसमें फ्रुक्टोज (शुक्राणुओं का ईंधन), प्रोस्टाग्लैंडिन्स और क्षारीय द्रव होता है जो शुक्राणुओं को ऊर्जा देता है।',
+        funFactEn: 'Fructose in seminal fluid is produced nowhere else in the male body — forensics uses seminal fructose tests to confirm biological evidence!',
+        funFactHinglish: 'वीर्य में पाया जाने वाला फ्रुक्टोज पुरुष शरीर में अन्य किसी भी अंग में नहीं बनता — फॉरेंसिक साइंस में इसका उपयोग अपराध जांच में वीर्य की पहचान हेतु किया जाता है!',
+        clinicalNoteEn: 'Absence of seminal fructose in an azoospermic male strongly indicates Congenital Bilateral Absence of the Vas Deferens (CBAVD), frequently linked to CFTR gene mutations.',
+        clinicalNoteHinglish: 'वीर्य में फ्रुक्टोज केवल सेमिनल वेसिकल्स से आता है; बांझपन की जांच में यदि फ्रुक्टोज शून्य हो तो इसका अर्थ है कि नलिकाएं जन्म से गायब या अवरुद्ध हैं।',
+        highYieldMnemonic: 'Seminal Fructose: 65% semen volume, exclusive source of sperm fructose',
+        examPearls: [
+          'फ्रुक्टोज की उपस्थिति फॉरेंसिक मेडिसिन में वीर्य के दाग (Semen identification) की पुष्टि में काम आती है।',
+          'प्रोस्टाग्लैंडिन्स महिला गर्भाशय में संकुचन पैदा करते हैं जिससे शुक्राणु तेजी से फैलोपियन ट्यूब की ओर खिंचते हैं।',
+          'Duct of seminal vesicle + Ampulla of vas deferens = Ejaculatory duct (जो प्रोस्टेट के अंदर खुलती है)।'
+        ],
+        citations: [
+          {
+            book: "Guyton and Hall Textbook of Medical Physiology",
+            citation: "Unit XIV, Chapter 81 (Male Reproductive Functions and Seminal Fluid), pp. 1025–1032",
+            highYieldFact: "Prostaglandins from seminal vesicles react with female cervical mucus to render it more receptive to sperm movement and induce backward reverse peristalsis in the uterus and fallopian tubes."
+          }
+        ],
+        treatmentsHinglish: [
+          "सेमिनल वेसिकुलाइटिस: कल्चर्ड एंटीबायोटिक थेरेपी और पेल्विक एंटी-इन्फ्लेमेटरी दवाएं।",
+          "ट्रांसयूरेथ्रल रिसेक्शन ऑफ इजेकुलेटरी डक्ट (TURED): स्खलन नली में रुकावट होने पर एंडोस्कोपिक सर्जरी।",
+          "टीआरयूएस (TRUS - Transrectal Ultrasound) द्वारा सटीक सोनोग्राफी।"
+        ],
+        medications: ["Ciprofloxacin / Levofloxacin", "Tamsulosin", "NSAIDs"],
+        homeRemedies: [
+          "पर्याप्त पानी पीना, लंबे समय तक एक ही जगह बैठे रहने से बचना।",
+          "पेल्विक वॉर्म बाथ (Sitz bath) और नियमित वीर्यस्खलन से कंजेशन रोकना।"
+        ],
+        relatedDiseases: ['Seminal Vesiculitis', 'Hematospermia', 'Ejaculatory Duct Obstruction'],
       },
     ],
   },
-
   // CHAPTER 9: ENDOCRINE SYSTEM & HORMONAL REGULATION
   {
     id: 'chapter-endocrine',
@@ -1058,4 +1389,22 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
   },
 ];
+/**
+ * Gender-Specific Chapter Filter
+ * Male: Chapters 1-6 (Universal), 7 (Male Reproductive), 8-11 (Universal)
+ * Female: Chapters 1-6 (Universal), 7 (Female Reproductive), 8-11 (Universal)
+ * Re-indexes chapter numbers cleanly 1..11
+ */
+export function getChaptersForGender(gender: 'male' | 'female'): BookChapter[] {
+  const filtered = BOOK_CHAPTERS.filter(ch => {
+    if (gender === 'male' && ch.id === 'chapter-female-reproductive') return false;
+    if (gender === 'female' && ch.id === 'chapter-male-reproductive') return false;
+    return true;
+  });
 
+  return filtered.map((ch, idx) => ({
+    ...ch,
+    chapterNumber: idx + 1,
+    hindiTitle: ch.hindiTitle.replace(/अध्याय \d+:/, `अध्याय ${idx + 1}:`),
+  }));
+}

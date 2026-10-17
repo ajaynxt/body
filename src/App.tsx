@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
 import type { AtlasData, StudyPartItem, ClinicalDisease } from './types/atlas';
-import { BOOK_CHAPTERS } from './data/chapters';
+import { getChaptersForGender } from './data/chapters';
 import { ThreeViewer } from './engine/ThreeViewer';
 import { Header } from './components/Header';
 import { ThreeCanvas } from './components/ThreeCanvas';
@@ -41,7 +41,7 @@ export const App: React.FC = () => {
       const saved = localStorage.getItem('anatomy_atlas_theme');
       if (saved === 'dark' || saved === 'light') return saved;
     }
-    return 'dark';
+    return 'light';
   });
 
   useEffect(() => {
@@ -160,7 +160,8 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  const currentChapter = BOOK_CHAPTERS[currentChapterIndex] || BOOK_CHAPTERS[0];
+  const activeChapters = useMemo(() => getChaptersForGender(activeGender), [activeGender]);
+  const currentChapter = activeChapters[currentChapterIndex] || activeChapters[0];
 
   // Handle switching gender model
   const handleSwitchGender = useCallback(async (gender: 'male' | 'female') => {
@@ -174,10 +175,14 @@ export const App: React.FC = () => {
       // Keep full body standing in full view - no sudden zoom in
       viewerRef.current.resetView();
     }
+    const chapters = getChaptersForGender(gender);
     if (gender === 'female') {
-      const femaleChapterIdx = BOOK_CHAPTERS.findIndex(c => c.id === 'chapter-female-reproductive');
+      const femaleChapterIdx = chapters.findIndex(c => c.id === 'chapter-female-reproductive');
       if (femaleChapterIdx >= 0) {
         setCurrentChapterIndex(femaleChapterIdx);
+        setCurrentPartIndex(0);
+      } else {
+        setCurrentChapterIndex(0);
         setCurrentPartIndex(0);
       }
     } else {
@@ -194,10 +199,10 @@ export const App: React.FC = () => {
     setIsIsolated(false);
 
     // Find chapter and part index
-    const chIdx = BOOK_CHAPTERS.findIndex(c => c.systemId === part.system);
+    const chIdx = activeChapters.findIndex(c => c.systemId === part.system);
     if (chIdx >= 0) {
       setCurrentChapterIndex(chIdx);
-      const pIdx = BOOK_CHAPTERS[chIdx].parts.findIndex(p => p.id === part.id);
+      const pIdx = activeChapters[chIdx].parts.findIndex(p => p.id === part.id);
       if (pIdx >= 0) setCurrentPartIndex(pIdx);
     }
 
@@ -205,7 +210,7 @@ export const App: React.FC = () => {
       viewerRef.current.selectMultipleParts(part.elements);
       viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [viewMode, isBookReaderCollapsed]);
+  }, [viewMode, isBookReaderCollapsed, activeChapters]);
 
   // Handle isolating a part
   const handleIsolatePart = useCallback((part: StudyPartItem) => {
@@ -311,17 +316,17 @@ export const App: React.FC = () => {
 
   // Handle selecting a disease from Disease modal or tab
   const handleSelectDisease = useCallback((disease: ClinicalDisease) => {
-    const chIdx = BOOK_CHAPTERS.findIndex(c => c.systemId === disease.system);
+    const chIdx = activeChapters.findIndex(c => c.systemId === disease.system);
     if (chIdx >= 0) {
       setCurrentChapterIndex(chIdx);
-      const matchingPart = BOOK_CHAPTERS[chIdx].parts.find(p =>
+      const matchingPart = activeChapters[chIdx].parts.find(p =>
         disease.affectedPartNames.some(name => p.name.toLowerCase().includes(name.toLowerCase()))
       );
       if (matchingPart) {
         handleIsolatePart(matchingPart);
       }
     }
-  }, [handleIsolatePart]);
+  }, [handleIsolatePart, activeChapters]);
 
   // Handle Layer Mode Application from StudySuiteModal
   const handleApplyLayerMode = useCallback((layer: number) => {
@@ -381,8 +386,8 @@ export const App: React.FC = () => {
           return nextIdx;
         } else {
           setCurrentChapterIndex(prevCh => {
-            const nextCh = (prevCh + 1) % BOOK_CHAPTERS.length;
-            const newChapter = BOOK_CHAPTERS[nextCh];
+            const nextCh = (prevCh + 1) % activeChapters.length;
+            const newChapter = activeChapters[nextCh];
             if (newChapter.parts.length > 0) {
               handleSelectPart(newChapter.parts[0]);
             }
@@ -394,14 +399,14 @@ export const App: React.FC = () => {
     }, 7000);
 
     return () => clearInterval(interval);
-  }, [isTourPlaying, viewMode, currentChapter, handleSelectPart]);
+  }, [isTourPlaying, viewMode, currentChapter, handleSelectPart, activeChapters]);
 
   // Currently focused / active part across male & female reference models
   const activePart: StudyPartItem | undefined =
     selectedPartItem ||
     (activeGender === 'female'
       ? selectedFemalePart || undefined
-      : BOOK_CHAPTERS[currentChapterIndex]?.parts[currentPartIndex]);
+      : activeChapters[currentChapterIndex]?.parts[currentPartIndex]);
 
   return (
     <div className={`app-root view-${viewMode}`} data-theme={theme}>
@@ -462,6 +467,8 @@ export const App: React.FC = () => {
           <>
             {viewMode === 'book' && (
               <BookReader
+                chapters={activeChapters}
+                activeGender={activeGender}
                 currentChapterIndex={currentChapterIndex}
                 currentPartIndex={currentPartIndex}
                 selectedPart={selectedPartItem}
@@ -472,8 +479,8 @@ export const App: React.FC = () => {
                   setCurrentPartIndex(0);
                   setSelectedPartItem(null);
                   setSelectedFemalePart(null);
-                  const ch = BOOK_CHAPTERS[idx];
-                  if (ch.parts.length > 0) {
+                  const ch = activeChapters[idx];
+                  if (ch && ch.parts.length > 0) {
                     handleSelectPart(ch.parts[0]);
                   }
                 }}
@@ -652,7 +659,7 @@ export const App: React.FC = () => {
           isOpen={isAITutorOpen}
           onClose={() => setIsAITutorOpen(false)}
           currentPart={activePart}
-          currentChapter={BOOK_CHAPTERS[currentChapterIndex]}
+          currentChapter={activeChapters[currentChapterIndex]}
           onIsolateIn3D={() => {
             if (activePart) handleIsolatePart(activePart);
           }}
@@ -664,7 +671,7 @@ export const App: React.FC = () => {
         isOpen={isAudioPlayerOpen}
         onClose={() => setIsAudioPlayerOpen(false)}
         currentPart={activePart}
-        currentChapter={BOOK_CHAPTERS[currentChapterIndex]}
+        currentChapter={activeChapters[currentChapterIndex]}
       />
     </div>
   );

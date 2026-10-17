@@ -742,16 +742,16 @@ export interface LanguageContextType {
 }
 
 export const LanguageContext = createContext<LanguageContextType>({
-  language: 'hi',
+  language: 'en',
   setLanguage: () => {},
   dir: 'ltr',
-  t: TRANSLATIONS.hi,
-  meta: SUPPORTED_LANGUAGES[0],
+  t: TRANSLATIONS.en,
+  meta: SUPPORTED_LANGUAGES[1] || SUPPORTED_LANGUAGES[0],
 });
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<string>(() => {
-    return localStorage.getItem('anatomy_atlas_lang') || 'hi';
+    return localStorage.getItem('anatomy_atlas_lang') || 'en';
   });
 
   const meta = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];

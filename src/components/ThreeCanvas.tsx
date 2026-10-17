@@ -28,7 +28,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
   isAutoRotating,
   selectedPartId,
   isIsolated,
-  theme = 'dark',
+  theme = 'light',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<ThreeViewer | null>(null);

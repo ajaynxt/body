@@ -864,6 +864,8 @@ export class ThreeViewer {
   /** Retry the female reference load without forcing a full page refresh. */
   public async retryFemaleModel(): Promise<void> {
     if (this.activeGender !== 'female' || this.femaleLoading || this.femaleLoaded) return;
+    // A previous failure hides the partial female root; make it visible before the clean retry.
+    this.femaleRoot.visible = true;
     await this.loadFemaleModel();
     this.updateStateTextures();
     if (this.femaleLoaded) this.updateFemaleState();

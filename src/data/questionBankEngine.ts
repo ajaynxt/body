@@ -73,35 +73,40 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
     : BOOK_CHAPTERS.flatMap(ch => ch.parts).filter(part => part.id?.trim() && part.name?.trim());
   const femaleParts = chapters.find(ch => ch.id === 'chapter-female-reproductive')?.parts
     .filter(part => part.id?.trim() && part.name?.trim() && part.elements.some(Boolean)) ?? [];
-  const hasFemaleStudyContent = femaleParts.length > 0;
 
-  // Keep system filters within the active edition. Clinical questions use the full disease bank.
+  // Respect selected system even when it contains fewer than three study topics.
+  let eligibleParts = activeParts;
+  if (filter !== 'all' && filter !== 'clinical') {
+    const filteredParts = activeParts.filter(part => part.system === filter);
+    if (filteredParts.length > 0) eligibleParts = filteredParts;
+  }
+  const hasFemaleStudyContent = femaleParts.length > 0;
+  const hasLatinParts = eligibleParts.some(part => !!part.latinName);
+  const hasMnemonicParts = eligibleParts.some(part => !!part.memoryTrickHindi || !!part.highYieldMnemonic);
+
+  // Keep each filter limited to the supported question types for that system.
   const archetypes: string[] = filter === 'clinical'
     ? ['emergency_red_flag', 'treatment_protocol']
     : filter === 'all'
       ? [
           'organ_function',
-          'latin_name',
+          ...(hasLatinParts ? ['latin_name'] : []),
           'emergency_red_flag',
           'treatment_protocol',
-          'memory_mnemonic',
+          ...(hasMnemonicParts ? ['memory_mnemonic'] : []),
           ...(hasFemaleStudyContent ? ['female_anatomy'] : []),
+          'system_classification',
         ]
       : [
           'organ_function',
-          'latin_name',
-          'memory_mnemonic',
+          ...(hasLatinParts ? ['latin_name'] : []),
+          ...(hasMnemonicParts ? ['memory_mnemonic'] : []),
           ...(filter === 'reproductive' && hasFemaleStudyContent ? ['female_anatomy'] : []),
+          'system_classification',
         ];
 
   const pickedType = archetypes[Math.floor(Math.random() * archetypes.length)] || 'organ_function';
   const randomSeed = Math.floor(Math.random() * 1000000);
-
-  let eligibleParts = activeParts;
-  if (filter !== 'all' && filter !== 'clinical') {
-    const filteredParts = activeParts.filter(part => part.system === filter);
-    if (filteredParts.length >= 3) eligibleParts = filteredParts;
-  }
 
   let eligibleDiseases = ALL_DISEASES;
   if (filter !== 'all' && filter !== 'clinical') {
@@ -189,11 +194,13 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
     const targetDisease = eligibleDiseases[Math.floor(Math.random() * eligibleDiseases.length)];
     const correctTreatment = targetDisease.treatment?.medical[0] || 'R.I.C.E Protocol & Rest';
     
-    // Pick 3 plausible distractors from other diseases
-    const otherTreatments = ALL_DISEASES
-      .filter(d => d.id !== targetDisease.id && !!d.treatment?.medical)
-      .flatMap(d => d.treatment?.medical || [])
-      .slice(0, 3);
+    // Pick distinct distractors so the correct treatment cannot appear twice.
+    const otherTreatments = shuffle(Array.from(new Set(
+      ALL_DISEASES
+        .filter(d => d.id !== targetDisease.id && !!d.treatment?.medical)
+        .flatMap(d => d.treatment?.medical || [])
+        .filter(treatment => !!treatment && treatment !== correctTreatment)
+    ))).slice(0, 3);
 
     const shuffled = shuffle([correctTreatment, ...otherTreatments]);
     const correctIdx = shuffled.findIndex(t => t === correctTreatment);
@@ -267,7 +274,11 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
 
   // --- DEFAULT FALLBACK: SYSTEM CLASSIFICATION ---
   const fallbackPart = eligibleParts[Math.floor(Math.random() * eligibleParts.length)];
-  const systemNames = ['cardiac', 'skeletal', 'muscular', 'nervous', 'respiratory', 'digestive', 'urinary'];
+  const systemNames = [
+    'cardiac', 'skeletal', 'muscular', 'nervous', 'respiratory', 'digestive', 'urinary',
+    'reproductive', 'endocrine', 'lymphatic', 'sensory', 'arterial', 'venous',
+    'integumentary', 'connective',
+  ];
   const correctSys = fallbackPart.system;
   const distractorSystems = systemNames.filter(s => s !== correctSys).slice(0, 3);
   const shuffledSystems = shuffle([correctSys, ...distractorSystems]);
@@ -281,6 +292,14 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapter
     respiratory: 'श्वसन तंत्र (Respiratory System)',
     digestive: 'पाचन तंत्र (Digestive System)',
     urinary: 'उत्सर्जन तंत्र (Urinary System)',
+    reproductive: 'प्रजनन तंत्र (Reproductive System)',
+    endocrine: 'अंतःस्रावी तंत्र (Endocrine System)',
+    lymphatic: 'लसिका एवं प्रतिरक्षा तंत्र (Lymphatic System)',
+    sensory: 'संवेदी तंत्र (Sensory System)',
+    arterial: 'धमनी परिसंचरण (Arterial System)',
+    venous: 'शिरापरक परिसंचरण (Venous System)',
+    integumentary: 'त्वचा एवं बाह्य आवरण (Integumentary System)',
+    connective: 'संयोजी ऊतक तंत्र (Connective Tissue System)',
   };
 
   return {

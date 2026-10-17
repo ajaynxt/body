@@ -164,6 +164,30 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
               🧠 मस्तिष्क व तंत्रिका
             </button>
             <button
+              className={`filter-btn ${activeFilter === 'respiratory' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('respiratory')}
+            >
+              🫁 श्वसन तंत्र
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'digestive' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('digestive')}
+            >
+              पाचन तंत्र
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'urinary' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('urinary')}
+            >
+              💧 मूत्र एवं उत्सर्जन तंत्र
+            </button>
+            <button
+              className={`filter-btn ${activeFilter === 'reproductive' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('reproductive')}
+            >
+              🧬 प्रजनन तंत्र
+            </button>
+            <button
               className={`filter-btn ${activeFilter === 'clinical' ? 'active' : ''}`}
               onClick={() => handleFilterChange('clinical')}
             >

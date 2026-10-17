@@ -67,6 +67,12 @@ assert.match(appSource, /<StudentQuizModal[\s\S]*?chapters=\{activeChapters\}/, 
 assert.match(bookReaderSource, /AnatomyStudyVisual/, 'Each individual Study page must include its anatomy visual.');
 assert.match(anatomyVisualSource, /mammaryGland/, 'Mammary study topics must use a dedicated mammary anatomy diagram.');
 assert.match(anatomyVisualSource, /mammary|breast|nipple|areola/, 'Female breast structures must resolve to the mammary diagram.');
+assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');
+assert.match(questionBankSource, /hasMnemonicParts = eligibleParts\.some/, 'Mnemonic questions must only be selected when data exists.');
+assert.match(questionBankSource, /new Set\([\s\S]*treatment !== correctTreatment/, 'Treatment answer choices must not duplicate the correct answer.');
+for (const filter of ['respiratory', 'digestive', 'urinary', 'reproductive']) {
+  assert.ok(quizSource.includes(`handleFilterChange('${filter}')`), `Missing quiz filter button: ${filter}`);
+}
 
 const starterStart = librarySource.indexOf('export const STARTER_BOOKS: StudyBook[] = [');
 const starterEnd = librarySource.indexOf('\n];', starterStart);

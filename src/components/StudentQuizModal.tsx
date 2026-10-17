@@ -16,20 +16,24 @@ import {
   type QuizQuestion,
   type QuizFilterSystem,
 } from '../data/questionBankEngine';
-import type { StudyPartItem } from '../types/atlas';
+import type { BookChapter, StudyPartItem } from '../types/atlas';
 import { BOOK_CHAPTERS } from '../data/chapters';
 
 interface StudentQuizModalProps {
   isOpen: boolean;
   onClose: () => void;
   onHighlightPart: (part: StudyPartItem) => void;
+  chapters: BookChapter[];
 }
 
 export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
   isOpen,
   onClose,
   onHighlightPart,
+  chapters,
 }) => {
+  const studyChapters = chapters.length > 0 ? chapters : BOOK_CHAPTERS;
+  const studyParts = studyChapters.flatMap(chapter => chapter.parts);
   const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -42,14 +46,14 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
   const fetchNextQuestion = (filter: QuizFilterSystem = activeFilter) => {
-    const q = generateRandomQuestion(filter);
+    const q = generateRandomQuestion(filter, studyChapters);
     setCurrentQuestion(q);
     setSelectedAnswerIndex(null);
     setIsAnswered(false);
 
     // If question has relatedPartId, highlight in 3D
     if (q.relatedPartId) {
-      const part = BOOK_CHAPTERS.flatMap(ch => ch.parts).find(p => p.id === q.relatedPartId);
+      const part = studyParts.find(p => p.id === q.relatedPartId);
       if (part) {
         onHighlightPart(part);
       }
@@ -261,9 +265,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
                   <button
                     className="view-3d-btn"
                     onClick={() => {
-                      const part = BOOK_CHAPTERS.flatMap(ch => ch.parts).find(
-                        p => p.id === currentQuestion.relatedPartId
-                      );
+                      const part = studyParts.find(p => p.id === currentQuestion.relatedPartId);
                       if (part) {
                         onHighlightPart(part);
                         onClose();

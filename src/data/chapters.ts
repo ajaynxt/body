@@ -822,7 +822,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         latinName: 'Glandulae mammariae',
         pronunciation: 'MAM-uh-ree glandz',
         system: 'reproductive',
-        elements: ['HRAF0005', 'HRAF0006', 'HRAF0007', 'HRAF0008', 'HRAF0013', 'HRAF0014', 'HRAF0015', 'HRAF0018'],
+        elements: ['HRAF0004', 'HRAF0005', 'HRAF0006', 'HRAF0007', 'HRAF0008', 'HRAF0009', 'HRAF0010', 'HRAF0011', 'HRAF0012', 'HRAF0013', 'HRAF0014', 'HRAF0015', 'HRAF0016', 'HRAF0017', 'HRAF0018', 'HRAF0019'],
         rootWordEtymology: "लैटिन 'Mamma' (स्तन/मां)। Mammography (स्तन एक्स-रे), Mastitis (स्तन में सूजन), Mastectomy (स्तन हटाने की सर्जरी)।",
         memoryTrickHindi: "ट्रिक: \"PROLACTIN Produces milk; OXYTOCIN Outflows milk\" — कूपर के लिगामेंट्स (Cooper's ligaments) स्तनों को त्वचा से जोड़कर सीधा रखते हैं।",
         locationEn: 'Subcutaneous modified sweat glands overlying the pectoralis major muscle from the 2nd to 6th ribs vertically, and sternal edge to midaxillary line horizontally.',

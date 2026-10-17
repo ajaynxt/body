@@ -686,6 +686,7 @@ export const App: React.FC = () => {
           isOpen={isQuizModalOpen}
           onClose={() => setIsQuizModalOpen(false)}
           onHighlightPart={handleSelectPart}
+          chapters={activeChapters}
         />
 
         {/* Attribution & About Modal */}

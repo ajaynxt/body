@@ -6,8 +6,7 @@
 
 import { BOOK_CHAPTERS } from './chapters';
 import { CLINICAL_DISEASES } from './diseases';
-import { FEMALE_MESH_CATALOG } from './femaleMeshCatalog';
-import type { StudyPartItem, ClinicalDisease } from '../types/atlas';
+import type { BookChapter, StudyPartItem, ClinicalDisease } from '../types/atlas';
 
 export interface QuizQuestion {
   id: string;
@@ -36,8 +35,7 @@ export type QuizFilterSystem =
   | 'reproductive'
   | 'clinical';
 
-// Aggregate all unique study parts
-const ALL_PARTS: StudyPartItem[] = BOOK_CHAPTERS.flatMap(ch => ch.parts);
+// Diseases are shared reference data; study parts must follow the active gender edition.
 const ALL_DISEASES: ClinicalDisease[] = CLINICAL_DISEASES;
 
 /**
@@ -64,40 +62,57 @@ function pickDistractors<T>(array: T[], count: number, excludePredicate: (item: 
 /**
  * Generates a randomized question on the fly from the 1 Lakh+ pool.
  */
-export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQuestion {
-  // Only include templates implemented below. Clinical mode is limited to clinical questions.
-  const archetypes = [
-    'organ_function',
-    'latin_name',
-    'emergency_red_flag',
-    'treatment_protocol',
-    'memory_mnemonic',
-    'female_anatomy',
-  ];
+export function generateRandomQuestion(filter: QuizFilterSystem = 'all', chapters: BookChapter[] = BOOK_CHAPTERS): QuizQuestion {
+  const chapterParts = chapters.flatMap(ch => ch.parts);
+  const uniquePartMap = new Map<string, StudyPartItem>();
+  chapterParts.forEach(part => {
+    if (part.id?.trim() && part.name?.trim()) uniquePartMap.set(part.id, part);
+  });
+  const activeParts = uniquePartMap.size > 0
+    ? Array.from(uniquePartMap.values())
+    : BOOK_CHAPTERS.flatMap(ch => ch.parts).filter(part => part.id?.trim() && part.name?.trim());
+  const femaleParts = chapters.find(ch => ch.id === 'chapter-female-reproductive')?.parts
+    .filter(part => part.id?.trim() && part.name?.trim() && part.elements.some(Boolean)) ?? [];
+  const hasFemaleStudyContent = femaleParts.length > 0;
 
-  const pickedType = filter === 'clinical'
-    ? (Math.random() < 0.5 ? 'emergency_red_flag' : 'treatment_protocol')
-    : archetypes[Math.floor(Math.random() * archetypes.length)];
+  // Keep system filters within the active edition. Clinical questions use the full disease bank.
+  const archetypes: string[] = filter === 'clinical'
+    ? ['emergency_red_flag', 'treatment_protocol']
+    : filter === 'all'
+      ? [
+          'organ_function',
+          'latin_name',
+          'emergency_red_flag',
+          'treatment_protocol',
+          'memory_mnemonic',
+          ...(hasFemaleStudyContent ? ['female_anatomy'] : []),
+        ]
+      : [
+          'organ_function',
+          'latin_name',
+          'memory_mnemonic',
+          ...(filter === 'reproductive' && hasFemaleStudyContent ? ['female_anatomy'] : []),
+        ];
+
+  const pickedType = archetypes[Math.floor(Math.random() * archetypes.length)] || 'organ_function';
   const randomSeed = Math.floor(Math.random() * 1000000);
 
-  // Filter parts based on user selection
-  let eligibleParts = ALL_PARTS;
+  let eligibleParts = activeParts;
   if (filter !== 'all' && filter !== 'clinical') {
-    eligibleParts = ALL_PARTS.filter(p => p.system === filter);
-    if (eligibleParts.length < 3) eligibleParts = ALL_PARTS;
+    const filteredParts = activeParts.filter(part => part.system === filter);
+    if (filteredParts.length >= 3) eligibleParts = filteredParts;
   }
 
-  // Filter diseases based on user selection
   let eligibleDiseases = ALL_DISEASES;
-  if (filter !== 'all') {
-    eligibleDiseases = ALL_DISEASES.filter(d => d.system === filter);
-    if (eligibleDiseases.length === 0) eligibleDiseases = ALL_DISEASES;
+  if (filter !== 'all' && filter !== 'clinical') {
+    const filteredDiseases = ALL_DISEASES.filter(disease => disease.system === filter);
+    if (filteredDiseases.length > 0) eligibleDiseases = filteredDiseases;
   }
 
   // --- ARCHETYPE 1: ORGAN FUNCTION (शरीर क्रिया) ---
   if (pickedType === 'organ_function') {
     const targetPart = eligibleParts[Math.floor(Math.random() * eligibleParts.length)];
-    const distractors = pickDistractors(ALL_PARTS, 3, p => p.id === targetPart.id);
+    const distractors = pickDistractors(activeParts, 3, p => p.id === targetPart.id);
 
     const optionsRaw = [targetPart, ...distractors];
     const shuffledOptions = shuffle(optionsRaw);
@@ -122,7 +137,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
   // --- ARCHETYPE 2: SCIENTIFIC / LATIN NAME (लैटिन वैज्ञानिक नाम) ---
   if (pickedType === 'latin_name') {
     const partsWithLatin = eligibleParts.filter(p => !!p.latinName);
-    const targetPart = partsWithLatin[Math.floor(Math.random() * partsWithLatin.length)] || ALL_PARTS[0];
+    const targetPart = partsWithLatin[Math.floor(Math.random() * partsWithLatin.length)] || activeParts[0];
     const distractors = pickDistractors(partsWithLatin, 3, p => p.id === targetPart.id);
 
     const shuffled = shuffle([targetPart, ...distractors]);
@@ -203,8 +218,8 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
   // --- ARCHETYPE 5: MEMORY MNEMONIC (याद रखने की ट्रिक्स) ---
   if (pickedType === 'memory_mnemonic') {
     const partsWithMnemonics = eligibleParts.filter(p => !!p.memoryTrickHindi || !!p.highYieldMnemonic);
-    const targetPart = partsWithMnemonics[Math.floor(Math.random() * partsWithMnemonics.length)] || ALL_PARTS[0];
-    const distractors = pickDistractors(ALL_PARTS, 3, p => p.id === targetPart.id);
+    const targetPart = partsWithMnemonics[Math.floor(Math.random() * partsWithMnemonics.length)] || activeParts[0];
+    const distractors = pickDistractors(activeParts, 3, p => p.id === targetPart.id);
 
     const shuffled = shuffle([targetPart, ...distractors]);
     const correctIdx = shuffled.findIndex(p => p.id === targetPart.id);
@@ -225,27 +240,28 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
     };
   }
 
-  // --- ARCHETYPE 6: FEMALE ANATOMY (HuBMAP VHF 1.5) ---
-  if (pickedType === 'female_anatomy') {
-    const fParts = FEMALE_MESH_CATALOG;
-    const targetF = fParts[Math.floor(Math.random() * fParts.length)] || fParts[0];
-    const distractors = pickDistractors(fParts, 3, p => p.id === targetF.id);
-
+  // --- ARCHETYPE 6: FEMALE ANATOMY ---
+  // Use the same female chapter parts as the Study reader so answers map to selectable HRA meshes.
+  if (pickedType === 'female_anatomy' && femaleParts.length > 0) {
+    const targetF = femaleParts[Math.floor(Math.random() * femaleParts.length)];
+    const distractors = pickDistractors(femaleParts, 3, part => part.id === targetF.id);
     const shuffled = shuffle([targetF, ...distractors]);
-    const correctIdx = shuffled.findIndex(p => p.id === targetF.id);
+    const correctIdx = shuffled.findIndex(part => part.id === targetF.id);
+    const description = targetF.functionHinglish || targetF.locationHinglish || targetF.name;
 
     return {
       id: `q-female-${targetF.id}-${randomSeed}`,
-      category: 'FEMALE ANATOMY (HuBMAP VHF 1.5)',
-      categoryHindi: 'महिला शरीर रचना विज्ञान (VHF 1.5)',
-      questionText: `In the human female 3D anatomy atlas, which structure is described as: "${targetF.description}"?`,
-      questionHindi: `महिला 3D शरीर रचना में इस विवरण से कौन सा अंग मेल खाता है: "${targetF.description}"?`,
-      options: shuffled.map(p => p.hindiName || p.name),
+      category: 'FEMALE ANATOMY',
+      categoryHindi: 'महिला शरीर रचना विज्ञान',
+      questionText: `Which female anatomical structure is described by this function or location: "${description}"?`,
+      questionHindi: `इस कार्य या स्थान के विवरण से महिला शरीर का कौन-सा अंग मेल खाता है: "${description}"?`,
+      options: shuffled.map(part => `${part.hindiName} (${part.name})`),
       correctIndex: correctIdx,
-      explanationHindi: `${targetF.hindiName || targetF.name} (${targetF.system} तंत्र): ${targetF.description}. FMA ID: ${targetF.fmaId || 'VHF 1.5'}`,
-      explanationEn: `Part of the HuBMAP Visible Human Female dataset representing the ${targetF.system} system.`,
+      explanationHindi: `${targetF.hindiName} (${targetF.name}): ${targetF.functionHinglish} स्थान: ${targetF.locationHinglish}`,
+      explanationEn: `${targetF.name}: ${targetF.functionEn || targetF.functionHinglish} Location: ${targetF.locationEn || targetF.locationHinglish}`,
       relatedPartId: targetF.id,
       difficulty: 'Medium',
+      highYieldMnemonic: targetF.highYieldMnemonic,
     };
   }
 

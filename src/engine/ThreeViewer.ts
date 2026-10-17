@@ -79,9 +79,10 @@ const FEMALE_REPLACED_MALE_SYSTEMS = new Set([
   'reproductive',
 ]);
 
-function isFemaleRenderablePart(part: { id: string; system: string }): boolean {
-  // Pregnancy-only meshes are excluded from the standard non-pregnant female body view.
-  return part.system !== 'pregnancy';
+function isFemaleRenderablePart(_part: { id: string; system: string }): boolean {
+  // Every official female-atlas mesh is loadable. Pregnancy meshes remain hidden by updateFemaleState
+  // until the related part is explicitly selected, so they are available for study without showing by default.
+  return true;
 }
 
 function isFemaleBreastPart(partId: string): boolean {
@@ -773,6 +774,9 @@ export class ThreeViewer {
 
       this.femaleLoaded = true;
       this.femaleLoading = false;
+      // Recompute shared anatomy visibility as soon as the female meshes are ready. This also
+      // handles rapid male → female → male → female switching while one load is still in flight.
+      this.updateStateTextures();
       this.updateFemaleState();
       if (this.activeGender === 'female') {
         this.onProgress(100);
@@ -783,20 +787,34 @@ export class ThreeViewer {
       this.femaleAtlas = null;
       this.femaleRoot.visible = false;
 
-      // Remove partial meshes/materials so a later retry starts cleanly and cannot leave
-      // half a female model layered over the shared fallback anatomy.
-      this.femaleRoot.traverse(object => {
-        if (!(object instanceof THREE.Mesh)) return;
-        object.geometry.dispose();
-        if (Array.isArray(object.material)) {
-          object.material.forEach(material => material.dispose());
-        } else {
-          object.material.dispose();
+      // Dispose partial merged meshes and original per-part geometries (also used for raycasting).
+      // Deduplicate resources because the skin geometry is referenced by both a mesh and a picker.
+      const disposedGeometries = new Set<THREE.BufferGeometry>();
+      const disposedMaterials = new Set<THREE.Material>();
+      const disposeMeshResources = (mesh: THREE.Mesh) => {
+        if (!disposedGeometries.has(mesh.geometry)) {
+          mesh.geometry.dispose();
+          disposedGeometries.add(mesh.geometry);
         }
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        materials.forEach(material => {
+          if (!disposedMaterials.has(material)) {
+            material.dispose();
+            disposedMaterials.add(material);
+          }
+        });
+      };
+      this.femaleRoot.traverse(object => {
+        if (object instanceof THREE.Mesh) disposeMeshResources(object);
+      });
+      this.femaleIndividualMeshes.forEach(mesh => {
+        if (mesh) disposeMeshResources(mesh);
       });
       this.femaleRoot.clear();
       this.femaleSystemMeshes.clear();
-      this.femaleSystemMaterials.forEach(material => material.dispose());
+      this.femaleSystemMaterials.forEach(material => {
+        if (!disposedMaterials.has(material)) material.dispose();
+      });
       this.femaleSystemMaterials.clear();
       this.femaleSkinMesh = null;
       this.femaleIndividualMeshes = [];
@@ -806,21 +824,29 @@ export class ThreeViewer {
       this.femalePartStateTexture?.dispose();
       this.femaleSelectionTexture?.dispose();
 
+      // Ensure the shared anatomy fallback becomes visible again after a failed or cancelled load.
+      this.updateStateTextures();
       const message = err instanceof Error ? err.message : String(err);
       this.onError('महिला 3D मॉडल लोड करने में त्रुटि: ' + message);
     }
   }
 
   public async switchGender(gender: 'male' | 'female'): Promise<void> {
-    if (this.activeGender === gender) return;
+    if (this.activeGender === gender) {
+      // A repeated request while the female atlas is still loading must not skip its eventual visibility refresh.
+      if (gender === 'female' && !this.femaleLoaded && !this.femaleLoading) {
+        await this.loadFemaleModel();
+        this.updateStateTextures();
+      }
+      return;
+    }
     this.activeGender = gender;
 
-    // Retain the shared root only for anatomy not supplied by the female reference, especially missing muscles.
-    // updateStateTextures hides male-native organs where the female atlas provides a replacement.
+    // Retain shared meshes only where the female reference has no loaded replacement.
     this.maleRoot.visible = true;
 
     if (gender === 'female') {
-      this.femaleRoot.visible = true; // Female surface, native organs, fitted bones and available muscles
+      this.femaleRoot.visible = true;
       if (!this.femaleLoaded) {
         await this.loadFemaleModel();
       } else {
@@ -830,8 +856,17 @@ export class ThreeViewer {
       this.femaleRoot.visible = false;
     }
 
-    // Update visibility so the female atlas, rather than male organ meshes, provides the native organs.
+    // Keep both rendered layers in sync after every gender transition, including a load fallback.
     this.updateStateTextures();
+    if (gender === 'female' && this.femaleLoaded) this.updateFemaleState();
+  }
+
+  /** Retry the female reference load without forcing a full page refresh. */
+  public async retryFemaleModel(): Promise<void> {
+    if (this.activeGender !== 'female' || this.femaleLoading || this.femaleLoaded) return;
+    await this.loadFemaleModel();
+    this.updateStateTextures();
+    if (this.femaleLoaded) this.updateFemaleState();
   }
 
   public getActiveGender(): 'male' | 'female' {
@@ -1368,11 +1403,46 @@ export class ThreeViewer {
     cancelAnimationFrame(this.animationFrameId);
     this.resizeObserver?.disconnect();
     this.controls?.dispose();
-    this.renderer?.dispose();
+
+    const disposedGeometries = new Set<THREE.BufferGeometry>();
+    const disposedMaterials = new Set<THREE.Material>();
+    const disposeMesh = (mesh: THREE.Mesh) => {
+      if (!disposedGeometries.has(mesh.geometry)) {
+        mesh.geometry.dispose();
+        disposedGeometries.add(mesh.geometry);
+      }
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach(material => {
+        if (!disposedMaterials.has(material)) {
+          material.dispose();
+          disposedMaterials.add(material);
+        }
+      });
+    };
+    this.maleRoot.traverse(object => {
+      if (object instanceof THREE.Mesh) disposeMesh(object);
+    });
+    this.individualMeshes.forEach(mesh => {
+      if (mesh) disposeMesh(mesh);
+    });
+    this.femaleRoot.traverse(object => {
+      if (object instanceof THREE.Mesh) disposeMesh(object);
+    });
+    this.femaleIndividualMeshes.forEach(mesh => {
+      if (mesh) disposeMesh(mesh);
+    });
+
+    this.systemMaterials.forEach(material => {
+      if (!disposedMaterials.has(material)) material.dispose();
+    });
+    this.femaleSystemMaterials.forEach(material => {
+      if (!disposedMaterials.has(material)) material.dispose();
+    });
     this.partStateTexture?.dispose();
     this.selectionTexture?.dispose();
     this.femalePartStateTexture?.dispose();
     this.femaleSelectionTexture?.dispose();
+    this.renderer?.dispose();
     this.container.innerHTML = '';
   }
 }

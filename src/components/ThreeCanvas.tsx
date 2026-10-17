@@ -59,10 +59,11 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
     };
   }, [atlas]);
 
-  // Sync active gender with ThreeViewer
+  // Sync active gender with ThreeViewer. Clear a stale female-load warning when leaving that mode.
   useEffect(() => {
     if (!viewerRef.current) return;
-    viewerRef.current.switchGender(activeGender);
+    if (activeGender === 'male') setErrorMessage(null);
+    void viewerRef.current.switchGender(activeGender);
   }, [activeGender]);
 
   // Sync skin opacity
@@ -134,16 +135,40 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
         </div>
       )}
 
-      {/* Error Recovery Card */}
+      {/* A failed female reference load falls back to shared anatomy instead of blocking the canvas. */}
       {errorMessage && (
-        <div className="error-glass-overlay">
+        <div className={`error-glass-overlay ${activeGender === 'female' ? 'female-fallback-error' : ''}`}>
           <div className="error-card glass-panel">
             <AlertTriangle size={26} className="text-danger" />
-            <p className="error-msg">{errorMessage}</p>
-            <button className="reload-btn" onClick={() => window.location.reload()}>
-              <RefreshCw size={15} />
-              <span>दोबारा लोड करें (Reload)</span>
-            </button>
+            <p className="error-msg">
+              {activeGender === 'female'
+                ? 'Female reference model load nahi hua. Available shared anatomy fallback dikh rahi hai.'
+                : errorMessage}
+            </p>
+            {activeGender === 'female' ? (
+              <>
+                <details className="female-load-error-details">
+                  <summary>Error details</summary>
+                  <span>{errorMessage}</span>
+                </details>
+                <button
+                  className="reload-btn"
+                  onClick={async () => {
+                    setErrorMessage(null);
+                    setLoadingProgress(0);
+                    await viewerRef.current?.retryFemaleModel();
+                  }}
+                >
+                  <RefreshCw size={15} />
+                  <span>Retry female model</span>
+                </button>
+              </>
+            ) : (
+              <button className="reload-btn" onClick={() => window.location.reload()}>
+                <RefreshCw size={15} />
+                <span>दोबारा लोड करें (Reload)</span>
+              </button>
+            )}
           </div>
         </div>
       )}

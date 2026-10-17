@@ -12150,3 +12150,51 @@ button.primary-action:hover {
   .anatomy-study-visual__media { height: 190px; }
   .anatomy-study-visual--compact .anatomy-study-visual__media { height: 150px; }
 }
+
+/* Keep the shared female-mode fallback visible and provide an in-place retry. */
+.female-fallback-error {
+  inset: auto 12px 12px auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: none;
+}
+.female-fallback-error .error-card {
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(48vh, 360px);
+  overflow: auto;
+  padding: 14px;
+  gap: 8px;
+  pointer-events: auto;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+.female-load-error-details {
+  width: 100%;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.female-load-error-details summary {
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+.female-load-error-details span {
+  display: block;
+  max-height: 72px;
+  overflow: auto;
+}
+@media (max-width: 600px) {
+  .female-fallback-error {
+    inset: auto 8px 8px 8px;
+    justify-content: center;
+  }
+  .female-fallback-error .error-card {
+    width: 100%;
+    max-height: 38vh;
+  }
+}
+

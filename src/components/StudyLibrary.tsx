@@ -34,7 +34,7 @@ const CATEGORIES: CategoryType[] = [
   'Human Biology',
 ];
 
-const PRESET_COLORS = ['#0ea5e9', '#ef4444', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
+const PRESET_COLORS = ['#7c3aed', '#c026d3', '#8b5cf6', '#d946ef', '#be185d', '#4f46e5', '#6d28d9'];
 
 export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo3D }) => {
   const [books, setBooks] = useState<StudyBook[]>([]);

@@ -12198,3 +12198,60 @@ button.primary-action:hover {
   }
 }
 
+/* One-chapter-at-a-time study navigation for flashcards and glossary. */
+.study-topic-selector {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(220px, 1.1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass);
+}
+.study-topic-selector-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.study-topic-selector-copy label {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 750;
+}
+.study-topic-selector-copy span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.study-topic-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 36px 10px 12px;
+  color: var(--text-main);
+  background: var(--bg-secondary, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  cursor: pointer;
+}
+.study-topic-select:focus-visible {
+  outline: 2px solid var(--accent-cyan-light, #38bdf8);
+  outline-offset: 2px;
+}
+.study-topic-select option {
+  color: #111827;
+  background: #ffffff;
+}
+@media (max-width: 620px) {
+  .study-topic-selector {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+}
+

@@ -639,6 +639,7 @@ export const App: React.FC = () => {
           onClose={() => setIsStudySuiteModalOpen(false)}
           onSelectPart={handleSelectPart}
           onApplyLayerMode={handleApplyLayerMode}
+          chapters={activeChapters}
         />
 
         {/* Clinical Disease Encyclopedia Modal */}

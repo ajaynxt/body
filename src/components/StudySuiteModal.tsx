@@ -12,7 +12,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { BOOK_CHAPTERS } from '../data/chapters';
-import type { StudyPartItem } from '../types/atlas';
+import type { BookChapter, StudyPartItem } from '../types/atlas';
 import { AnatomyStudyVisual } from './AnatomyStudyVisual';
 
 interface StudySuiteModalProps {
@@ -20,6 +20,7 @@ interface StudySuiteModalProps {
   onClose: () => void;
   onSelectPart: (part: StudyPartItem) => void;
   onApplyLayerMode?: (layer: number) => void;
+  chapters?: BookChapter[];
 }
 
 export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
@@ -27,16 +28,21 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
   onClose,
   onSelectPart,
   onApplyLayerMode,
+  chapters: providedChapters,
 }) => {
   const [activeTab, setActiveTab] = useState<'flashcards' | 'layers' | 'glossary' | 'bookmarks'>('flashcards');
 
-  // Flatten all parts for flashcards and glossary
-  const allParts: StudyPartItem[] = BOOK_CHAPTERS.flatMap(ch => ch.parts);
+  // Study one chapter at a time. The parent supplies gender-filtered chapters when available.
+  const studyChapters = providedChapters && providedChapters.length > 0 ? providedChapters : BOOK_CHAPTERS;
+  const allParts: StudyPartItem[] = studyChapters.flatMap(ch => ch.parts);
+  const [activeChapterId, setActiveChapterId] = useState<string>(studyChapters[0]?.id ?? '');
+  const activeChapter = studyChapters.find(ch => ch.id === activeChapterId) || studyChapters[0];
+  const currentChapterParts: StudyPartItem[] = activeChapter?.parts ?? [];
 
-  // Flashcards state
+  // Flashcards state is scoped to the selected chapter, not the entire anatomy library.
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [shuffledParts, setShuffledParts] = useState<StudyPartItem[]>(allParts);
+  const [shuffledParts, setShuffledParts] = useState<StudyPartItem[]>(() => [...currentChapterParts]);
 
   // Glossary state
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,16 +60,35 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
   const [currentLayer, setCurrentLayer] = useState(1); // One isolated study layer at a time
 
   useEffect(() => {
+    const selectedChapterIsAvailable = studyChapters.some(ch => ch.id === activeChapterId);
+    if (!selectedChapterIsAvailable) {
+      const fallbackChapter = studyChapters[0];
+      setActiveChapterId(fallbackChapter?.id ?? '');
+      setShuffledParts([...(fallbackChapter?.parts ?? [])].sort(() => 0.5 - Math.random()));
+      setCardIndex(0);
+      setIsFlipped(false);
+      return;
+    }
+
     if (isOpen) {
-      setShuffledParts([...allParts].sort(() => 0.5 - Math.random()));
+      setShuffledParts([...currentChapterParts].sort(() => 0.5 - Math.random()));
       setCardIndex(0);
       setIsFlipped(false);
     }
-  }, [isOpen]);
+  }, [isOpen, activeChapterId, studyChapters, currentChapterParts]);
 
   if (!isOpen) return null;
 
-  const currentCard = shuffledParts[cardIndex] || allParts[0];
+  const currentCard = shuffledParts[cardIndex] || currentChapterParts[0];
+
+  const handleTopicChange = (chapterId: string) => {
+    setActiveChapterId(chapterId);
+    const nextChapter = studyChapters.find(ch => ch.id === chapterId);
+    setShuffledParts([...(nextChapter?.parts ?? [])].sort(() => 0.5 - Math.random()));
+    setCardIndex(0);
+    setIsFlipped(false);
+    setSearchTerm('');
+  };
 
   const handleNextCard = () => {
     setIsFlipped(false);
@@ -88,7 +113,7 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
     setCurrentLayer(layer);
   };
 
-  const filteredGlossary = allParts.filter(
+  const filteredGlossary = currentChapterParts.filter(
     p =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.hindiName.includes(searchTerm) ||
@@ -151,6 +176,32 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
 
         {/* Tab Content */}
         <div className="study-suite-body">
+          {(activeTab === 'flashcards' || activeTab === 'glossary') && (
+            <div className="study-topic-selector">
+              <div className="study-topic-selector-copy">
+                <label htmlFor="study-topic-select">एक बार में एक अध्याय पढ़ें</label>
+                <span>
+                  {activeChapter
+                    ? `${activeChapter.chapterNumber}. ${activeChapter.hindiTitle || activeChapter.title} · ${currentChapterParts.length} topics`
+                    : 'कोई अध्याय उपलब्ध नहीं'}
+                </span>
+              </div>
+              <select
+                id="study-topic-select"
+                className="study-topic-select"
+                value={activeChapter?.id ?? ''}
+                onChange={e => handleTopicChange(e.target.value)}
+                aria-label="Choose one anatomy study chapter"
+              >
+                {studyChapters.map(ch => (
+                  <option key={ch.id} value={ch.id}>
+                    अध्याय {ch.chapterNumber}: {ch.hindiTitle || ch.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* TAB 1: FLASHCARDS */}
           {activeTab === 'flashcards' && currentCard && (
             <div className="flashcards-container">

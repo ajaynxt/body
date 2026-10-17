@@ -1,5 +1,5 @@
 import type { StudyPartItem, AtlasData } from '../types/atlas';
-import { BOOK_CHAPTERS } from '../data/chapters';
+import { getChaptersForGender } from '../data/chapters';
 import { FEMALE_MESH_CATALOG } from '../data/femaleMeshCatalog';
 
 // Hindi translation map for anatomical keywords and common structures
@@ -293,9 +293,10 @@ export function resolveAnatomicalPart(
     ],
   });
 
-  // 1. First, search if part matches curated BOOK_CHAPTERS
-  for (let cIdx = 0; cIdx < BOOK_CHAPTERS.length; cIdx++) {
-    const ch = BOOK_CHAPTERS[cIdx];
+  // Search the active gender's chapter list so returned indices match the visible reader.
+  const activeChapters = getChaptersForGender(activeGender);
+  for (let cIdx = 0; cIdx < activeChapters.length; cIdx++) {
+    const ch = activeChapters[cIdx];
     const pIdx = ch.parts.findIndex(p => p.id === partId || p.elements.includes(partId));
     if (pIdx >= 0) {
       return {

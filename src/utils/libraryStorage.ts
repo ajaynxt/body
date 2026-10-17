@@ -66,7 +66,10 @@ export const initLibraryDB = (): Promise<IDBDatabase> => {
     };
 
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      dbPromise = null;
+      reject(request.error || new Error('Unable to open the study library database.'));
+    };
   });
 
   return dbPromise;

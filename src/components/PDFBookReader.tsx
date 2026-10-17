@@ -61,6 +61,9 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
 }) => {
   const [book, setBook] = useState<StudyBook | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [pdfLoadError, setPdfLoadError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [scale, setScale] = useState(1.15);
@@ -94,6 +97,11 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
     const loadData = async () => {
       try {
         setLoading(true);
+        setLoadError(null);
+        setPdfLoadError(null);
+        setBook(null);
+        setPdfDoc(null);
+        setHasPdfBlob(false);
         const bookData = await getBook(bookId);
         if (!bookData || !isMounted) return;
 
@@ -132,6 +140,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
             }
           } catch (pdfErr) {
             console.error('Failed to parse PDF with pdfjs-dist:', pdfErr);
+            setPdfLoadError('Saved PDF file could not be opened. Attach a valid copy of the PDF to continue reading.');
             setTotalPages(bookData.totalPages || 10);
           }
         } else {
@@ -141,6 +150,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         }
       } catch (err) {
         console.error('Error loading book reader:', err);
+        if (isMounted) setLoadError('Study data could not be read from this browser. Check storage permissions and retry.');
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -154,7 +164,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         renderTaskRef.current.cancel();
       }
     };
-  }, [bookId]);
+  }, [bookId, loadAttempt]);
 
   // Sync current note text when page changes
   useEffect(() => {
@@ -326,9 +336,10 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         setPdfDoc(loadedPdf);
         setTotalPages(loadedPdf.numPages);
         setHasPdfBlob(true);
+        setPdfLoadError(null);
       } catch (err) {
         console.error('Failed to attach PDF to book:', err);
-        alert('PDF लोड करने में त्रुटि हुई। कृपया पुनः प्रयास करें।');
+        setPdfLoadError('Selected PDF could not be opened. Choose a valid, unencrypted PDF file and retry.');
       } finally {
         setLoading(false);
       }
@@ -358,11 +369,28 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
     );
   }
 
+  if (loadError) {
+    return (
+      <div className="pdf-reader-error glass-panel">
+        <BookOpen size={48} className="empty-icon" />
+        <h3>पुस्तक डेटा लोड नहीं हो सका</h3>
+        <p>{loadError}</p>
+        <button onClick={() => setLoadAttempt(attempt => attempt + 1)} className="btn-primary">
+          फिर से प्रयास करें (Retry)
+        </button>
+        <button onClick={onBackToLibrary} className="reader-nav-btn">
+          ← पुस्तकालय में वापस जाएं
+        </button>
+      </div>
+    );
+  }
+
   if (!book) {
     return (
       <div className="pdf-reader-error glass-panel">
         <BookOpen size={48} className="empty-icon" />
         <h3>पुस्तक नहीं मिली (Book not found)</h3>
+        <p>यह पुस्तक हटाई गई हो सकती है या लिंक पुराना है।</p>
         <button onClick={onBackToLibrary} className="btn-primary">
           ← पुस्तकालय में वापस जाएं
         </button>
@@ -480,9 +508,16 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
 
       {/* Main Reading Stage & Canvas View */}
       <main className="reader-stage-container">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          onChange={handleAttachPdf}
+          style={{ display: 'none' }}
+        />
         {/* PDF Canvas or Starter Textbook Page */}
         <div className="reader-canvas-scroll-area">
-          {hasPdfBlob ? (
+          {hasPdfBlob && pdfDoc ? (
             <div className="pdf-canvas-container">
               {isPdfRendering && (
                 <div className="pdf-rendering-overlay">
@@ -491,6 +526,15 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
                 </div>
               )}
               <canvas ref={canvasRef} className="pdf-page-canvas" />
+            </div>
+          ) : pdfLoadError ? (
+            <div className="empty-page-placeholder glass-panel">
+              <AlertCircle size={32} className="empty-icon" />
+              <p>{pdfLoadError}</p>
+              <button onClick={() => fileInputRef.current?.click()} className="attach-btn">
+                <Upload size={15} />
+                <span>मान्य PDF चुनें (Attach PDF)</span>
+              </button>
             </div>
           ) : currentStarterPage ? (
             /* Built-in Rich Reference Book Page */
@@ -568,13 +612,6 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
                   <Upload size={15} />
                   <span>मूल PDF फ़ाइल जोड़ें (Attach PDF)</span>
                 </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,application/pdf"
-                  onChange={handleAttachPdf}
-                  style={{ display: 'none' }}
-                />
               </div>
             </div>
           ) : (

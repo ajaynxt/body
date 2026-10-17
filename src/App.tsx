@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
-import type { AtlasData, StudyPartItem, ClinicalDisease } from './types/atlas';
+import type { AtlasData, BookChapter, StudyPartItem, ClinicalDisease } from './types/atlas';
 import { getChaptersForGender } from './data/chapters';
 import { ALL_ANATOMICAL_SYSTEM_IDS, DEFAULT_VISIBLE_SYSTEM_IDS } from './data/systems';
 import { ThreeViewer } from './engine/ThreeViewer';
@@ -25,6 +25,34 @@ const StudySuiteModal = lazy(() => import('./components/StudySuiteModal').then(m
 const StepByStepAITutor = lazy(() => import('./components/StepByStepAITutor').then(m => ({ default: m.StepByStepAITutor })));
 const MedicalDiagnosticsModal = lazy(() => import('./components/MedicalDiagnosticsModal').then(m => ({ default: m.MedicalDiagnosticsModal })));
 const StudentFunZoneModal = lazy(() => import('./components/StudentFunZoneModal').then(m => ({ default: m.StudentFunZoneModal })));
+
+function findStudyLocation(
+  chapters: BookChapter[],
+  part: StudyPartItem
+): { chapterIndex: number; partIndex: number } | null {
+  const targetIds = new Set([part.id, ...part.elements].filter(Boolean));
+
+  for (let chapterIndex = 0; chapterIndex < chapters.length; chapterIndex++) {
+    const parts = chapters[chapterIndex].parts;
+    const partIndex = parts.findIndex(candidate =>
+      targetIds.has(candidate.id) ||
+      candidate.elements.some(id => targetIds.has(id)) ||
+      part.elements.some(id => candidate.id === id || candidate.elements.includes(id))
+    );
+    if (partIndex >= 0) return { chapterIndex, partIndex };
+  }
+
+  const systemAliases: Record<string, string> = {
+    brain: 'nervous',
+    borrowed: 'skeletal',
+    connective: 'skeletal',
+    'donor-muscle': 'muscular',
+    pregnancy: 'reproductive',
+  };
+  const targetSystem = systemAliases[part.system] || part.system;
+  const chapterIndex = chapters.findIndex(chapter => chapter.systemId === targetSystem);
+  return chapterIndex >= 0 ? { chapterIndex, partIndex: 0 } : null;
+}
 
 export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
@@ -209,12 +237,10 @@ export const App: React.FC = () => {
     setSelectedFemalePart(null);
     setIsIsolated(false);
 
-    // Find chapter and part index
-    const chIdx = activeChapters.findIndex(c => c.systemId === part.system);
-    if (chIdx >= 0) {
-      setCurrentChapterIndex(chIdx);
-      const pIdx = activeChapters[chIdx].parts.findIndex(p => p.id === part.id);
-      if (pIdx >= 0) setCurrentPartIndex(pIdx);
+    const location = findStudyLocation(activeChapters, part);
+    if (location) {
+      setCurrentChapterIndex(location.chapterIndex);
+      setCurrentPartIndex(location.partIndex);
     }
 
     if (viewerRef.current && part.elements.length > 0) {
@@ -227,6 +253,11 @@ export const App: React.FC = () => {
   const handleIsolatePart = useCallback((part: StudyPartItem) => {
     setSelectedPartId(part.elements[0] || part.id);
     setSelectedPartItem(part);
+    const location = findStudyLocation(activeChapters, part);
+    if (location) {
+      setCurrentChapterIndex(location.chapterIndex);
+      setCurrentPartIndex(location.partIndex);
+    }
     setIsIsolated(true);
     setExplodeValue(0);
 
@@ -235,7 +266,7 @@ export const App: React.FC = () => {
       viewerRef.current.setIsolated(true);
       viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [viewMode, isBookReaderCollapsed]);
+  }, [viewMode, isBookReaderCollapsed, activeChapters]);
 
   // Handle clicking directly in 3D viewport ("jis pr click kre vo hi name side me aaye")
   const handle3DPartClick = useCallback((partId: string) => {
@@ -245,35 +276,36 @@ export const App: React.FC = () => {
     const femaleAtlas = viewerRef.current?.getFemaleAtlas() || null;
     // Resolve organ details (Male, Female, Bones, Muscles, Vessels)
     const resolved = resolveAnatomicalPart(partId, atlas, activeGender, femaleAtlas);
-    if (resolved) {
-      setSelectedPartItem(resolved.part);
-      if (resolved.chapterIndex !== undefined && resolved.partIndex !== undefined) {
-        setCurrentChapterIndex(resolved.chapterIndex);
-        setCurrentPartIndex(resolved.partIndex);
-      }
-    } else {
-      const cleanName = partId.replace(/^FJ|^HRAF/, '');
-      setSelectedPartItem({
-        id: partId,
-        name: `Anatomical Part ${cleanName}`,
-        hindiName: `शारीरिक संरचना (${cleanName})`,
-        latinName: `Pars anatomica ${cleanName}`,
-        pronunciation: `part ${cleanName}`,
-        system: partId.startsWith('HRAF') ? 'reproductive' : 'muscular',
-        elements: [partId],
-        locationHinglish: 'मानव 3D शारीरिक मॉडल का महत्वपूर्ण अंग अथवा पेशीय ऊतक',
-        functionHinglish: 'शारीरिक संरचनात्मक स्थिरता, गतिशीलता और आंतरिक अंगों की सुरक्षा प्रदान करना।',
-        funFactHinglish: 'शरीर का हर सूक्ष्म ऊतक लाखों विशेष कोशिकाओं से मिलकर बना है।',
-        clinicalNoteHinglish: 'रेडियोलॉजिकल इमेजिंग (सीटी/एमआरआई) द्वारा इसकी सटीक शारीरिक स्थिति का अध्ययन किया जाता है।',
-        relatedDiseases: ['मांसपेशीय खिंचाव (Strain)', 'सूजन (Inflammation)', 'संरचनात्मक क्षति (Structural lesion)'],
-      });
+    const cleanName = partId.replace(/^FJ|^HRAF/, '');
+    const fallbackPart: StudyPartItem = {
+      id: partId,
+      name: `Anatomical Part ${cleanName}`,
+      hindiName: `शारीरिक संरचना (${cleanName})`,
+      latinName: `Pars anatomica ${cleanName}`,
+      pronunciation: `part ${cleanName}`,
+      system: partId.startsWith('HRAF') ? 'reproductive' : 'muscular',
+      elements: [partId],
+      locationHinglish: 'मानव 3D शारीरिक मॉडल का महत्वपूर्ण अंग अथवा पेशीय ऊतक',
+      functionHinglish: 'शारीरिक संरचनात्मक स्थिरता, गतिशीलता और आंतरिक अंगों की सुरक्षा प्रदान करना।',
+      funFactHinglish: 'शरीर का हर सूक्ष्म ऊतक लाखों विशेष कोशिकाओं से मिलकर बना है।',
+      clinicalNoteHinglish: 'रेडियोलॉजिकल इमेजिंग (सीटी/एमआरआई) द्वारा इसकी सटीक शारीरिक स्थिति का अध्ययन किया जाता है।',
+      relatedDiseases: ['मांसपेशीय खिंचाव (Strain)', 'सूजन (Inflammation)', 'संरचनात्मक क्षति (Structural lesion)'],
+    };
+    const studyPart = resolved?.part ?? fallbackPart;
+    setSelectedPartItem(studyPart);
+    const location = resolved?.chapterIndex !== undefined && resolved?.partIndex !== undefined
+      ? { chapterIndex: resolved.chapterIndex, partIndex: resolved.partIndex }
+      : findStudyLocation(activeChapters, studyPart);
+    if (location) {
+      setCurrentChapterIndex(location.chapterIndex);
+      setCurrentPartIndex(location.partIndex);
     }
 
     if (viewerRef.current) {
       viewerRef.current.selectPart(partId);
       viewerRef.current.frameSelectedStructure(isBookReaderCollapsed ? 0 : (viewMode === 'book' ? -0.2 : 0));
     }
-  }, [atlas, activeGender, viewMode, isBookReaderCollapsed]);
+  }, [atlas, activeGender, viewMode, isBookReaderCollapsed, activeChapters]);
 
   // Handle Hiding specific part ("is ang ko chupaye")
   const handleHidePart = useCallback(() => {

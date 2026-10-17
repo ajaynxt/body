@@ -42,6 +42,7 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
 
   // Upload Form State
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -59,10 +60,12 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
   const loadBooks = async () => {
     try {
       setLoading(true);
+      setLibraryError(null);
       const list = await ensureStarterBooksSeeded();
       setBooks(list);
     } catch (err) {
       console.error('Failed to load books from IndexedDB:', err);
+      setLibraryError('Study library data could not be opened in this browser. Check storage permissions and retry.');
     } finally {
       setLoading(false);
     }
@@ -334,6 +337,15 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
 
           {loading ? (
             <div className="shelf-loading">पुस्तकालय लोड हो रहा है...</div>
+          ) : libraryError ? (
+            <div className="shelf-empty glass-panel">
+              <AlertCircle size={36} className="empty-icon" />
+              <h4>पुस्तकालय नहीं खुल सका</h4>
+              <p>{libraryError}</p>
+              <button onClick={() => void loadBooks()} className="library-upload-btn primary-action">
+                <span>फिर से प्रयास करें (Retry)</span>
+              </button>
+            </div>
           ) : filteredBooks.length === 0 ? (
             <div className="shelf-empty glass-panel">
               <BookOpen size={40} className="empty-icon" />

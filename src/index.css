@@ -10658,3 +10658,172 @@ button.primary-action:hover {
     right: 10px;
   }
 }
+
+
+/* Mobile modal system: keep dialogs, tabs and scroll regions within the usable viewport. */
+@media (max-width: 768px) {
+  .modal-backdrop {
+    padding: 10px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .disease-modal-content,
+  .about-modal-card,
+  .compare-modal-card,
+  .study-suite-modal-card,
+  .ai-tutor-modal {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 20px);
+  }
+
+  .medical-diagnostics-modal {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100dvh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .modal-header {
+    padding: 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .modal-title {
+    overflow-wrap: anywhere;
+  }
+
+  .about-modal-body,
+  .compare-modal-body,
+  .modal-scroll-body {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .student-modal-overlay {
+    box-sizing: border-box;
+    padding: 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .student-modal-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+    min-height: 0;
+  }
+
+  .student-modal-header {
+    padding: 12px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .student-header-title-wrap {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .student-header-subtitle {
+    display: none;
+  }
+
+  .student-header-actions {
+    margin-left: auto;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .student-nav-tabs {
+    padding: 8px 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 6px;
+  }
+
+  .student-nav-tab {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  .student-modal-body {
+    min-height: 0;
+    padding: 12px;
+    overscroll-behavior: contain;
+  }
+
+  .study-suite-tab-nav {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .suite-tab-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-height: 38px;
+  }
+
+  .ai-tutor-header {
+    padding: 14px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .ai-tutor-header-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .diagnostics-split-workspace,
+  .detail-scrollable-content {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .modal-backdrop {
+    padding: 8px;
+  }
+
+  .disease-modal-content,
+  .about-modal-card,
+  .compare-modal-card,
+  .study-suite-modal-card,
+  .ai-tutor-modal,
+  .medical-diagnostics-modal {
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 12px;
+  }
+
+  .about-modal-body,
+  .compare-modal-body {
+    padding: 12px;
+  }
+
+  .student-modal-header {
+    padding: 10px;
+  }
+
+  .student-mascot-badge {
+    width: 36px;
+    height: 36px;
+  }
+
+  .student-modal-body {
+    padding: 10px;
+  }
+}

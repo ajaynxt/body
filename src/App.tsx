@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo, lazy, Suspense } from 'react';
 import type { AtlasData, StudyPartItem, ClinicalDisease } from './types/atlas';
 import { getChaptersForGender } from './data/chapters';
+import { ALL_ANATOMICAL_SYSTEM_IDS, DEFAULT_VISIBLE_SYSTEM_IDS } from './data/systems';
 import { ThreeViewer } from './engine/ThreeViewer';
 import { Header } from './components/Header';
 import { ThreeCanvas } from './components/ThreeCanvas';
@@ -29,7 +30,7 @@ export const App: React.FC = () => {
   const [atlas, setAtlas] = useState<AtlasData | null>(null);
   const viewerRef = useRef<ThreeViewer | null>(null);
 
-  // Active Gender Model ('male' = BodyParts3D 4.0, 'female' = HuBMAP VHF 1.5)
+  // Active Gender Model ('male' = BodyParts3D 4.0, 'female' = Human Reference Atlas v1.10)
   const [activeGender, setActiveGender] = useState<'male' | 'female'>('male');
   const [skinOpacity, setSkinOpacity] = useState(0.35); // 0.35 gives clear full female body contour while showing inner organs
 
@@ -82,7 +83,7 @@ export const App: React.FC = () => {
   const [isBookReaderCollapsed, setIsBookReaderCollapsed] = useState(false);
   const [hiddenPartsCount, setHiddenPartsCount] = useState(0);
   const [visibleSystems, setVisibleSystems] = useState<Set<string>>(
-    () => new Set(['cardiac', 'skeletal', 'muscular', 'arterial', 'venous', 'nervous', 'respiratory', 'digestive', 'urinary', 'reproductive', 'integumentary', 'lymphatic'])
+    () => new Set(DEFAULT_VISIBLE_SYSTEM_IDS)
   );
 
   // Handle URL routing on the custom domain and the optional GitHub Pages /body/ path.
@@ -340,32 +341,23 @@ export const App: React.FC = () => {
 
   // Handle Layer Mode Application from StudySuiteModal
   const handleApplyLayerMode = useCallback((layer: number) => {
-    if (!viewerRef.current) return;
-    if (layer === 1) {
-      viewerRef.current.setAllSystemsVisible(false);
-      viewerRef.current.setSystemVisible('integumentary', true);
-      setSkinOpacity(0.85);
-    } else if (layer === 2) {
-      viewerRef.current.setAllSystemsVisible(false);
-      viewerRef.current.setSystemVisible('muscular', true);
-      setSkinOpacity(0.0);
-    } else if (layer === 3) {
-      viewerRef.current.setAllSystemsVisible(false);
-      ['skeletal', 'digestive', 'respiratory', 'cardiac', 'circulatory', 'urinary', 'reproductive'].forEach(s => {
-        viewerRef.current?.setSystemVisible(s, true);
-      });
-      setSkinOpacity(0.0);
-    } else if (layer === 4) {
-      viewerRef.current.setAllSystemsVisible(false);
-      ['circulatory', 'cardiac', 'arterial', 'venous'].forEach(s => {
-        viewerRef.current?.setSystemVisible(s, true);
-      });
-      setSkinOpacity(0.0);
-    } else if (layer === 5) {
-      viewerRef.current.setAllSystemsVisible(false);
-      viewerRef.current.setSystemVisible('nervous', true);
-      setSkinOpacity(0.0);
-    }
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+
+    const layerSystems: Record<number, string[]> = {
+      1: ['integumentary'],
+      2: ['muscular'],
+      3: ['skeletal', 'digestive', 'respiratory', 'cardiac', 'circulatory', 'urinary', 'reproductive'],
+      4: ['circulatory', 'cardiac', 'arterial', 'venous'],
+      5: ['nervous'],
+    };
+    const targetSystems = layerSystems[layer];
+    if (!targetSystems) return;
+
+    viewer.setAllSystemsVisible(false);
+    targetSystems.forEach(systemId => viewer.setSystemVisible(systemId, true));
+    setVisibleSystems(new Set(targetSystems));
+    setSkinOpacity(layer === 1 ? 0.85 : 0.0);
   }, []);
 
   // Handle Reset View
@@ -378,8 +370,11 @@ export const App: React.FC = () => {
     setIsAutoRotating(false);
     setCurrentView('three-quarter');
     setIsTourPlaying(false);
+    setVisibleSystems(new Set(ALL_ANATOMICAL_SYSTEM_IDS));
+    setSkinOpacity(0.35);
     if (viewerRef.current) {
       viewerRef.current.resetView();
+      viewerRef.current.setAllSystemsVisible(true);
     }
   }, []);
 
@@ -450,7 +445,7 @@ export const App: React.FC = () => {
             ? '♀ महिला संपूर्ण शरीर रचना (3D Anatomy Atlas)'
             : currentChapter.hindiTitle
         }
-        totalPartsCount={activeGender === 'female' ? 2285 : atlas?.parts.length || 2234}
+        totalPartsCount={atlas?.parts.length || 2234}
       />
 
       {/* Main Workspace */}

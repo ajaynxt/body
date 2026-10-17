@@ -137,3 +137,22 @@ export const ANATOMICAL_SYSTEMS: AnatomicalSystem[] = [
     keyOrgans: ['Intervertebral Discs', 'Articular Cartilages', 'Costal Cartilages'],
   },
 ];
+
+
+// Shared visibility defaults keep the UI controls and the 3D engine in sync.
+export const DEFAULT_VISIBLE_SYSTEM_IDS = [
+  'cardiac',
+  'skeletal',
+  'muscular',
+  'arterial',
+  'venous',
+  'nervous',
+  'respiratory',
+  'digestive',
+  'urinary',
+  'reproductive',
+  'integumentary',
+  'lymphatic',
+];
+
+export const ALL_ANATOMICAL_SYSTEM_IDS: string[] = ANATOMICAL_SYSTEMS.map(system => system.id);

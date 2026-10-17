@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { AtlasData } from '../types/atlas';
-import { ANATOMICAL_SYSTEMS } from '../data/systems';
+import { ANATOMICAL_SYSTEMS, DEFAULT_VISIBLE_SYSTEM_IDS } from '../data/systems';
 import { decompressGzip } from '../utils/decompression';
 import { calculateKnollingLayout } from '../utils/knolling';
 import type { KnollingLayout } from '../utils/knolling';
@@ -163,12 +163,8 @@ export class ThreeViewer {
       this.femaleCatalogMap.set(p.id, p);
     });
 
-    // Default visible systems: all except integumentary
-    ANATOMICAL_SYSTEMS.forEach(s => {
-      if (s.id !== 'integumentary') {
-        this.visibleSystems.add(s.id);
-      }
-    });
+    // Use the same default visibility set as the React controls.
+    DEFAULT_VISIBLE_SYSTEM_IDS.forEach(systemId => this.visibleSystems.add(systemId));
 
     this.initScene();
     this.initStage();
@@ -1161,7 +1157,7 @@ export class ThreeViewer {
     // 2. Check female-specific anatomy if in female mode
     if (this.activeGender === 'female' && this.femaleAtlas) {
       this.femaleAtlas.parts.forEach((part, idx) => {
-        if (!FEMALE_SPECIFIC_PARTS.has(part.id)) return;
+        if (!isFemaleRenderablePart(part)) return;
         if (this.selectedPartIds.has(part.id) || this.selectedPartIds.has(part.conceptId)) {
           const indMesh = this.femaleIndividualMeshes[idx];
           const offset = indMesh ? indMesh.position : new THREE.Vector3();
@@ -1245,7 +1241,7 @@ export class ThreeViewer {
     this.controls.target.set(0, 0.85, 0);
     this.camera.position.set(1.4, 1.05, 3.6);
     this.controls.update();
-    this.setAllSystemsVisible(true);
+    // Reset the camera and selection without unexpectedly overriding active layer filters.
     this.updateState();
   }
 

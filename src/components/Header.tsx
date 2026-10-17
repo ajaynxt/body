@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <span>
                 {activeGender === 'female'
-                  ? (isHindi ? 'HuBMAP VHF 1.5 · 888 संरचनाएं' : 'HuBMAP VHF 1.5 · 888 Structures')
+                  ? (isHindi ? 'HRA v1.10 · महिला संदर्भ मॉडल' : 'HRA v1.10 · Female reference model')
                   : (isHindi ? `${totalPartsCount.toLocaleString()} अंग · BodyParts3D` : `${totalPartsCount.toLocaleString()} Organs · BodyParts3D`)}
               </span>
             )}
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             className={`gender-btn ${activeGender === 'female' ? 'active' : ''}`}
             onClick={() => onChangeGender('female')}
-            title="महिला 3D संदर्भ मॉडल (HuBMAP VHF 1.5, 888 संरचनाएं)"
+            title="महिला 3D संदर्भ मॉडल (Human Reference Atlas v1.10)"
           >
             <span className="gender-symbol">♀</span>
             <span className="gender-label">{isHindi ? 'महिला (Female)' : 'Female'}</span>

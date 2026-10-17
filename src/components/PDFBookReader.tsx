@@ -80,6 +80,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
   const [notes, setNotes] = useState<BookNote[]>([]);
   const [currentNoteText, setCurrentNoteText] = useState('');
   const [noteSaveStatus, setNoteSaveStatus] = useState<string | null>(null);
+  const [readerActionError, setReaderActionError] = useState<string | null>(null);
 
   // PDF.js Document State
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -185,8 +186,10 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         if (book) {
           setBook((prev) => (prev ? { ...prev, lastReadPage: newPage } : null));
         }
+        setReaderActionError(null);
       } catch (err) {
         console.error('Failed to update book progress:', err);
+        setReaderActionError('Page changed, but reading progress could not be saved. Check browser storage.');
       }
     },
     [bookId, totalPages, book]
@@ -271,48 +274,58 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
   const isCurrentPageBookmarked = bookmarks.some((b) => b.pageNumber === currentPage);
 
   const handleToggleBookmark = async () => {
-    const existing = bookmarks.find((b) => b.pageNumber === currentPage);
-    if (existing) {
-      await deleteBookmark(existing.id);
-      setBookmarks((prev) => prev.filter((b) => b.id !== existing.id));
-    } else {
-      const title = `Page ${currentPage} Bookmark`;
-      const created = await addBookmark({
-        bookId,
-        pageNumber: currentPage,
-        title,
-      });
-      setBookmarks((prev) => [...prev, created].sort((a, b) => a.pageNumber - b.pageNumber));
+    try {
+      const existing = bookmarks.find((b) => b.pageNumber === currentPage);
+      if (existing) {
+        await deleteBookmark(existing.id);
+        setBookmarks((prev) => prev.filter((b) => b.id !== existing.id));
+      } else {
+        const title = `Page ${currentPage} Bookmark`;
+        const created = await addBookmark({ bookId, pageNumber: currentPage, title });
+        setBookmarks((prev) => [...prev, created].sort((a, b) => a.pageNumber - b.pageNumber));
+      }
+      setReaderActionError(null);
+    } catch (err) {
+      console.error('Failed to update page bookmark:', err);
+      setReaderActionError('Bookmark could not be saved. Check browser storage and try again.');
     }
   };
 
   // Save or update note for current page
   const handleSaveCurrentNote = async () => {
-    if (!currentNoteText.trim()) {
-      // If empty and existing, delete note
+    try {
       const existing = notes.find((n) => n.pageNumber === currentPage);
-      if (existing) {
-        await deleteNote(existing.id);
-        setNotes((prev) => prev.filter((n) => n.id !== existing.id));
+      if (!currentNoteText.trim()) {
+        if (existing) {
+          await deleteNote(existing.id);
+          setNotes((prev) => prev.filter((n) => n.id !== existing.id));
+          setNoteSaveStatus('नोट हटाया गया (Deleted)');
+          setTimeout(() => setNoteSaveStatus(null), 2500);
+        }
+        setReaderActionError(null);
+        return;
       }
-      return;
+
+      const saved = await saveNote({
+        id: existing ? existing.id : undefined,
+        bookId,
+        pageNumber: currentPage,
+        content: currentNoteText.trim(),
+      });
+
+      setNotes((prev) => {
+        const filtered = prev.filter((n) => n.id !== saved.id);
+        return [...filtered, saved].sort((a, b) => a.pageNumber - b.pageNumber);
+      });
+
+      setReaderActionError(null);
+      setNoteSaveStatus('सहेजा गया (Saved)');
+      setTimeout(() => setNoteSaveStatus(null), 2500);
+    } catch (err) {
+      console.error('Failed to save or delete page note:', err);
+      setNoteSaveStatus(null);
+      setReaderActionError('Note could not be saved. Check browser storage and try again.');
     }
-
-    const existing = notes.find((n) => n.pageNumber === currentPage);
-    const saved = await saveNote({
-      id: existing ? existing.id : undefined,
-      bookId,
-      pageNumber: currentPage,
-      content: currentNoteText.trim(),
-    });
-
-    setNotes((prev) => {
-      const filtered = prev.filter((n) => n.id !== saved.id);
-      return [...filtered, saved].sort((a, b) => a.pageNumber - b.pageNumber);
-    });
-
-    setNoteSaveStatus('सहेजा गया (Saved)');
-    setTimeout(() => setNoteSaveStatus(null), 2500);
   };
 
   // Attach a real PDF file to this book
@@ -341,6 +354,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
       } catch (err) {
         console.error('Failed to attach PDF to book:', err);
         setPdfLoadError('Selected PDF could not be opened. Choose a valid, unencrypted PDF file and retry.');
+        setReaderActionError('The PDF was not attached. Choose a valid, unencrypted PDF file and retry.');
       } finally {
         setLoading(false);
       }
@@ -507,6 +521,16 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         </div>
       </header>
 
+      {readerActionError && (
+        <div className="form-error-banner" role="alert">
+          <AlertCircle size={16} />
+          <span>{readerActionError}</span>
+          <button type="button" onClick={() => setReaderActionError(null)} aria-label="Dismiss error">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Main Reading Stage & Canvas View */}
       <main className="reader-stage-container">
         <input
@@ -661,10 +685,16 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
                         <span className="bookmark-title">{bm.title}</span>
                       </div>
                       <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          deleteBookmark(bm.id);
-                          setBookmarks((prev) => prev.filter((b) => b.id !== bm.id));
+                          try {
+                            await deleteBookmark(bm.id);
+                            setBookmarks((prev) => prev.filter((b) => b.id !== bm.id));
+                            setReaderActionError(null);
+                          } catch (err) {
+                            console.error('Failed to delete bookmark:', err);
+                            setReaderActionError('Bookmark could not be deleted. Check browser storage and retry.');
+                          }
                         }}
                         className="delete-item-btn"
                         title="हटाएं"
@@ -739,11 +769,17 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
                             {new Date(note.updatedAt).toLocaleDateString()}
                           </span>
                           <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                               e.stopPropagation();
-                              deleteNote(note.id);
-                              setNotes((prev) => prev.filter((n) => n.id !== note.id));
-                              if (note.pageNumber === currentPage) setCurrentNoteText('');
+                              try {
+                                await deleteNote(note.id);
+                                setNotes((prev) => prev.filter((n) => n.id !== note.id));
+                                if (note.pageNumber === currentPage) setCurrentNoteText('');
+                                setReaderActionError(null);
+                              } catch (err) {
+                                console.error('Failed to delete note:', err);
+                                setReaderActionError('Note could not be deleted. Check browser storage and retry.');
+                              }
                             }}
                             className="delete-item-btn"
                             title="नोट हटाएं"

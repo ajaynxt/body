@@ -186,9 +186,14 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
   // Handle Book Deletion
   const handleDeleteBook = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (window.confirm('क्या आप वाकई इस पुस्तक को हटाना चाहते हैं? (Remove this book from library?)')) {
+    if (!window.confirm('क्या आप वाकई इस पुस्तक को हटाना चाहते हैं? (Remove this book from library?)')) return;
+    try {
+      setLibraryError(null);
       await deleteBook(id);
       await loadBooks();
+    } catch (err) {
+      console.error('Failed to delete study book:', err);
+      setLibraryError('The book could not be deleted from browser storage. Retry after checking storage permissions.');
     }
   };
 

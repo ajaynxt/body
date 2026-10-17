@@ -39,7 +39,14 @@ export const initLibraryDB = (): Promise<IDBDatabase> => {
   if (dbPromise) return dbPromise;
 
   dbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    let request: IDBOpenDBRequest;
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (error) {
+      dbPromise = null;
+      reject(error);
+      return;
+    }
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;

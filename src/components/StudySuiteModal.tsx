@@ -32,9 +32,9 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'flashcards' | 'layers' | 'glossary' | 'bookmarks'>('flashcards');
 
-  // Study one chapter at a time. The parent supplies gender-filtered chapters when available.
+  // Study one chapter at a time; keep previously saved items available across both editions.
   const studyChapters = providedChapters && providedChapters.length > 0 ? providedChapters : BOOK_CHAPTERS;
-  const allParts: StudyPartItem[] = studyChapters.flatMap(ch => ch.parts);
+  const allParts: StudyPartItem[] = BOOK_CHAPTERS.flatMap(ch => ch.parts);
   const [activeChapterId, setActiveChapterId] = useState<string>(studyChapters[0]?.id ?? '');
   const activeChapter = studyChapters.find(ch => ch.id === activeChapterId) || studyChapters[0];
   const currentChapterParts: StudyPartItem[] = activeChapter?.parts ?? [];
@@ -50,11 +50,13 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
   // Bookmarks state
   const [savedPartIds, setSavedPartIds] = useState<string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem('anatomy_saved_parts') || '[]');
+      const saved = JSON.parse(localStorage.getItem('anatomy_saved_parts') || '[]');
+      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string') : [];
     } catch {
       return [];
     }
   });
+  const [bookmarkError, setBookmarkError] = useState<string | null>(null);
 
   // Layer mode state
   const [currentLayer, setCurrentLayer] = useState(1); // One isolated study layer at a time
@@ -74,6 +76,7 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
       setShuffledParts([...currentChapterParts].sort(() => 0.5 - Math.random()));
       setCardIndex(0);
       setIsFlipped(false);
+      setBookmarkError(null);
     }
   }, [isOpen, activeChapterId, studyChapters, currentChapterParts]);
 
@@ -104,8 +107,14 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
     const updated = savedPartIds.includes(partId)
       ? savedPartIds.filter(id => id !== partId)
       : [...savedPartIds, partId];
-    setSavedPartIds(updated);
-    localStorage.setItem('anatomy_saved_parts', JSON.stringify(updated));
+    try {
+      localStorage.setItem('anatomy_saved_parts', JSON.stringify(updated));
+      setSavedPartIds(updated);
+      setBookmarkError(null);
+    } catch (err) {
+      console.error('Failed to persist anatomy bookmarks:', err);
+      setBookmarkError('Saved study items could not be stored in this browser. Check site storage permissions.');
+    }
   };
 
   // Preview only while moving the slider; apply to the 3D model only on button click.
@@ -176,6 +185,12 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
 
         {/* Tab Content */}
         <div className="study-suite-body">
+          {bookmarkError && (
+            <div className="form-error-banner" role="alert">
+              <HelpCircle size={16} />
+              <span>{bookmarkError}</span>
+            </div>
+          )}
           {(activeTab === 'flashcards' || activeTab === 'glossary') && (
             <div className="study-topic-selector">
               <div className="study-topic-selector-copy">

@@ -78,11 +78,20 @@ const VISUALS = {
     'Female reproductive system',
     'Cancer Research UK · Wikimedia Commons'
   ),
+  mammaryGland: reference(
+    '201405 mammary gland.png',
+    'https://commons.wikimedia.org/wiki/File:201405_mammary_gland.png',
+    'Mammary gland cross-section',
+    'DataBase Center for Life Science (DBCLS) · CC BY 4.0'
+  ),
 };
 
 function chooseVisual(name: string, hindiName: string, latinName: string | undefined, system: string): VisualReference {
   const subject = `${name} ${hindiName} ${latinName || ''} ${system}`.toLowerCase();
 
+  if (/mammary|breast|nipple|areola|स्तन ग्रंथि|स्तन|दुग्ध ग्रंथि/.test(subject)) {
+    return VISUALS.mammaryGland;
+  }
   if (/uterus|ovary|ovarian|fallopian|cervix|vagina|vulva|female reproductive|अंडाशय|गर्भाशय|योनि/.test(subject)) {
     return VISUALS.femaleReproductive;
   }

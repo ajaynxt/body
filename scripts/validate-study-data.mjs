@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
-const [femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource, bookReaderSource, librarySource, starterContentSource] =
+const [femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource, bookReaderSource, anatomyVisualSource, librarySource, starterContentSource] =
   await Promise.all([
     read('../public/models/atlas-female.json'),
     read('../src/data/chapters.ts'),
@@ -10,6 +10,7 @@ const [femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSourc
     read('../src/components/StudentQuizModal.tsx'),
     read('../src/App.tsx'),
     read('../src/components/BookReader.tsx'),
+    read('../src/components/AnatomyStudyVisual.tsx'),
     read('../src/utils/libraryStorage.ts'),
     read('../src/data/starterBookContents.ts'),
   ]);
@@ -64,6 +65,8 @@ assert.match(quizSource, /generateRandomQuestion\(filter, studyChapters\)/, 'Qui
 assert.match(quizSource, /const part = studyParts\.find/, 'Quiz 3D links must look up active-edition study parts.');
 assert.match(appSource, /<StudentQuizModal[\s\S]*?chapters=\{activeChapters\}/, 'App must pass active gender chapters to the quiz.');
 assert.match(bookReaderSource, /AnatomyStudyVisual/, 'Each individual Study page must include its anatomy visual.');
+assert.match(anatomyVisualSource, /mammaryGland/, 'Mammary study topics must use a dedicated mammary anatomy diagram.');
+assert.match(anatomyVisualSource, /mammary\|breast\|nipple\|areola/, 'Female breast structures must resolve to the mammary diagram.');
 
 const starterStart = librarySource.indexOf('export const STARTER_BOOKS: StudyBook[] = [');
 const starterEnd = librarySource.indexOf('\n];', starterStart);

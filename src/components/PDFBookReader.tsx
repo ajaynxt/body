@@ -12,6 +12,7 @@ import {
   Bookmark,
   BookmarkCheck,
   FileText,
+  AlertCircle,
   RotateCcw,
   Sparkles,
   Upload,

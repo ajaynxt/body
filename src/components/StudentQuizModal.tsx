@@ -98,7 +98,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
             </div>
             <div>
               <div className="quiz-badge-row">
-                <span className="quiz-pill-total">1,50,000+ AI प्रश्न बैंक</span>
+                <span className="quiz-pill-total">रैंडमाइज़्ड मेडिकल प्रश्न बैंक</span>
                 <span className="quiz-pill-cat">{currentQuestion.categoryHindi}</span>
               </div>
               <h3 className="modal-title">3D एनाटॉमी एवं क्लिनिकल क्विज़ (Active Recall)</h3>
@@ -133,7 +133,7 @@ export const StudentQuizModal: React.FC<StudentQuizModalProps> = ({
               className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
               onClick={() => handleFilterChange('all')}
             >
-              🎲 संपूर्ण शरीर (All 1.5 Lakh+)
+              🎲 संपूर्ण शरीर (All Systems)
             </button>
             <button
               className={`filter-btn ${activeFilter === 'cardiac' ? 'active' : ''}`}

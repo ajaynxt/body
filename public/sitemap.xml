@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://ajaynxt.github.io/body/</loc>
+    <loc>https://body.ajaynxt.com/</loc>
     <lastmod>2026-10-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="hi" href="https://ajaynxt.github.io/body/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ajaynxt.github.io/body/" />
   </url>
   <url>
-    <loc>https://ajaynxt.github.io/body/study/</loc>
+    <loc>https://body.ajaynxt.com/study/</loc>
     <lastmod>2026-10-17</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="hi" href="https://ajaynxt.github.io/body/study/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ajaynxt.github.io/body/study/" />
-  </url>
-  <url>
-    <loc>https://ajaynxt.com/body/</loc>
-    <lastmod>2026-10-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="hi" href="https://ajaynxt.com/body/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ajaynxt.com/body/" />
+    <priority>0.8</priority>
   </url>
 </urlset>

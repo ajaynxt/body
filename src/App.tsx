@@ -85,27 +85,28 @@ export const App: React.FC = () => {
     () => new Set(['cardiac', 'skeletal', 'muscular', 'arterial', 'venous', 'nervous', 'respiratory', 'digestive', 'urinary', 'reproductive', 'integumentary', 'lymphatic'])
   );
 
-  // Handle URL Routing (Supports both HTML5 pathname and SPA hash fallback for GitHub Pages)
+  // Handle URL routing on the custom domain and the optional GitHub Pages /body/ path.
   const parseCurrentRoute = useCallback(() => {
-    const path = window.location.pathname.replace(/\/$/, '');
+    const rawPath = window.location.pathname.replace(/\/+$/, '') || '/';
+    const path = rawPath.replace(/^\/body(?=\/|$)/, '') || '/';
     const hash = window.location.hash.replace(/^#\/?/, '');
 
-    // Check for individual book reader route: /study/books/:bookId
-    const bookMatch = path.match(/study\/books\/([^/]+)/) || hash.match(/study\/books\/([^/]+)/);
-    if (bookMatch && bookMatch[1]) {
-      setSelectedBookId(bookMatch[1]);
+    // Individual reader route: /study/books/:bookId
+    const bookMatch = path.match(/^\/study\/books\/([^/]+)$/) || hash.match(/^study\/books\/([^/]+)$/);
+    if (bookMatch?.[1]) {
+      setSelectedBookId(decodeURIComponent(bookMatch[1]));
       setViewMode('reader');
       return;
     }
 
-    // Check for library shelf route: /study or #study
-    if (path.endsWith('/study') || path === '/study' || hash.startsWith('study')) {
+    // Study library route: /study or #study
+    if (path === '/study' || path.startsWith('/study/') || hash === 'study' || hash.startsWith('study/')) {
       setViewMode('library');
       setSelectedBookId(null);
       return;
     }
 
-    // Default to 3D book/atlas
+    // Default to the 3D atlas.
     setViewMode((prev) => (prev === 'library' || prev === 'reader' ? 'book' : prev));
   }, []);
 
@@ -116,12 +117,20 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [parseCurrentRoute]);
 
-  // Navigate functions with history.pushState
+  // Keep in-app navigation inside the active deployment's base path.
+  const appBasePath = () => {
+    const pathname = window.location.pathname;
+    return window.location.hostname === 'ajaynxt.github.io' || pathname === '/body' || pathname.startsWith('/body/')
+      ? '/body/'
+      : '/';
+  };
+  const appPath = (route: string) => `${appBasePath()}${route.replace(/^\/+/, '')}`;
+
   const navigateToLibrary = useCallback(() => {
     setViewMode('library');
     setSelectedBookId(null);
     try {
-      window.history.pushState(null, '', '/study/');
+      window.history.pushState(null, '', appPath('study/'));
     } catch {
       window.location.hash = '/study';
     }
@@ -130,10 +139,11 @@ export const App: React.FC = () => {
   const navigateToBook = useCallback((bookId: string) => {
     setSelectedBookId(bookId);
     setViewMode('reader');
+    const encodedBookId = encodeURIComponent(bookId);
     try {
-      window.history.pushState(null, '', `/study/books/${bookId}`);
+      window.history.pushState(null, '', appPath(`study/books/${encodedBookId}`));
     } catch {
-      window.location.hash = `/study/books/${bookId}`;
+      window.location.hash = `/study/books/${encodedBookId}`;
     }
   }, []);
 
@@ -141,7 +151,7 @@ export const App: React.FC = () => {
     setViewMode(mode);
     setSelectedBookId(null);
     try {
-      window.history.pushState(null, '', '/');
+      window.history.pushState(null, '', appPath(''));
     } catch {
       window.location.hash = '';
     }

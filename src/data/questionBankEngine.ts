@@ -1,7 +1,7 @@
 /**
- * 1 Lakh+ (150,000+) Algorithmic Medical & Anatomy Question Bank Engine
- * Generates endless, randomized, high-yield questions for NEET-PG, USMLE, and medical students.
- * Features 12 question archetypes across 3,122 anatomical structures and 18 clinical diseases.
+ * Randomized medical and anatomy question engine.
+ * Questions are generated locally from the bundled anatomy and disease reference data.
+ * Includes six implemented question templates plus a system-classification fallback.
  */
 
 import { BOOK_CHAPTERS } from './chapters';
@@ -65,23 +65,19 @@ function pickDistractors<T>(array: T[], count: number, excludePredicate: (item: 
  * Generates a randomized question on the fly from the 1 Lakh+ pool.
  */
 export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQuestion {
-  // 12 Archetypes
+  // Only include templates implemented below. Clinical mode is limited to clinical questions.
   const archetypes = [
     'organ_function',
     'latin_name',
-    'etymology',
-    'system_classification',
-    'clinical_pathology',
     'emergency_red_flag',
     'treatment_protocol',
-    'exam_pearl',
     'memory_mnemonic',
     'female_anatomy',
-    'medication',
-    'home_remedy',
   ];
 
-  const pickedType = archetypes[Math.floor(Math.random() * archetypes.length)];
+  const pickedType = filter === 'clinical'
+    ? (Math.random() < 0.5 ? 'emergency_red_flag' : 'treatment_protocol')
+    : archetypes[Math.floor(Math.random() * archetypes.length)];
   const randomSeed = Math.floor(Math.random() * 1000000);
 
   // Filter parts based on user selection
@@ -99,7 +95,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
   }
 
   // --- ARCHETYPE 1: ORGAN FUNCTION (शरीर क्रिया) ---
-  if (pickedType === 'organ_function' || filter !== 'clinical') {
+  if (pickedType === 'organ_function') {
     const targetPart = eligibleParts[Math.floor(Math.random() * eligibleParts.length)];
     const distractors = pickDistractors(ALL_PARTS, 3, p => p.id === targetPart.id);
 
@@ -149,7 +145,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
   }
 
   // --- ARCHETYPE 3: EMERGENCY RED FLAGS (खतरे के संकेत - डॉक्टर को कब दिखाएं) ---
-  if (pickedType === 'emergency_red_flag' || filter === 'clinical') {
+  if (pickedType === 'emergency_red_flag') {
     const targetDisease = eligibleDiseases[Math.floor(Math.random() * eligibleDiseases.length)];
     const otherDiseases = pickDistractors(ALL_DISEASES, 3, d => d.id === targetDisease.id);
 
@@ -208,7 +204,7 @@ export function generateRandomQuestion(filter: QuizFilterSystem = 'all'): QuizQu
   if (pickedType === 'memory_mnemonic') {
     const partsWithMnemonics = eligibleParts.filter(p => !!p.memoryTrickHindi || !!p.highYieldMnemonic);
     const targetPart = partsWithMnemonics[Math.floor(Math.random() * partsWithMnemonics.length)] || ALL_PARTS[0];
-    const distractors = pickDistractors(ALL_PARTS, 3, p => p.id !== targetPart.id);
+    const distractors = pickDistractors(ALL_PARTS, 3, p => p.id === targetPart.id);
 
     const shuffled = shuffle([targetPart, ...distractors]);
     const correctIdx = shuffled.findIndex(p => p.id === targetPart.id);

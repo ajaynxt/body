@@ -57,8 +57,10 @@ export const Header: React.FC<HeaderProps> = ({
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
+  const langTriggerRef = useRef<HTMLButtonElement>(null);
+  const toolsTriggerRef = useRef<HTMLButtonElement>(null);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click or Escape, returning keyboard focus to the trigger.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (langMenuRef.current && !langMenuRef.current.contains(e.target as Node)) {
@@ -68,10 +70,24 @@ export const Header: React.FC<HeaderProps> = ({
         setIsToolsMenuOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (isToolsMenuOpen) {
+        setIsToolsMenuOpen(false);
+        toolsTriggerRef.current?.focus();
+      } else if (isLangMenuOpen) {
+        setIsLangMenuOpen(false);
+        langTriggerRef.current?.focus();
+      }
+    };
     if (isLangMenuOpen || isToolsMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isLangMenuOpen, isToolsMenuOpen]);
 
   const isHindi = language === 'hi';
@@ -165,6 +181,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Consolidated Medical Tools Dropdown */}
         <div className="tools-selector-wrap" ref={toolsMenuRef}>
           <button
+            ref={toolsTriggerRef}
             className={`tool-btn tools-dropdown-btn ${isToolsMenuOpen ? 'active' : ''}`}
             onClick={() => setIsToolsMenuOpen(open => !open)}
             aria-expanded={isToolsMenuOpen}
@@ -290,6 +307,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* 24-Language Selector Dropdown */}
         <div className="language-selector-wrap" ref={langMenuRef}>
           <button
+            ref={langTriggerRef}
             className="tool-btn lang-toggle-btn"
             onClick={() => setIsLangMenuOpen(open => !open)}
             aria-expanded={isLangMenuOpen}

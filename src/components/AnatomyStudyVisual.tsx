@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ExternalLink, ImageOff, Maximize2, ZoomIn, ZoomOut, RotateCcw, X } from 'lucide-react';
 
 interface AnatomyStudyVisualProps {
@@ -131,6 +131,14 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
   const [imageFailed, setImageFailed] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
+  const lightboxRef = useRef<HTMLDivElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const openZoom = (event: React.MouseEvent<HTMLButtonElement>) => {
+    previousFocusRef.current = event.currentTarget;
+    setZoomScale(1);
+    setIsZoomOpen(true);
+  };
 
   useEffect(() => {
     setImageFailed(false);
@@ -141,9 +149,37 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
   useEffect(() => {
     if (!isZoomOpen) return;
 
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const getFocusableElements = () =>
+      Array.from(
+        lightboxRef.current?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), input:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])'
+        ) || []
+      ).filter(element => element.offsetParent !== null);
+
+    getFocusableElements()[0]?.focus();
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setIsZoomOpen(false);
+      } else if (event.key === 'Tab') {
+        const focusable = getFocusableElements();
+        if (focusable.length === 0) {
+          event.preventDefault();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       } else if (event.key === '+' || event.key === '=') {
         event.preventDefault();
         setZoomScale(scale => Math.min(4, Number((scale + 0.1).toFixed(2))));
@@ -156,7 +192,11 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      previousFocusRef.current?.focus();
+    };
   }, [isZoomOpen]);
 
   return (
@@ -168,7 +208,7 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
           <button
             type="button"
             className="anatomy-study-visual__zoom-trigger"
-            onClick={() => { setZoomScale(1); setIsZoomOpen(true); }}
+            onClick={openZoom}
             aria-label={`Open a larger view of ${visual.label}`}
             title="चित्र बड़ा करके देखें (Zoom diagram)"
           >
@@ -182,7 +222,7 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
           <button
             type="button"
             className="anatomy-study-visual__open-image"
-            onClick={() => { setZoomScale(1); setIsZoomOpen(true); }}
+            onClick={openZoom}
             aria-label={`Enlarge ${hindiName} anatomy diagram`}
             title="Click to enlarge diagram"
           >
@@ -212,6 +252,7 @@ export const AnatomyStudyVisual: React.FC<AnatomyStudyVisualProps> = ({
 
       {isZoomOpen && !imageFailed && (
         <div
+          ref={lightboxRef}
           className="anatomy-image-lightbox"
           role="dialog"
           aria-modal="true"

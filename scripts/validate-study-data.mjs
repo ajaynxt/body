@@ -90,6 +90,11 @@ assert.match(studyLibrarySource, /MAX_PDF_SIZE_BYTES = 150 \* 1024 \* 1024/, 'PD
 assert.match(studyLibrarySource, /valid, non-password-protected PDF/, 'Invalid PDFs must be rejected before saving instead of being recorded as readable.');
 assert.doesNotMatch(studyLibrarySource, /doc\.destroy\(\)/, 'PDF.js preflight must use only supported PDFDocumentProxy APIs.');
 assert.match(pdfReaderSource, /aria-label="PDF zoom level"/, 'PDF pages need an accessible fine-grained zoom slider.');
+assert.match(pdfReaderSource, /document\.addEventListener\('fullscreenchange'/, 'Fullscreen state must follow browser controls such as Escape.'); 
+assert.match(pdfReaderSource, /MAX_PDF_SIZE_BYTES = 150 \* 1024 \* 1024/, 'Attaching a PDF in the reader must use the library size limit.');
+assert.match(pdfReaderSource, /Math\.min\(startPage, loadedPdf\.numPages\)/, 'Restored PDF progress must be clamped to the actual page count.');
+assert.match(pdfReaderSource, /pdfLoadingTasksRef\.current\.delete\(pdfDoc\)/, 'PDF.js loading tasks must be released when a reader closes or changes documents.');
+assert.match(pdfReaderSource, /Math\.min\(currentPage, loadedPdf\.numPages\)/, 'Replacing a PDF must clamp the current page to the new document.');
 assert.match(pdfReaderSource, /AnatomyStudyVisual/, 'Built-in study pages must include visual anatomy references.');
 assert.match(anatomyVisualSource, /anatomy-image-lightbox/, 'Study diagrams must open into an enlarged lightbox.');
 assert.match(anatomyVisualSource, /aria-label="Diagram zoom level"/, 'Enlarged diagrams need an accessible zoom slider.');

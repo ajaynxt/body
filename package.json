@@ -1,7 +1,30 @@
 {
-  "name": "body",
+  "name": "human-anatomy-atlas-3d",
+  "version": "2.4.0",
+  "description": "Bilingual 3D Human Anatomy Atlas, Virtual Auscultation Stethoscope, Cadaver Dissection Lab & Early Cardiac Diagnostics Suite by AJAYNXT",
+  "author": "Ajay Saini (AJAYNXT) <https://github.com/ajaynxt>",
+  "homepage": "https://body.ajaynxt.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajaynxt/body.git"
+  },
+  "keywords": [
+    "anatomy",
+    "human-body",
+    "3d-atlas",
+    "threejs",
+    "webgl",
+    "medical",
+    "mbbs",
+    "neet-pg",
+    "auscultation",
+    "stethoscope",
+    "cardiology",
+    "diagnostics",
+    "ajaynxt"
+  ],
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

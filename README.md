@@ -76,8 +76,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/ajaynxt/human-anatomy-3d-book.git
-cd human-anatomy-3d-book
+git clone https://github.com/ajaynxt/body.git
+cd body
 
 # Install dependencies
 npm install
@@ -101,46 +101,61 @@ npm run preview
 
 ```
 ├── public/
-│   ├── favicon.svg               # Application icon
+│   ├── ajaynxt-avatar.png        # Official AJAYNXT brand avatar
+│   ├── logo.png                  # High-resolution brand logo
+│   ├── CNAME                     # Custom domain (body.ajaynxt.com)
+│   ├── favicon.svg               # Application vector icon
 │   └── models/
-│       ├── atlas.json            # 1.3 MB anatomy manifest (parts, concepts, bounds)
+│       ├── atlas.json            # Male anatomy manifest (2,234 parts, bounds)
+│       ├── atlas-female.json     # HuBMAP VHF 1.5 female anatomy manifest (888 parts)
 │       └── body-0.bin.gz ...     # 15 gzip-compressed binary geometry chunks (~31.4 MB total)
 ├── src/
 │   ├── components/
-│   │   ├── AboutModal.tsx        # Attribution, license, and dataset citations
-│   │   ├── BookReader.tsx        # Interactive textbook reader with study & disease tabs
-│   │   ├── ControlsOverlay.tsx   # Camera presets, auto-rotate, and explode slider
+│   │   ├── AboutModal.tsx        # Attribution, license, dataset citations & developer card
+│   │   ├── BookReader.tsx        # Collapsible textbook reader with study & disease tabs
+│   │   ├── ControlsOverlay.tsx   # Floating layer strip, camera presets, auto-rotate & explode
 │   │   ├── DiseaseExplorerModal.tsx # Searchable clinical disease encyclopedia
-│   │   ├── Header.tsx            # Navigation, mode toggle, and tools
-│   │   └── ThreeCanvas.tsx       # Three.js canvas wrapper
+│   │   ├── Header.tsx            # Navigation, mode toggle, AJAYNXT logo badge & modal triggers
+│   │   ├── MedicalDiagnosticsModal.tsx # Cardiac prevention, X-Ray, CT, MRI & imaging guide
+│   │   ├── QuickOrganFocusBar.tsx# Instant 3D click focus pill (Solo, Hide, Audio, AI Guide)
+│   │   ├── StudentFunZoneModal.tsx # 3D Stethoscope, Dissection Lab, Mnemonics & Spotter Exam
+│   │   ├── StudentQuizModal.tsx  # Active recall quiz modal with 1,50,000+ AI questions
+│   │   ├── StudyLibrary.tsx      # Medical PDF bookshelf and study document reader
+│   │   ├── StudySuiteModal.tsx   # Flashcards, layer controls, and medical glossary
+│   │   └── ThreeCanvas.tsx       # Three.js canvas wrapper & WebGL viewport
 │   ├── data/
-│   │   ├── chapters.ts           # 15 book chapters with part catalogs and explanations
+│   │   ├── chapters.ts           # 12 comprehensive MBBS chapters with organ catalogs
 │   │   ├── diseases.ts           # Clinical disease database with symptoms and causes
+│   │   ├── studentMnemonics.ts   # NEET-PG / MBBS high-yield mnemonics with 3D jump links
 │   │   └── systems.ts            # 15 anatomical systems (colors, descriptions)
 │   ├── engine/
-│   │   └── ThreeViewer.ts        # Three.js engine, GPU DataTextures, shaders, raycasting
+│   │   └── ThreeViewer.ts        # Three.js WebGL engine, GPU DataTextures, shaders, hide/solo
 │   ├── types/
-│   │   └── atlas.ts              # TypeScript interfaces
+│   │   └── atlas.ts              # TypeScript interfaces & medical study data types
 │   ├── utils/
-│   │   ├── decompression.ts      # DecompressionStream + fflate fallback
+│   │   ├── medicalAudio.ts       # Web Audio API synthesizer for heartbeat, scalpel & sounds
+│   │   ├── anatomicalResolver.ts # 3D mesh to human organ resolver (Male & Female)
+│   │   ├── decompression.ts      # Native DecompressionStream + fflate fallback
 │   │   └── knolling.ts           # 2D bin-packing layout algorithm
-│   ├── App.tsx                   # Main application coordinator
-│   ├── index.css                 # Glassmorphism design system & typography
+│   ├── App.tsx                   # Main application coordinator & routing
+│   ├── index.css                 # Cyber-medical glassmorphism design system & responsive UI
 │   └── main.tsx                  # React DOM root entry
-├── ATTRIBUTION.md                # BodyParts3D CC BY 4.0 attribution
+├── CNAME                         # Root custom domain pointer
+├── ATTRIBUTION.md                # BodyParts3D & HuBMAP CC BY 4.0 attribution
 ├── LICENSE.txt                   # MIT License
-└── package.json
+└── package.json                  # Project manifest and scripts
 ```
 
 ---
 
 ## 📜 Dataset Attribution & Licensing
 
-* **3D Geometry & Anatomical Concepts:** BodyParts3D, © The Database Center for Life Science (DBCLS), licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
-  * Source: [https://dbarchive.biosciencedbc.jp/en/bodyparts3d/](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/)
-  * Citation: Mitsuhashi et al. (2009), *BodyParts3D: 3D structure database for anatomical concepts*, Nucleic Acids Res, 37(Database issue): D782–D785.
-* **Viewer Architecture:** Adapted from *Human Atlas* by Ashe Magalhaes (`ashemag/human-atlas`), licensed under the **MIT License** (Copyright 2026).
-* **Application Code:** Licensed under the [MIT License](LICENSE.txt).
+* **Male 3D Geometry (BodyParts3D 4.0):** © The Database Center for Life Science (DBCLS), Japan. Licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+  * Citation: Mitsuhashi et al. (2009), *BodyParts3D: 3D structure database for anatomical concepts*, Nucleic Acids Res, 37: D782–D785.
+* **Female 3D Geometry (HuBMAP VHF 1.5):** NIH Human BioMolecular Atlas Program & Human Reference Atlas. Licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+  * DOI: `10.48539/HBM352.BTSQ.586`
+* **Medical Literature Citations:** Gray's Anatomy (42nd Ed), Guyton & Hall Physiology (14th Ed), Cunningham's Manual of Practical Anatomy, BD Chaurasia's Human Anatomy.
+* **Application Architecture & Code:** Developed by **Ajay Saini (AJAYNXT)**, licensed under the [MIT License](LICENSE.txt).
 
 ---
 

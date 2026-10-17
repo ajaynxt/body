@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
 const [
   femaleAtlasText, chaptersSource, questionBankSource, quizSource, appSource,
-  bookReaderSource, anatomyVisualSource, librarySource, starterContentSource,
-  threeViewerSource, threeCanvasSource, cacheSource, studyLibrarySource, pdfReaderSource, indexCssSource,
+  bookReaderSource, controlsOverlaySource, anatomyVisualSource, librarySource, starterContentSource,
+  threeViewerSource, threeCanvasSource, cacheSource, studyLibrarySource, pdfReaderSource, indexCssSource, headerSource,
 ] = await Promise.all([
   read('../public/models/atlas-female.json'),
   read('../src/data/chapters.ts'),
@@ -13,6 +13,7 @@ const [
   read('../src/components/StudentQuizModal.tsx'),
   read('../src/App.tsx'),
   read('../src/components/BookReader.tsx'),
+  read('../src/components/ControlsOverlay.tsx'),
   read('../src/components/AnatomyStudyVisual.tsx'),
   read('../src/utils/libraryStorage.ts'),
   read('../src/data/starterBookContents.ts'),
@@ -22,6 +23,7 @@ const [
   read('../src/components/StudyLibrary.tsx'),
   read('../src/components/PDFBookReader.tsx'),
   read('../src/index.css'),
+  read('../src/components/Header.tsx'),
 ]);
 
 const femaleAtlas = JSON.parse(femaleAtlasText);
@@ -109,6 +111,14 @@ assert.match(indexCssSource, /@media screen and \(min-width: 769px\) and \(max-w
 assert.match(indexCssSource, /@media screen and \(max-width: 768px\) and \(orientation: landscape\)/, 'Small landscape screens need a side-by-side atlas layout.');
 assert.match(indexCssSource, /\.pdf-page-canvas[\s\S]*?max-width: none !important/, 'Mobile PDF zoom must not be CSS-shrunk to fit the phone width.');
 assert.match(indexCssSource, /prefers-reduced-motion: reduce/, 'Reduced-motion preferences must be respected.');
+assert.match(controlsOverlaySource, /aria-expanded=\{isDockExpanded\}/, 'The 3D dock toggle must announce its expanded state.');
+assert.match(controlsOverlaySource, /aria-controls="anatomy-explode-controls"/, 'The 3D dock toggle must reference its expandable control panel.');
+assert.match(anatomyVisualSource, /getFocusableElements/, 'The diagram lightbox must keep keyboard focus inside the dialog.');
+assert.match(anatomyVisualSource, /document\.body\.style\.overflow = 'hidden'/, 'Opening a zoomed diagram must prevent background page scrolling.');
+assert.match(headerSource, /aria-expanded=\{isToolsMenuOpen\}/, 'Medical tools menu must expose its expanded state.');
+assert.match(headerSource, /aria-expanded=\{isLangMenuOpen\}/, 'Language menu must expose its expanded state.');
+assert.match(indexCssSource, /diagnostics-list-pane[\s\S]*?flex: 0 0 clamp\(176px, 30dvh, 260px\)/, 'Stacked diagnostics view must bound the list pane so the details remain reachable.');
+assert.match(indexCssSource, /input,[\s\S]*?font-size: 16px/, 'Mobile form controls must avoid browser focus zoom.');
 assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');
 assert.match(questionBankSource, /hasMnemonicParts = eligibleParts\.some/, 'Mnemonic questions must only be selected when data exists.');
 assert.match(questionBankSource, /new Set\([\s\S]*treatment !== correctTreatment/, 'Treatment answer choices must not duplicate the correct answer.');

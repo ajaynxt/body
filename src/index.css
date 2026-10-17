@@ -10827,3 +10827,609 @@ button.primary-action:hover {
     padding: 10px;
   }
 }
+
+
+/* Missing component styles: library empty states, PDF reader, attribution and comparison details. */
+.shelf-loading,
+.pdf-reader-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 220px;
+  padding: 24px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.shelf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 240px;
+  padding: 28px 20px;
+  text-align: center;
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-xl);
+  background: var(--bg-glass);
+}
+
+.shelf-empty h4,
+.shelf-empty p {
+  margin: 0;
+}
+
+.shelf-empty h4 {
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.shelf-empty p {
+  max-width: 460px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.empty-icon {
+  color: var(--accent-cyan-light);
+  flex-shrink: 0;
+}
+
+.search-icon {
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+
+.cover-pages {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cover-icon {
+  color: rgba(255, 255, 255, 0.9);
+  filter: drop-shadow(0 2px 8px rgba(20, 8, 36, 0.35));
+}
+
+.continue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.privacy-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.privacy-text p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.modal-title-wrap h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.modal-icon {
+  color: var(--accent-cyan-light);
+  flex: 0 0 auto;
+}
+
+.close-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.close-modal-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-card-hover);
+  border-color: var(--accent-indigo);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.btn-primary {
+  border: 1px solid transparent;
+  background: linear-gradient(120deg, #7c3aed 0%, #c026d3 58%, #ff4fd8 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(192, 38, 211, 0.22);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 24px rgba(255, 79, 216, 0.24);
+}
+
+.btn-secondary {
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-indigo);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.upload-icon-pulse {
+  color: var(--accent-cyan-light);
+  filter: drop-shadow(0 0 12px rgba(192, 38, 211, 0.2));
+  animation: upload-float 2.6s ease-in-out infinite;
+}
+
+@keyframes upload-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* PDF reader loading/error/empty states use the same visual language as the shelf. */
+.pdf-reader-loading {
+  flex: 1;
+  min-height: 280px;
+  flex-direction: column;
+  background: var(--bg-app);
+}
+
+.reader-loader-spinner,
+.mini-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(192, 132, 252, 0.22);
+  border-top-color: var(--accent-cyan-light);
+  border-right-color: #ff4fd8;
+  border-radius: 50%;
+  animation: reader-spin 0.85s linear infinite;
+}
+
+.mini-spinner {
+  width: 28px;
+  height: 28px;
+  border-width: 3px;
+}
+
+@keyframes reader-spin {
+  to { transform: rotate(360deg); }
+}
+
+.pdf-reader-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 320px;
+  padding: 28px 20px;
+  color: var(--text-main);
+  text-align: center;
+  background: var(--bg-surface);
+}
+
+.pdf-reader-error h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.empty-page-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 820px);
+  min-height: 240px;
+  padding: 24px;
+  border: 1px dashed var(--border-accent);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.empty-page-placeholder p {
+  margin: 0;
+}
+
+.reader-side-drawer.notes-drawer {
+  width: min(360px, 92vw);
+}
+
+.drawer-icon {
+  color: var(--accent-cyan-light);
+  flex-shrink: 0;
+}
+
+.delete-item-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.delete-item-btn:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.current-page-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(192, 38, 211, 0.1);
+  color: var(--accent-cyan);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.no-notes-text {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.reset-zoom {
+  color: var(--accent-cyan-light);
+}
+
+.atlas-jump-btn {
+  border-color: rgba(192, 38, 211, 0.24);
+}
+
+.reader-nav-btn.back-btn:hover,
+.page-nav-btn.prev-btn:hover:not(:disabled),
+.page-nav-btn.next-btn:hover:not(:disabled) {
+  border-color: var(--accent-indigo);
+}
+
+[data-theme="light"] .pdf-rendering-overlay {
+  background: rgba(33, 20, 56, 0.64);
+}
+
+/* Attribution and comparison content that previously inherited browser defaults. */
+.credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(192, 38, 211, 0.24);
+  border-radius: var(--radius-full);
+  background: rgba(192, 38, 211, 0.1);
+  color: var(--accent-indigo);
+  font-size: 11.5px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.credit-badge.male-tag {
+  border-color: rgba(124, 58, 237, 0.28);
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--accent-cyan);
+}
+
+.credit-badge.female-tag {
+  border-color: rgba(255, 79, 216, 0.28);
+  background: rgba(255, 79, 216, 0.1);
+  color: #c026a8;
+}
+
+.textbook-list {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding-left: 22px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.textbook-list li {
+  padding-left: 3px;
+}
+
+.textbook-list strong {
+  color: var(--text-main);
+}
+
+.comparison-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.comparison-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  color: var(--text-main);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparison-table th {
+  background: rgba(192, 38, 211, 0.1);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.comparison-table tbody tr:hover {
+  background: var(--bg-card-hover);
+}
+
+.sys-name-cell {
+  min-width: 170px;
+  font-weight: 700;
+}
+
+.male-cell,
+.female-cell {
+  min-width: 210px;
+  color: var(--text-secondary);
+}
+
+.status-cell {
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.no-disease-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 190px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.no-disease-found p {
+  margin: 0;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.no-disease-found span {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Step-by-step anatomy tutor: structured information cards and readable clinical notes. */
+.ai-tutor-brand {
+  color: var(--accent-cyan-light);
+  font-weight: 800;
+}
+
+.latin-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+
+.badge-label {
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.latin-badge-row code {
+  color: var(--accent-cyan);
+  overflow-wrap: anywhere;
+}
+
+.step-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.step-info-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.step-info-card h5 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.step-info-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.step-section-box.function-box {
+  border-color: rgba(124, 58, 237, 0.3);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(192, 38, 211, 0.06));
+}
+
+.disease-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.disease-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 5px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-card-hover);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.disease-chip.red {
+  border-color: rgba(225, 29, 72, 0.25);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.sample-disease-brief {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent-indigo);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: rgba(192, 38, 211, 0.07);
+}
+
+.sample-disease-brief h5 {
+  margin: 0 0 6px;
+  color: var(--text-main);
+  font-size: 12.5px;
+}
+
+.sample-disease-brief p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.step-section-box.med-box {
+  border-color: rgba(192, 38, 211, 0.26);
+  background: rgba(192, 38, 211, 0.06);
+}
+
+.step-section-box.home-box {
+  border-color: rgba(124, 58, 237, 0.22);
+  background: rgba(124, 58, 237, 0.06);
+}
+
+.step-section-box.research-box {
+  border-color: rgba(192, 132, 252, 0.3);
+  background: rgba(192, 132, 252, 0.08);
+}
+
+@media (max-width: 768px) {
+  .step-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modal-actions {
+    align-items: stretch;
+  }
+
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    flex: 1 1 auto;
+  }
+
+  .modal-title-wrap h3 {
+    font-size: 15px;
+  }
+
+  .comparison-table {
+    min-width: 640px;
+  }
+
+  .pdf-reader-error {
+    padding: 20px 14px;
+  }
+}

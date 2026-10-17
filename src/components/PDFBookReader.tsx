@@ -50,6 +50,8 @@ if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
   }
 }
 
+const MAX_PDF_SIZE_BYTES = 150 * 1024 * 1024;
+
 interface PDFBookReaderProps {
   bookId: string;
   onBackToLibrary: () => void;
@@ -87,6 +89,7 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [isPdfRendering, setIsPdfRendering] = useState(false);
   const [hasPdfBlob, setHasPdfBlob] = useState(false);
+  const pdfLoadingTasksRef = useRef(new WeakMap<pdfjsLib.PDFDocumentProxy, ReturnType<typeof pdfjsLib.getDocument>>());
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -109,9 +112,11 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
         if (!bookData || !isMounted) return;
 
         setBook(bookData);
-        const startPage = bookData.lastReadPage || 1;
-        setCurrentPage(startPage);
-        setJumpPageInput(String(startPage));
+        const startPage = Math.max(1, bookData.lastReadPage || 1);
+        const fallbackPageCount = STARTER_BOOK_CONTENTS[bookId]?.length || bookData.totalPages || 1;
+        const initialPage = Math.max(1, Math.min(startPage, fallbackPageCount));
+        setCurrentPage(initialPage);
+        setJumpPageInput(String(initialPage));
 
         // Load Bookmarks & Notes
         const [bmList, noteList, blob] = await Promise.all([
@@ -128,28 +133,69 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
           setHasPdfBlob(true);
           try {
             const arrayBuffer = await blob.arrayBuffer();
-            const loadedPdf = await pdfjsLib.getDocument({
+            const loadingTask = pdfjsLib.getDocument({
               data: new Uint8Array(arrayBuffer),
-            }).promise;
+            });
+            const loadedPdf = await loadingTask.promise;
 
             if (isMounted) {
+              pdfLoadingTasksRef.current.set(loadedPdf, loadingTask);
+              const safeStartPage = Math.max(1, Math.min(startPage, loadedPdf.numPages));
+              setCurrentPage(safeStartPage);
+              setJumpPageInput(String(safeStartPage));
               setPdfDoc(loadedPdf);
               setTotalPages(loadedPdf.numPages);
-              // Update book totalPages if different
-              if (loadedPdf.numPages !== bookData.totalPages) {
-                bookData.totalPages = loadedPdf.numPages;
-                saveBook(bookData);
+
+              // Correct stale page-count/progress metadata so the saved page always exists.
+              const correctedBook = {
+                ...bookData,
+                totalPages: loadedPdf.numPages,
+                lastReadPage: safeStartPage,
+              };
+              if (
+                correctedBook.totalPages !== bookData.totalPages ||
+                correctedBook.lastReadPage !== bookData.lastReadPage
+              ) {
+                setBook(correctedBook);
+                void saveBook(correctedBook).catch(saveErr => {
+                  console.warn('Could not update corrected PDF progress metadata:', saveErr);
+                });
               }
+            } else {
+              void loadingTask.destroy().catch(cleanupErr => {
+                console.warn('Could not clean up a PDF loaded after leaving the reader:', cleanupErr);
+              });
             }
           } catch (pdfErr) {
             console.error('Failed to parse PDF with pdfjs-dist:', pdfErr);
-            setPdfLoadError('Saved PDF file could not be opened. Attach a valid copy of the PDF to continue reading.');
-            setTotalPages(bookData.totalPages || 10);
+            if (isMounted) {
+              setPdfLoadError('Saved PDF file could not be opened. Attach a valid copy of the PDF to continue reading.');
+              setTotalPages(bookData.totalPages || 10);
+            }
           }
         } else {
           setHasPdfBlob(false);
           const starterPages = STARTER_BOOK_CONTENTS[bookId];
-          setTotalPages(starterPages ? starterPages.length : bookData.totalPages || 10);
+          const pageCount = Math.max(
+            1,
+            starterPages && starterPages.length > 0 ? starterPages.length : bookData.totalPages || 10
+          );
+          const safeStartPage = Math.max(1, Math.min(startPage, pageCount));
+          setCurrentPage(safeStartPage);
+          setJumpPageInput(String(safeStartPage));
+          setTotalPages(pageCount);
+
+          if (safeStartPage !== bookData.lastReadPage || pageCount !== bookData.totalPages) {
+            const correctedBook = {
+              ...bookData,
+              totalPages: pageCount,
+              lastReadPage: safeStartPage,
+            };
+            setBook(correctedBook);
+            void saveBook(correctedBook).catch(saveErr => {
+              console.warn('Could not update starter-book progress metadata:', saveErr);
+            });
+          }
         }
       } catch (err) {
         console.error('Error loading book reader:', err);
@@ -255,19 +301,43 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
     };
   }, [pdfDoc, currentPage, scale]);
 
+  // Keep the UI synchronized with browser actions such as Escape-to-exit fullscreen.
+  useEffect(() => {
+    const syncFullscreenState = () => {
+      setIsFullscreen(Boolean(containerRef.current && document.fullscreenElement === containerRef.current));
+    };
+    document.addEventListener('fullscreenchange', syncFullscreenState);
+    return () => document.removeEventListener('fullscreenchange', syncFullscreenState);
+  }, []);
+
+  // Release each PDF.js loading task after its page renderer has been cancelled.
+  useEffect(() => {
+    if (!pdfDoc) return;
+    return () => {
+      const loadingTask = pdfLoadingTasksRef.current.get(pdfDoc);
+      if (!loadingTask) return;
+      pdfLoadingTasksRef.current.delete(pdfDoc);
+      void loadingTask.destroy().catch(cleanupErr => {
+        console.warn('Could not release PDF reader resources:', cleanupErr);
+      });
+    };
+  }, [pdfDoc]);
+
   // Handle Fullscreen Toggle
-  const toggleFullscreen = () => {
-    if (!containerRef.current) return;
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch((err) => {
-        console.error('Fullscreen request failed:', err);
-      });
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch((err) => {
-        console.error('Exit fullscreen failed:', err);
-      });
-      setIsFullscreen(false);
+  const toggleFullscreen = async () => {
+    const container = containerRef.current;
+    if (!container) return;
+    try {
+      if (document.fullscreenElement === container) {
+        await document.exitFullscreen();
+      } else {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        await container.requestFullscreen();
+      }
+      setReaderActionError(null);
+    } catch (err) {
+      console.error('Fullscreen request failed:', err);
+      setReaderActionError('Fullscreen mode could not be changed in this browser. Try using the reader without fullscreen.');
     }
   };
 
@@ -329,35 +399,61 @@ export const PDFBookReader: React.FC<PDFBookReaderProps> = ({
     }
   };
 
-  // Attach a real PDF file to this book
+  // Attach a real PDF file to this book.
   const handleAttachPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0] && book) {
-      const file = e.target.files[0];
-      try {
-        setLoading(true);
-        const arrayBuffer = await file.arrayBuffer();
-        const loadedPdf = await pdfjsLib.getDocument({
-          data: new Uint8Array(arrayBuffer),
-        }).promise;
+    const input = e.currentTarget;
+    const file = input.files?.[0];
+    if (!file || !book) {
+      input.value = '';
+      return;
+    }
 
-        const updatedBook: StudyBook = {
-          ...book,
-          totalPages: loadedPdf.numPages,
-          fileSizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        };
+    if (file.size > MAX_PDF_SIZE_BYTES) {
+      setReaderActionError('PDF 150 MB से बड़ी है। कृपया छोटी फ़ाइल चुनें (Maximum PDF size: 150 MB).');
+      input.value = '';
+      return;
+    }
 
-        await saveBook(updatedBook, file);
-        setBook(updatedBook);
-        setPdfDoc(loadedPdf);
-        setTotalPages(loadedPdf.numPages);
-        setHasPdfBlob(true);
-        setPdfLoadError(null);
-      } catch (err) {
-        console.error('Failed to attach PDF to book:', err);
-        setPdfLoadError('Selected PDF could not be opened. Choose a valid, unencrypted PDF file and retry.');
-        setReaderActionError('The PDF was not attached. Choose a valid, unencrypted PDF file and retry.');
-      } finally {
-        setLoading(false);
+    let loadingTask: ReturnType<typeof pdfjsLib.getDocument> | null = null;
+    let attachmentSaved = false;
+    try {
+      setLoading(true);
+      const arrayBuffer = await file.arrayBuffer();
+      loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(arrayBuffer),
+      });
+      const loadedPdf = await loadingTask.promise;
+      const safePage = Math.max(1, Math.min(currentPage, loadedPdf.numPages));
+
+      const updatedBook: StudyBook = {
+        ...book,
+        totalPages: loadedPdf.numPages,
+        lastReadPage: safePage,
+        fileSizeFormatted: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+      };
+
+      await saveBook(updatedBook, file);
+      pdfLoadingTasksRef.current.set(loadedPdf, loadingTask);
+      setBook(updatedBook);
+      setPdfDoc(loadedPdf);
+      setCurrentPage(safePage);
+      setJumpPageInput(String(safePage));
+      setTotalPages(loadedPdf.numPages);
+      setHasPdfBlob(true);
+      setPdfLoadError(null);
+      setReaderActionError(null);
+      attachmentSaved = true;
+    } catch (err) {
+      console.error('Failed to attach PDF to book:', err);
+      setPdfLoadError('Selected PDF could not be opened. Choose a valid, unencrypted PDF file and retry.');
+      setReaderActionError('The PDF was not attached. Choose a valid, unencrypted PDF file and retry.');
+    } finally {
+      setLoading(false);
+      input.value = '';
+      if (loadingTask && !attachmentSaved) {
+        void loadingTask.destroy().catch(cleanupErr => {
+          console.warn('Could not clean up the rejected PDF attachment:', cleanupErr);
+        });
       }
     }
   };

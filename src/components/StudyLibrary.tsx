@@ -148,10 +148,17 @@ export const StudyLibrary: React.FC<StudyLibraryProps> = ({ onOpenBook, onBackTo
       try {
         const pdfjsLib = await import('pdfjs-dist');
         const arrayBuffer = await uploadFile.arrayBuffer();
-        const doc = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-        detectedPages = doc.numPages;
-        if (!Number.isFinite(detectedPages) || detectedPages < 1) {
-          throw new Error('The PDF has no readable pages.');
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+        try {
+          const doc = await loadingTask.promise;
+          detectedPages = doc.numPages;
+          if (!Number.isFinite(detectedPages) || detectedPages < 1) {
+            throw new Error('The PDF has no readable pages.');
+          }
+        } finally {
+          await loadingTask.destroy().catch(cleanupErr => {
+            console.warn('Could not release the temporary PDF validation worker:', cleanupErr);
+          });
         }
       } catch (err) {
         console.error('Could not validate the selected PDF:', err);

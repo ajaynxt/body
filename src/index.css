@@ -13430,3 +13430,36 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Final narrow-header corrections: keep essential mode names readable and anchor menus
+   to their actual trigger instead of a viewport-relative guessed offset. */
+@media screen and (max-width: 768px) {
+  .header-center-modes .mode-toggle-btn span {
+    display: inline;
+  }
+  .header-center-modes .student-zone-nav-btn span {
+    display: none;
+  }
+  .tools-selector-wrap,
+  .language-selector-wrap {
+    position: relative;
+  }
+  .tools-dropdown-menu,
+  .language-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    bottom: auto;
+    right: 0;
+    left: auto;
+    max-height: min(66dvh, 520px);
+    overflow: hidden;
+  }
+  .tools-list-scroll,
+  .lang-list-scroll {
+    min-height: 0;
+    max-height: min(58dvh, 450px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}

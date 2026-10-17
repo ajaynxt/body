@@ -75,6 +75,7 @@ const FEMALE_REPLACED_MALE_SYSTEMS = new Set([
   'respiratory',
   'lymphatic',
   'skeletal',
+  'connective',
   'reproductive',
 ]);
 
@@ -888,11 +889,12 @@ export class ThreeViewer {
 
       this.selectionArray[idx * 4] = isSelected ? 255 : 0;
 
-      // Update position on individualMesh for bounding raycasting
+      // Update both local and world matrices: raycasting uses these standalone per-part meshes.
       const indMesh = this.individualMeshes[idx];
       if (indMesh) {
         indMesh.position.set(dx, dy, dz);
         indMesh.updateMatrix();
+        indMesh.updateMatrixWorld(true);
       }
     });
 
@@ -975,6 +977,7 @@ export class ThreeViewer {
       if (indMesh) {
         indMesh.position.set(dx, dy, dz);
         indMesh.updateMatrix();
+        indMesh.updateMatrixWorld(true);
       }
     });
 

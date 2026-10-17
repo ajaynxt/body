@@ -103,6 +103,12 @@ assert.match(anatomyVisualSource, /aria-label="Diagram zoom level"/, 'Enlarged d
 assert.match(anatomyVisualSource, /setZoomScale\(scale => Math\.min\(4/, 'Diagram zoom should support detailed close-up inspection.');
 assert.match(indexCssSource, /\.anatomy-image-lightbox__viewport/, 'Image zoom view must scroll when an image exceeds the viewport.');
 assert.match(indexCssSource, /@media \(max-width: 680px\)/, 'Diagram and PDF zoom controls need mobile layout rules.');
+assert.match(indexCssSource, /RESPONSIVE REPAIR — Phone, tablet, laptop and desktop/, 'Responsive regression rules must be present in the global stylesheet.');
+assert.match(indexCssSource, /grid-template-areas:[\s\S]*"brand gender"[\s\S]*"modes tools"/, 'Compact headers must use predictable responsive rows.');
+assert.match(indexCssSource, /@media screen and \(min-width: 769px\) and \(max-width: 1280px\)/, 'Compact laptop widths need a dedicated header and viewer layout.');
+assert.match(indexCssSource, /@media screen and \(max-width: 768px\) and \(orientation: landscape\)/, 'Small landscape screens need a side-by-side atlas layout.');
+assert.match(indexCssSource, /\.pdf-page-canvas[\s\S]*?max-width: none !important/, 'Mobile PDF zoom must not be CSS-shrunk to fit the phone width.');
+assert.match(indexCssSource, /prefers-reduced-motion: reduce/, 'Reduced-motion preferences must be respected.');
 assert.match(questionBankSource, /hasLatinParts = eligibleParts\.some/, 'Latin-name questions must only be selected when data exists.');
 assert.match(questionBankSource, /hasMnemonicParts = eligibleParts\.some/, 'Mnemonic questions must only be selected when data exists.');
 assert.match(questionBankSource, /new Set\([\s\S]*treatment !== correctTreatment/, 'Treatment answer choices must not duplicate the correct answer.');

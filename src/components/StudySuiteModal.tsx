@@ -34,7 +34,12 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
 
   // Study one chapter at a time; keep previously saved items available across both editions.
   const studyChapters = providedChapters && providedChapters.length > 0 ? providedChapters : BOOK_CHAPTERS;
-  const allParts: StudyPartItem[] = BOOK_CHAPTERS.flatMap(ch => ch.parts);
+  // Include both reference editions so female-specific bookmarks remain visible when switching models.
+  const allParts: StudyPartItem[] = Array.from(
+    new Map(
+      [...BOOK_CHAPTERS.flatMap(ch => ch.parts), ...studyChapters.flatMap(ch => ch.parts)].map(part => [part.id, part])
+    ).values()
+  );
   const [activeChapterId, setActiveChapterId] = useState<string>(studyChapters[0]?.id ?? '');
   const activeChapter = studyChapters.find(ch => ch.id === activeChapterId) || studyChapters[0];
   const currentChapterParts: StudyPartItem[] = activeChapter?.parts ?? [];

@@ -12469,3 +12469,964 @@ button.primary-action:hover {
     flex: 1 1 auto;
   }
 }
+
+
+/* ==========================================================================
+   RESPONSIVE REPAIR — Phone, tablet, laptop and desktop
+   Keep each view inside its viewport and give scroll areas explicit owners.
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+body {
+  overflow-x: hidden;
+}
+@supports (overflow: clip) {
+  body {
+    overflow-x: clip;
+  }
+}
+#root,
+.app-root,
+.app-main-workspace,
+.app-main-workspace > *,
+.three-viewport-section,
+.book-reader-container,
+.study-library-container,
+.pdf-reader-wrapper {
+  min-width: 0;
+}
+.app-root {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+.app-main-workspace {
+  flex: 1 1 0;
+  min-height: 0;
+}
+.app-main-workspace > * {
+  min-height: 0;
+}
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-cyan, #7c3aed);
+  outline-offset: 2px;
+}
+
+/* Laptop and compact desktop: header wraps into two predictable rows. */
+@media screen and (min-width: 769px) and (max-width: 1280px) {
+  .app-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand gender"
+      "modes tools";
+    align-items: center;
+    justify-content: initial;
+    height: auto;
+    min-height: 60px;
+    padding: 8px 12px;
+    gap: 8px 12px;
+  }
+  .header-brand {
+    grid-area: brand;
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 1;
+  }
+  .brand-text-col,
+  .brand-title-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .brand-title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .brand-meta {
+    min-width: 0;
+    max-width: 52vw;
+  }
+  .active-chapter-text {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .header-gender-selector-wrap {
+    grid-area: gender;
+    justify-self: end;
+    min-width: 0;
+  }
+  .header-center-modes {
+    grid-area: modes;
+    justify-self: start;
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .header-center-modes::-webkit-scrollbar {
+    display: none;
+  }
+  .header-right-tools {
+    grid-area: tools;
+    justify-self: end;
+    min-width: 0;
+    max-width: 100%;
+    gap: 5px;
+  }
+  .tools-dropdown-menu,
+  .language-dropdown-menu {
+    max-width: calc(100vw - 24px);
+  }
+  .book-reader-container {
+    width: clamp(280px, 32vw, 380px);
+    min-width: 280px;
+    max-width: 420px;
+  }
+  .three-viewport-section {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .controls-overlay-container {
+    padding: clamp(8px, 1.1vw, 14px);
+  }
+  .bottom-dock-card {
+    max-width: 100%;
+    padding: 10px 14px;
+  }
+  .side-organ-inspector-drawer {
+    top: 12px;
+    right: 12px;
+    width: min(360px, calc(100% - 24px));
+    max-width: calc(100% - 24px);
+    max-height: calc(100dvh - 112px);
+  }
+}
+
+/* Short laptop screens: stop floating controls and inspector drawers from
+   covering the whole 3D stage. Expanded docks remain independently scrollable. */
+@media screen and (min-width: 769px) and (max-height: 760px) {
+  .bottom-dock-card.expanded {
+    max-height: 38dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .side-organ-inspector-drawer {
+    max-height: calc(100dvh - 92px);
+  }
+  .reader-canvas-scroll-area,
+  .library-content-scroll,
+  .book-content-scroll,
+  .inspector-scroll-content {
+    overscroll-behavior: contain;
+  }
+}
+
+/* Tablet / phone portrait: compact header, stable 3D area, scrollable study pane. */
+@media screen and (max-width: 768px) {
+  html,
+  body,
+  #root {
+    min-width: 320px;
+    width: 100%;
+  }
+  .app-root {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    max-width: 100vw;
+  }
+  .app-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand gender"
+      "modes tools";
+    align-items: center;
+    height: auto;
+    min-height: 0;
+    padding: 8px 10px;
+    gap: 7px 8px;
+    flex-wrap: unset;
+    row-gap: 7px;
+  }
+  .header-brand {
+    grid-area: brand;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    flex: initial;
+    gap: 8px;
+  }
+  .brand-logo-badge {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+  }
+  .brand-text-col,
+  .brand-title-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .brand-title-wrap {
+    flex-wrap: nowrap;
+  }
+  .brand-title {
+    display: block;
+    max-width: min(42vw, 220px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(12px, 2.2vw, 14px);
+    line-height: 1.2;
+  }
+  .brand-meta {
+    display: none;
+  }
+  .edition-badge,
+  .creator-header-pill {
+    display: none;
+  }
+  .header-gender-selector-wrap {
+    grid-area: gender;
+    justify-self: end;
+    min-width: 0;
+  }
+  .header-gender-selector-wrap .gender-label {
+    display: none;
+  }
+  .model-gender-selector {
+    gap: 2px;
+    padding: 3px;
+  }
+  .gender-btn {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 5px 8px;
+    justify-content: center;
+  }
+  .header-center-modes {
+    grid-area: modes;
+    justify-self: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    gap: 3px;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .header-center-modes::-webkit-scrollbar {
+    display: none;
+  }
+  .mode-toggle-btn {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+  .header-right-tools {
+    grid-area: tools;
+    justify-self: end;
+    min-width: 0;
+    max-width: 100%;
+    margin-left: 0;
+    gap: 3px;
+    flex-wrap: nowrap;
+  }
+  .tool-btn {
+    min-width: 34px;
+    min-height: 34px;
+    height: 34px;
+    padding: 5px 7px;
+    justify-content: center;
+    gap: 4px;
+  }
+  .tool-btn-label,
+  .lang-code-tag {
+    display: none;
+  }
+  .tools-chevron {
+    display: none;
+  }
+  .tools-dropdown-menu {
+    position: fixed;
+    top: auto;
+    right: 8px;
+    left: auto;
+    width: min(360px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    max-height: min(70dvh, 520px);
+  }
+  .language-dropdown-menu {
+    position: fixed;
+    top: auto;
+    right: 8px;
+    left: auto;
+    width: min(320px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    max-height: min(70dvh, 480px);
+  }
+
+  .app-main-workspace {
+    display: flex;
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .three-viewport-section.split-mode {
+    width: 100% !important;
+    height: min(40dvh, 350px) !important;
+    min-height: 180px;
+    flex: 0 0 min(40dvh, 350px) !important;
+    min-width: 0;
+    order: 1;
+  }
+  .three-viewport-section.fullscreen-mode {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0;
+    flex: 1 1 100% !important;
+    order: 1;
+  }
+  .book-reader-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    max-height: none;
+    order: 2;
+    overflow: hidden !important;
+    border-radius: 12px 12px 0 0;
+  }
+  .book-reader-container::before {
+    flex: 0 0 auto;
+  }
+  .book-tabs-nav-row {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .book-tabs-nav-row::-webkit-scrollbar {
+    display: none;
+  }
+  .book-nav-tab {
+    min-width: max-content;
+    min-height: 38px;
+  }
+  .book-sub-toolbar-row {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 7px 10px;
+  }
+  .book-lang-picker {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .book-content-scroll {
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 12px;
+  }
+  .chapter-banner-card,
+  .book-content-scroll > *,
+  .chapter-expanded-overview {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Controls over the model stay tappable and stay inside the viewport. */
+  .controls-overlay-container {
+    padding: 7px !important;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .controls-overlay-container > * {
+    max-width: 100%;
+    pointer-events: auto;
+  }
+  .top-floating-bar-col {
+    width: 100%;
+    max-width: 100%;
+    gap: 6px;
+  }
+  .view-presets-pill {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 3px 5px;
+    scale: 1;
+  }
+  .preset-btn {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+  .floating-layer-strip {
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 5px 7px;
+    gap: 4px;
+  }
+  .layer-chip-btn {
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .bottom-dock-wrap {
+    width: min(100%, 480px);
+    max-width: calc(100vw - 16px);
+    margin-bottom: max(4px, env(safe-area-inset-bottom, 0px));
+  }
+  .bottom-dock-card {
+    max-width: 100%;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .dock-compact-bar {
+    gap: 6px;
+    min-height: 36px;
+  }
+  .dock-bar-left,
+  .dock-bar-right {
+    min-width: 0;
+    gap: 6px;
+  }
+  .dock-bar-title {
+    overflow-wrap: anywhere;
+    font-size: 11px;
+  }
+  .dock-toggle-arrow-btn {
+    flex: 0 0 auto;
+    min-width: 34px;
+    min-height: 34px;
+  }
+  .dock-expanded-content {
+    max-height: min(30dvh, 220px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .explode-header-row,
+  .slider-row {
+    min-width: 0;
+    gap: 6px;
+  }
+  .slider-endpoint-label {
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+  .custom-range-slider {
+    min-width: 64px;
+    flex: 1 1 auto;
+  }
+  .quick-organ-focus-pill {
+    left: 8px !important;
+    right: 8px !important;
+    top: auto !important;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    width: auto !important;
+    max-width: calc(100% - 16px) !important;
+    max-height: 34dvh;
+    overflow: auto;
+    padding: 8px !important;
+    gap: 6px !important;
+    align-items: stretch;
+    overscroll-behavior: contain;
+  }
+  .focus-pill-meta,
+  .focus-title-row,
+  .focus-sub-tags,
+  .focus-pill-actions {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  .focus-organ-name,
+  .focus-latin-name,
+  .function-chip-snip {
+    overflow-wrap: anywhere;
+  }
+  .focus-pill-actions {
+    gap: 5px;
+  }
+  .focus-action-btn {
+    min-height: 36px;
+    max-width: 100%;
+  }
+  .side-organ-inspector-drawer {
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: min(360px, calc(100% - 16px));
+    max-width: calc(100% - 16px);
+    max-height: none;
+  }
+  .inspector-header,
+  .inspector-actions-grid {
+    min-width: 0;
+    padding: 10px;
+  }
+  .inspector-name-row,
+  .inspector-sub-name,
+  .inspector-actions-grid {
+    min-width: 0;
+  }
+  .inspector-scroll-content {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Narrow phones: let navigation scroll rather than forcing a page wider than
+   the display; make study and quiz card grids single-column. */
+@media screen and (max-width: 600px) {
+  .library-top-nav {
+    align-items: stretch;
+    padding: 10px;
+    gap: 10px;
+  }
+  .library-top-nav-left {
+    flex: 1 1 100%;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+    gap: 10px;
+  }
+  .back-to-3d-btn,
+  .library-top-nav-right,
+  .library-upload-btn {
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+  .library-title-group {
+    width: 100%;
+    min-width: 0;
+  }
+  .library-main-heading {
+    font-size: clamp(16px, 4.8vw, 22px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .library-sub-heading {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .library-content-scroll {
+    min-height: 0;
+    padding: 12px 10px 22px;
+    gap: 14px;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .library-toolbar {
+    width: 100%;
+    padding: 10px;
+    gap: 10px;
+  }
+  .library-search-box {
+    width: 100%;
+    min-width: 0;
+  }
+  .books-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .continue-reading-section,
+  .book-card,
+  .library-privacy-banner {
+    min-width: 0;
+    padding: 12px;
+  }
+  .continue-reading-grid {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .continue-reading-cover {
+    width: 68px;
+    min-width: 68px;
+    flex: 0 0 68px;
+    min-height: 88px;
+  }
+  .continue-reading-info {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+  .continue-reading-title,
+  .book-card-title,
+  .book-card-desc {
+    overflow-wrap: anywhere;
+  }
+  .book-card-actions {
+    flex-wrap: wrap;
+  }
+
+  .disease-grid,
+  .quiz-options-grid,
+  .options-grid-container,
+  .spotter-options-grid,
+  .compare-top-cards-grid,
+  .stethoscope-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mnemonics-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quick-parts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .disease-modal-content,
+  .about-modal-card,
+  .compare-modal-card,
+  .study-suite-modal-card,
+  .ai-tutor-modal,
+  .quiz-modal-card,
+  .master-quiz-container,
+  .medical-diagnostics-modal,
+  .student-modal-container {
+    min-width: 0;
+  }
+  .modal-backdrop,
+  .student-modal-overlay {
+    align-items: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: max(8px, env(safe-area-inset-top, 0px)) 8px max(8px, env(safe-area-inset-bottom, 0px));
+  }
+  .modal-scroll-body,
+  .quiz-modal-body,
+  .quiz-body-content,
+  .student-modal-body,
+  .diagnostics-detail-pane,
+  .about-modal-body,
+  .compare-modal-body {
+    min-width: 0;
+    padding: 12px;
+    overflow-wrap: anywhere;
+  }
+  .modal-header,
+  .student-modal-header,
+  .student-header-actions,
+  .ai-tutor-header,
+  .ai-tutor-header-actions {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-title,
+  .student-header-title-row,
+  .tutor-organ-title {
+    overflow-wrap: anywhere;
+  }
+  .diagnostics-split-workspace {
+    min-height: 0;
+    overflow-x: hidden;
+  }
+  .diagnostics-list-pane {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid var(--glass-border-subtle);
+  }
+  .diagnostics-cards-scroll {
+    min-height: 0;
+  }
+  .diagnostics-detail-pane {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  /* PDF zoom must remain real zoom. Do not CSS-shrink the canvas to the phone
+     width; the scroll area should pan to the enlarged page instead. */
+  .pdf-reader-wrapper {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+  .reader-top-bar {
+    min-width: 0;
+    gap: 8px;
+    padding: 8px;
+  }
+  .reader-top-left {
+    min-width: 0;
+    width: 100%;
+    gap: 8px;
+  }
+  .reader-book-identity {
+    min-width: 0;
+    flex: 1 1 0;
+    flex-wrap: wrap;
+  }
+  .reader-book-title {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .reader-top-right {
+    min-width: 0;
+    width: 100%;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .reader-zoom-group {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: nowrap;
+  }
+  .zoom-range {
+    width: clamp(48px, 17vw, 88px);
+    max-width: 22vw;
+    min-width: 44px;
+  }
+  .reader-stage-container {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .reader-canvas-scroll-area {
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 8px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pdf-canvas-container {
+    width: max-content;
+    max-width: none;
+    flex: 0 0 auto;
+    margin: 0 auto;
+  }
+  .pdf-page-canvas {
+    display: block;
+    max-width: none !important;
+    flex: 0 0 auto;
+  }
+  .starter-textbook-page {
+    width: 100%;
+    max-width: 820px;
+    min-width: 0;
+    padding: 16px 12px;
+    gap: 14px;
+    overflow-wrap: anywhere;
+  }
+  .page-header-ribbon {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .topic-main-title {
+    font-size: clamp(18px, 5vw, 23px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .reader-bottom-bar {
+    min-width: 0;
+    gap: 7px;
+    padding: 8px;
+  }
+  .reader-nav-controls {
+    min-width: 0;
+    gap: 4px;
+  }
+  .page-nav-btn {
+    min-width: 34px;
+    min-height: 38px;
+    padding: 6px 8px;
+    justify-content: center;
+  }
+  .page-jump-input {
+    width: 44px;
+    max-width: 18vw;
+  }
+  .reader-bottom-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+  .reader-side-drawer {
+    width: min(340px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+  }
+
+  .anatomy-image-lightbox__viewport {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Very small phones: avoid losing access to model modes or tools. */
+@media screen and (max-width: 380px) {
+  .app-header {
+    padding: 7px;
+    gap: 6px;
+  }
+  .brand-title {
+    max-width: 34vw;
+    font-size: 11.5px;
+  }
+  .gender-btn {
+    min-width: 30px;
+    padding-inline: 6px;
+  }
+  .header-right-tools {
+    gap: 2px;
+  }
+  .tool-btn {
+    min-width: 31px;
+    padding-inline: 5px;
+  }
+  .mode-toggle-btn {
+    padding-inline: 7px;
+  }
+  .reader-nav-controls {
+    flex-wrap: nowrap;
+  }
+  .page-nav-btn {
+    padding-inline: 5px;
+  }
+}
+
+/* Mobile landscape: retain a side-by-side atlas + reader rather than
+   squeezing them into a short vertical stack. */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .app-main-workspace {
+    flex-direction: row !important;
+  }
+  .three-viewport-section.split-mode {
+    width: 56% !important;
+    height: 100% !important;
+    min-height: 0;
+    flex: 1 1 56% !important;
+    order: 2;
+    border-bottom: 0;
+  }
+  .book-reader-container {
+    width: 44% !important;
+    max-width: 44% !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    flex: 0 0 44% !important;
+    order: 1;
+    border-radius: 0;
+    border-top: 0 !important;
+    border-right: 1px solid var(--glass-border) !important;
+  }
+  .book-reader-container::before {
+    display: none;
+  }
+  .book-content-scroll {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .three-viewport-section.fullscreen-mode {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  .quick-organ-focus-pill {
+    max-height: 36dvh;
+    bottom: 8px !important;
+  }
+  .bottom-dock-card.expanded {
+    max-height: 32dvh;
+    overflow-y: auto;
+  }
+}
+
+/* On small screens, preserve readable single-column clinical content. */
+@media screen and (max-width: 900px) {
+  .diagnostics-split-workspace {
+    flex-direction: column;
+    min-width: 0;
+  }
+  .diagnostics-list-pane {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-right: 0;
+    border-bottom: 1px solid var(--glass-border-subtle);
+  }
+  .diagnostics-detail-pane {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+  .stethoscope-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .compare-top-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Respect reduced-motion preferences on all devices. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

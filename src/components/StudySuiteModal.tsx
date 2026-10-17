@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { BOOK_CHAPTERS } from '../data/chapters';
 import type { StudyPartItem } from '../types/atlas';
+import { AnatomyStudyVisual } from './AnatomyStudyVisual';
 
 interface StudySuiteModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
   });
 
   // Layer mode state
-  const [currentLayer, setCurrentLayer] = useState(3); // 1 to 5
+  const [currentLayer, setCurrentLayer] = useState(1); // One isolated study layer at a time
 
   useEffect(() => {
     if (isOpen) {
@@ -82,11 +83,9 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
     localStorage.setItem('anatomy_saved_parts', JSON.stringify(updated));
   };
 
+  // Preview only while moving the slider; apply to the 3D model only on button click.
   const handleLayerChange = (layer: number) => {
     setCurrentLayer(layer);
-    if (onApplyLayerMode) {
-      onApplyLayerMode(layer);
-    }
   };
 
   const filteredGlossary = allParts.filter(
@@ -172,6 +171,15 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
                   />
                 </button>
               </div>
+
+              {/* Always keep the study image visible while the card is flipped. */}
+              <AnatomyStudyVisual
+                name={currentCard.name}
+                hindiName={currentCard.hindiName}
+                latinName={currentCard.latinName}
+                system={currentCard.system}
+                variant="compact"
+              />
 
               {/* The Flip Card */}
               <div
@@ -265,13 +273,14 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
 
               <div className="layer-slider-box glass-panel">
                 <div className="layer-slider-header">
-                  <span className="layer-number-badge">स्तर {currentLayer} / 5</span>
+                  <span className="layer-number-badge">स्तर {currentLayer} / 6</span>
                   <strong className="layer-title-text">
-                    {currentLayer === 1 && 'स्तर 1: बाह्य आवरण (Integumentary Surface)'}
-                    {currentLayer === 2 && 'स्तर 2: सतही पेशी विन्यास (Superficial Musculature)'}
-                    {currentLayer === 3 && 'स्तर 3: कंकाल एवं विसरल अंग (Skeletal & Core Organs)'}
-                    {currentLayer === 4 && 'स्तर 4: गहन कार्डियो-पल्मोनरी व संवहनी तंत्र (Deep Cardiovascular)'}
-                    {currentLayer === 5 && 'स्तर 5: केंद्रीय एवं स्वायत्त तंत्रिका तंत्र (Pure Neural Core)'}
+                    {currentLayer === 1 && 'स्तर 1: त्वचा (Skin)'}
+                    {currentLayer === 2 && 'स्तर 2: मांसपेशियां (Muscles)'}
+                    {currentLayer === 3 && 'स्तर 3: हड्डियां व जोड़ (Skeleton)'}
+                    {currentLayer === 4 && 'स्तर 4: आंतरिक अंग (Internal organs)'}
+                    {currentLayer === 5 && 'स्तर 5: रक्त वाहिकाएं (Blood vessels)'}
+                    {currentLayer === 6 && 'स्तर 6: तंत्रिका तंत्र (Nervous system)'}
                   </strong>
                 </div>
 
@@ -279,7 +288,7 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
                   <input
                     type="range"
                     min="1"
-                    max="5"
+                    max="6"
                     step="1"
                     value={currentLayer}
                     onChange={e => handleLayerChange(parseInt(e.target.value))}
@@ -288,9 +297,10 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
                   <div className="layer-range-ticks">
                     <span>1. त्वचा</span>
                     <span>2. मांसपेशियां</span>
-                    <span>3. कंकाल व अंग</span>
-                    <span>4. वाहिकाएं</span>
-                    <span>5. तंत्रिकाएं</span>
+                    <span>3. हड्डियां</span>
+                    <span>4. आंतरिक अंग</span>
+                    <span>5. वाहिकाएं</span>
+                    <span>6. तंत्रिकाएं</span>
                   </div>
                 </div>
 
@@ -307,29 +317,62 @@ export const StudySuiteModal: React.FC<StudySuiteModalProps> = ({
                   )}
                   {currentLayer === 3 && (
                     <p>
-                      <strong>दिखाई देने वाले अंग:</strong> कंकाल फ्रेम (हड्डियां, पसलियां, रीढ़) के साथ हृदय, फेफड़े, यकृत, आमाशय और आंतें अपने स्वाभाविक शरीर-रचनात्मक स्थान पर।
+                      <strong>दिखाई देने वाले अंग:</strong> हड्डियां, खोपड़ी, पसलियां, रीढ़ और जोड़। आंतरिक अंग और मांसपेशियां इस चरण में छुपे रहते हैं।
                     </p>
                   )}
                   {currentLayer === 4 && (
                     <p>
-                      <strong>दिखाई देने वाले अंग:</strong> हृदय के चार कक्ष, महाधमनी, फुफ्फुसीय शाखाएं एवं वृक्कीय संवहनी जाल।
+                      <strong>दिखाई देने वाले अंग:</strong> हृदय, फेफड़े, यकृत, आमाशय, आंतें, गुर्दे और अन्य प्रमुख आंतरिक अंग। हड्डियां, मांसपेशियां और वाहिकाएं अलग रखी गई हैं।
                     </p>
                   )}
                   {currentLayer === 5 && (
                     <p>
-                      <strong>दिखाई देने वाले अंग:</strong> मस्तिष्क, कपाल तंत्रिकाएं, स्पाइनल कॉर्ड एवं गहन न्यूरल ट्रैक्स।
+                      <strong>दिखाई देने वाले अंग:</strong> धमनियां और शिराएं। हृदय को अलग अध्ययन करने के लिए आंतरिक-अंग स्तर में रखा गया है।
+                    </p>
+                  )}
+                  {currentLayer === 6 && (
+                    <p>
+                      <strong>दिखाई देने वाले अंग:</strong> मस्तिष्क, प्रमुख तंत्रिकाएं और स्पाइनल कॉर्ड।
                     </p>
                   )}
                 </div>
 
+                <AnatomyStudyVisual
+                  name={({
+                    1: 'Skin',
+                    2: 'Muscular system',
+                    3: 'Human skeleton',
+                    4: 'Internal organs',
+                    5: 'Blood vessels',
+                    6: 'Nervous system',
+                  } as Record<number, string>)[currentLayer]}
+                  hindiName={({
+                    1: 'त्वचा',
+                    2: 'मांसपेशियां',
+                    3: 'कंकाल',
+                    4: 'आंतरिक अंग',
+                    5: 'रक्त वाहिकाएं',
+                    6: 'तंत्रिका तंत्र',
+                  } as Record<number, string>)[currentLayer]}
+                  system={({
+                    1: 'integumentary',
+                    2: 'muscular',
+                    3: 'skeletal',
+                    4: 'digestive',
+                    5: 'arterial',
+                    6: 'nervous',
+                  } as Record<number, string>)[currentLayer]}
+                  variant="compact"
+                />
+
                 <button
                   className="apply-layer-3d-btn"
                   onClick={() => {
-                    handleLayerChange(currentLayer);
+                    onApplyLayerMode?.(currentLayer);
                     onClose();
                   }}
                 >
-                  <span>इस स्तर को 3D व्यूपोर्ट पर लागू करें</span>
+                  <span>केवल यह स्तर 3D में दिखाएं</span>
                 </button>
               </div>
             </div>

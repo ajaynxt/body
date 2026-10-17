@@ -12058,3 +12058,95 @@ button.primary-action:hover {
     flex: 0 0 auto;
   }
 }
+
+
+/* Study subject reference illustration */
+.anatomy-study-visual {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(148, 163, 184, 0.3));
+  border-radius: 14px;
+  background: var(--bg-card, #fff);
+  color: var(--text-main, #1f2937);
+}
+.anatomy-study-visual__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--border-color, rgba(148, 163, 184, 0.3));
+}
+.anatomy-study-visual__subject {
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-align: right;
+}
+.anatomy-study-visual__media {
+  display: grid;
+  place-items: center;
+  height: 230px;
+  padding: 10px;
+  background: var(--bg-stage, #f8fafc);
+}
+.anatomy-study-visual__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.anatomy-study-visual__credit {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--text-muted, #64748b);
+  border-top: 1px solid var(--border-color, rgba(148, 163, 184, 0.3));
+}
+.anatomy-study-visual__credit a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  color: var(--accent-cyan, #7c3aed);
+  text-decoration: none;
+  font-weight: 700;
+}
+.anatomy-study-visual__credit a:hover { text-decoration: underline; }
+.anatomy-study-visual__fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 120px;
+  color: var(--text-muted, #64748b);
+  font-size: 12px;
+}
+.anatomy-study-visual__fallback a { color: var(--accent-cyan, #7c3aed); }
+.anatomy-study-visual--compact .anatomy-study-visual__media { height: 175px; }
+.anatomy-study-visual--compact { margin: 2px 0 12px; }
+.layer-range-ticks {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  text-align: center;
+}
+@media (max-width: 640px) {
+  .layer-range-ticks {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 8px;
+  }
+  .layer-title-text { font-size: 12px; }
+  .anatomy-study-visual__media { height: 190px; }
+  .anatomy-study-visual--compact .anatomy-study-visual__media { height: 150px; }
+}

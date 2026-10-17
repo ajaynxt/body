@@ -293,25 +293,26 @@ export const App: React.FC = () => {
 
   // Handle toggling major organ groups (Muscles, Skeleton, Viscera, Vascular, Nerves)
   const handleToggleOrganGroup = useCallback((group: 'muscles' | 'skeleton' | 'viscera' | 'vascular' | 'nerves') => {
-    if (!viewerRef.current) return;
-    setVisibleSystems(prev => {
-      const next = new Set(prev);
-      let targetSystems: string[] = [];
-      if (group === 'muscles') targetSystems = ['muscular'];
-      else if (group === 'skeleton') targetSystems = ['skeletal'];
-      else if (group === 'viscera') targetSystems = ['cardiac', 'digestive', 'respiratory', 'urinary', 'reproductive', 'endocrine'];
-      else if (group === 'vascular') targetSystems = ['arterial', 'venous'];
-      else if (group === 'nerves') targetSystems = ['nervous', 'brain'];
+    const viewer = viewerRef.current;
+    if (!viewer) return;
 
-      const isCurrentlyVisible = targetSystems.some(s => next.has(s));
-      targetSystems.forEach(s => {
-        if (isCurrentlyVisible) next.delete(s);
-        else next.add(s);
-        viewerRef.current?.setSystemVisible(s, !isCurrentlyVisible);
-      });
-      return next;
-    });
-  }, []);
+    const groupSystems: Record<typeof group, string[]> = {
+      muscles: ['muscular'],
+      skeleton: ['skeletal', 'connective'],
+      viscera: ['cardiac', 'digestive', 'respiratory', 'urinary', 'reproductive', 'endocrine', 'lymphatic', 'sensory'],
+      vascular: ['arterial', 'venous'],
+      nerves: ['nervous', 'brain'],
+    };
+    const targetSystems = groupSystems[group];
+    const isCurrentlyVisible = targetSystems.some(systemId => visibleSystems.has(systemId));
+
+    // Quick layer chips are mutually exclusive: one selected layer is visible at a time.
+    viewer.setAllSystemsVisible(false);
+    const next = isCurrentlyVisible ? new Set<string>() : new Set(targetSystems);
+    next.forEach(systemId => viewer.setSystemVisible(systemId, true));
+    setVisibleSystems(next);
+    setSkinOpacity(0);
+  }, [visibleSystems]);
 
   // Handle toggling Solo Focus / Isolate from quick focus pill
   const handleToggleQuickIsolate = useCallback(() => {
@@ -347,9 +348,10 @@ export const App: React.FC = () => {
     const layerSystems: Record<number, string[]> = {
       1: ['integumentary'],
       2: ['muscular'],
-      3: ['skeletal', 'digestive', 'respiratory', 'cardiac', 'circulatory', 'urinary', 'reproductive'],
-      4: ['circulatory', 'cardiac', 'arterial', 'venous'],
-      5: ['nervous'],
+      3: ['skeletal', 'connective'],
+      4: ['cardiac', 'digestive', 'respiratory', 'urinary', 'reproductive', 'endocrine', 'lymphatic', 'sensory'],
+      5: ['arterial', 'venous'],
+      6: ['nervous', 'brain'],
     };
     const targetSystems = layerSystems[layer];
     if (!targetSystems) return;

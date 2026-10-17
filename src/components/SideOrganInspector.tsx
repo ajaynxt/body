@@ -12,6 +12,7 @@ import {
   Pill,
 } from 'lucide-react';
 import type { StudyPartItem } from '../types/atlas';
+import { AnatomyStudyVisual } from './AnatomyStudyVisual';
 
 interface SideOrganInspectorProps {
   part: StudyPartItem | null;
@@ -125,6 +126,13 @@ export const SideOrganInspector: React.FC<SideOrganInspectorProps> = ({
 
       {/* Content Scrollable Body */}
       <div className="inspector-scroll-content">
+        <AnatomyStudyVisual
+          name={part.name}
+          hindiName={part.hindiName}
+          latinName={part.latinName}
+          system={part.system}
+        />
+
         {/* Function */}
         <div className="inspector-info-card">
           <div className="card-label">

@@ -8,30 +8,30 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Pure Surgical Green & Crisp Clinical White */
-  --bg-app: #f8faf9; /* Pure crisp bright clinical background */
-  --bg-stage: #ffffff; /* Bright white 3D stage */
-  --bg-card: #ffffff; /* Pure crisp white card */
-  --bg-card-hover: #f0fdf4; /* Light emerald tint hover */
-  --bg-surface: #ffffff; /* Explicit surface token for textbook pages */
+  --bg-app: #f4f7fb; /* Cool clinical mist */
+  --bg-stage: #f8fbff; /* Clean atlas stage */
+  --bg-card: #ffffff; /* Neutral white surfaces */
+  --bg-card-hover: #eaf5fb; /* Soft blue hover */
+  --bg-surface: #ffffff; /* Textbook surface */
   --bg-glass: rgba(255, 255, 255, 0.96);
-  --bg-input: #f1f5f3;
-  --border-color: #d1fae5; /* Clean surgical emerald border */
-  --border-subtle: #e2e8f0; /* Crisp soft border */
-  --border-accent: #15803d; /* Authoritative medical green border */
+  --bg-input: #edf2f7;
+  --border-color: #dbe6f0; /* Quiet cool border */
+  --border-subtle: #e3eaf2; /* Quiet cool border */
+  --border-accent: #087e8b; /* Clinical teal accent */
 
-  --text-main: #061a12; /* Deepest forest charcoal - ultra-high contrast AAA on white */
-  --text-secondary: #166534; /* Rich surgical emerald */
-  --text-muted: #335343; /* Clear readable herbal slate */
-  --text-contrast: #04100b;
+  --text-main: #172b3a; /* Deep blue charcoal */
+  --text-secondary: #36556b; /* Muted clinical slate */
+  --text-muted: #607789; /* Secondary slate */
+  --text-contrast: #102433;
 
   /* Surgical Forest Green Accents */
-  --accent-cyan: #15803d; /* Classical medical green */
-  --accent-cyan-light: #16a34a; /* Vibrant health green */
-  --accent-cyan-glow: rgba(21, 128, 61, 0.2);
-  --accent-cyan-bg: #ecfdf5; /* Crisp emerald light bg */
+  --accent-cyan: #087e8b; /* Medical teal */
+  --accent-cyan-light: #159eaa; /* Clear teal */
+  --accent-cyan-glow: rgba(8, 126, 139, 0.18);
+  --accent-cyan-bg: #e6f5f7; /* Pale clinical teal */
 
-  --accent-indigo: #0f766e; /* Medical deep pine */
-  --accent-violet: #059669;
+  --accent-indigo: #3658a6; /* Medical indigo */
+  --accent-violet: #4f75c2;
   --accent-violet-glow: rgba(5, 150, 105, 0.18);
 
   --color-danger: #dc2626;
@@ -42,17 +42,17 @@
   --color-warning-bg: rgba(217, 119, 6, 0.08);
   --color-warning-glow: rgba(217, 119, 6, 0.2);
 
-  --color-success: #15803d;
-  --color-success-bg: rgba(21, 128, 61, 0.08);
+  --color-success: #167d69;
+  --color-success-bg: rgba(22, 125, 105, 0.08);
   --color-success-glow: rgba(21, 128, 61, 0.2);
 
   --glass-bg: rgba(255, 255, 255, 0.96);
-  --glass-bg-subtle: rgba(248, 250, 249, 0.92);
-  --glass-border: #d1fae5; /* Crisp emerald border */
+  --glass-bg-subtle: rgba(244, 247, 251, 0.94);
+  --glass-border: #dbe6f0; /* Cool understated border */
   --glass-border-subtle: #e2e8f0;
-  --glass-border-accent: rgba(21, 128, 61, 0.45);
-  --glass-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  --glass-shadow-glow: 0 0 20px -2px rgba(21, 128, 61, 0.16);
+  --glass-border-accent: rgba(8, 126, 139, 0.42);
+  --glass-shadow: 0 10px 28px -8px rgba(25, 54, 76, 0.10), 0 3px 8px -3px rgba(25, 54, 76, 0.05);
+  --glass-shadow-glow: 0 0 18px -4px rgba(8, 126, 139, 0.15);
   --glass-blur: blur(20px);
 
   --radius-xs: 6px;
@@ -63,38 +63,38 @@
 }
 
 [data-theme="dark"] {
-  --bg-app: #081611;
-  --bg-stage: #05100c;
-  --bg-card: rgba(13, 31, 23, 0.88);
-  --bg-card-hover: rgba(20, 48, 36, 0.95);
-  --bg-surface: #0a1f16;
-  --bg-glass: rgba(12, 28, 21, 0.92);
-  --bg-input: rgba(10, 24, 18, 0.9);
-  --border-color: rgba(16, 185, 129, 0.25);
+  --bg-app: #0b1724;
+  --bg-stage: #08131f;
+  --bg-card: rgba(18, 34, 49, 0.94);
+  --bg-card-hover: rgba(27, 48, 66, 0.96);
+  --bg-surface: #101f2d;
+  --bg-glass: rgba(13, 27, 40, 0.94);
+  --bg-input: rgba(12, 26, 39, 0.92);
+  --border-color: rgba(134, 166, 191, 0.22);
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: #10b981;
+  --border-accent: #38b6c4;
 
-  --text-main: #fbf8f0;
-  --text-secondary: #cde0d5;
-  --text-muted: #829e90;
+  --text-main: #f0f6fb;
+  --text-secondary: #c4d5e2;
+  --text-muted: #91a8b9;
   --text-contrast: #ffffff;
 
-  --accent-cyan: #10b981;
-  --accent-cyan-light: #34d399;
-  --accent-cyan-glow: rgba(16, 185, 129, 0.22);
-  --accent-cyan-bg: rgba(16, 185, 129, 0.12);
+  --accent-cyan: #38b6c4;
+  --accent-cyan-light: #67d3dd;
+  --accent-cyan-glow: rgba(56, 182, 196, 0.2);
+  --accent-cyan-bg: rgba(56, 182, 196, 0.12);
 
-  --accent-indigo: #059669;
-  --accent-violet: #14b8a6;
+  --accent-indigo: #7795e2;
+  --accent-violet: #79a8ef;
   --accent-violet-glow: rgba(20, 184, 166, 0.2);
 
-  --glass-bg: rgba(12, 28, 21, 0.88);
-  --glass-bg-subtle: rgba(10, 24, 18, 0.7);
-  --glass-border: rgba(16, 185, 129, 0.25);
+  --glass-bg: rgba(13, 27, 40, 0.94);
+  --glass-bg-subtle: rgba(10, 23, 35, 0.82);
+  --glass-border: rgba(134, 166, 191, 0.2);
   --glass-border-subtle: rgba(255, 255, 255, 0.08);
-  --glass-border-accent: rgba(16, 185, 129, 0.4);
+  --glass-border-accent: rgba(56, 182, 196, 0.42);
   --glass-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6);
-  --glass-shadow-glow: 0 4px 16px -2px rgba(16, 185, 129, 0.18);
+  --glass-shadow-glow: 0 4px 16px -2px rgba(56, 182, 196, 0.17);
 }
 
 * {
@@ -135,13 +135,13 @@ html, body {
   width: 100vw;
   height: 100vh;
   position: relative;
-  background: radial-gradient(ellipse at 50% 25%, #0f2d21 0%, #081611 60%, #050d0a 100%);
+  background: radial-gradient(ellipse at 50% 20%, #142a3b 0%, #0b1724 58%, #07111b 100%);
   color: var(--text-main);
   transition: background 0.3s ease, color 0.3s ease;
 }
 
 [data-theme="light"] .app-root {
-  background: radial-gradient(ellipse at 50% 15%, #f4efe4 0%, #f7f4ed 60%, #eae3d2 100%);
+  background: linear-gradient(145deg, #f7faff 0%, #f1f5fa 60%, #eaf1f7 100%);
 }
 
 /* Header */
@@ -178,7 +178,7 @@ html, body {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #4f46e5 100%);
+  background: linear-gradient(135deg, #087e8b 0%, #176f91 55%, #3658a6 100%);
   display: flex;
   align-items: center;
   justify-content: center;

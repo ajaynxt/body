@@ -305,15 +305,15 @@ export const StudentFunZoneModal: React.FC<StudentFunZoneModalProps> = ({
       ctx.fillRect((x + 2) % width, 0, 14, height);
 
       // Re-draw grid under trail
-      ctx.strokeStyle = 'rgba(0, 240, 180, 0.12)';
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.12)';
       ctx.strokeRect((x + 2) % width, 0, 14, height);
 
-      // Draw glowing ECG line segment
+      // Draw medical ECG line segment
       ctx.beginPath();
-      ctx.strokeStyle = '#00f0ff';
+      ctx.strokeStyle = '#10b981';
       ctx.lineWidth = 2.5;
-      ctx.shadowColor = '#00f0ff';
-      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(16, 185, 129, 0.5)';
+      ctx.shadowBlur = 6;
       ctx.moveTo(x, midY);
       ctx.lineTo((x + 3) % width, nextY);
       ctx.stroke();

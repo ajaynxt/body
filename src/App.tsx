@@ -487,7 +487,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            <section className="three-viewport-section">
+            <section className={`three-viewport-section ${viewMode === 'explorer' ? 'fullscreen-mode' : 'split-mode'}`}>
               <ThreeCanvas
                 atlas={atlas}
                 activeGender={activeGender}

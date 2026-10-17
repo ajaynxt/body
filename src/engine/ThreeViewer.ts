@@ -47,18 +47,33 @@ export const MALE_GENITALIA_IDS = new Set([
 ]);
 
 export const FEMALE_SPECIFIC_PARTS = new Set([
-  'HRAF0003', // Female Skin Silhouette
-  // Left Breast & Mammary structures
+  'HRAF0003', // Female skin silhouette
+  // Left breast & mammary structures
   'HRAF0004', 'HRAF0005', 'HRAF0006', 'HRAF0007', 'HRAF0008', 'HRAF0009', 'HRAF0010', 'HRAF0011',
-  // Right Breast & Mammary structures
+  // Right breast & mammary structures
   'HRAF0012', 'HRAF0013', 'HRAF0014', 'HRAF0015', 'HRAF0016', 'HRAF0017', 'HRAF0018', 'HRAF0019',
-  // Female Reproductive Organs & Pelvic Ligaments
+  // Female reproductive organs & pelvic ligaments
   'HRAF0406', 'HRAF0407', 'HRAF0408', 'HRAF0409', 'HRAF0410', 'HRAF0411', 'HRAF0412', 'HRAF0413',
   'HRAF0414', 'HRAF0415', 'HRAF0416', 'HRAF0417', 'HRAF0418', 'HRAF0419', 'HRAF0420', 'HRAF0421',
   'HRAF0422', 'HRAF0423', 'HRAF0424', 'HRAF0425', 'HRAF0426', 'HRAF0427', 'HRAF0428', 'HRAF0429',
   'HRAF0430', 'HRAF0431', 'HRAF0432', 'HRAF0433', 'HRAF0434', 'HRAF0435', 'HRAF0436', 'HRAF0437',
   'HRAF0438', 'HRAF0439', 'HRAF0440', 'HRAF0441', 'HRAF0442', 'HRAF0443'
 ]);
+
+// Female reference meshes that should replace the corresponding shared male anatomy.
+const FEMALE_FITTED_SYSTEMS = new Set(['skeletal', 'borrowed', 'donor-muscle']);
+
+function isFemaleRenderablePart(part: { id: string; system: string }): boolean {
+  return FEMALE_SPECIFIC_PARTS.has(part.id) || FEMALE_FITTED_SYSTEMS.has(part.system);
+}
+
+function normalizeMuscleName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\b(left|right|muscle|muscles|musculus)\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, '');
+}
 
 export class ThreeViewer {
   private container: HTMLDivElement;
@@ -108,6 +123,7 @@ export class ThreeViewer {
   private femalePartBoundingBoxes: THREE.Box3[] = [];
   private femaleCatalogMap = new Map<string, FemaleAnatomyPart>();
   private femaleSkinMesh: THREE.Mesh | null = null;
+  private femaleReplacedMaleMuscleIds = new Set<string>();
   private skinOpacity = 0.35;
 
   // Stage objects
@@ -494,6 +510,21 @@ export class ThreeViewer {
       const femaleData = await fetchJsonWithCache<AtlasData>(femaleAtlasUrl);
       this.femaleAtlas = femaleData;
 
+      // Fit the female body with female-reference bones and lower-limb muscles.
+      // Where an identically named male muscle exists, suppress that duplicate in female mode.
+      const femaleMuscleNames = new Set(
+        femaleData.parts
+          .filter(part => part.system === 'donor-muscle')
+          .map(part => normalizeMuscleName(part.name))
+          .filter(Boolean)
+      );
+      this.femaleReplacedMaleMuscleIds.clear();
+      this.atlas.parts.forEach(part => {
+        if (part.system === 'muscular' && femaleMuscleNames.has(normalizeMuscleName(part.name))) {
+          this.femaleReplacedMaleMuscleIds.add(part.id);
+        }
+      });
+
       // 1. Initialize GPU DataTextures for female model
       this.femaleStateWidth = THREE.MathUtils.ceilPowerOfTwo(femaleData.parts.length);
       this.femalePartStateArray = new Float32Array(this.femaleStateWidth * 4);
@@ -580,8 +611,13 @@ export class ThreeViewer {
         this.femaleSystemMaterials.set(sysId, mat);
       });
 
-      // 3. Download & decompress chunks containing female-specific organs [0, 1, 5]
-      const targetChunkIndices = [0, 1, 5];
+      // Load only chunks containing female skin, reproductive structures, fitted bones and donor muscles.
+      // This keeps the first female switch lighter than loading all 1,220 reference meshes.
+      const targetChunkIndices = [...new Set(
+        femaleData.parts
+          .filter(isFemaleRenderablePart)
+          .map(part => part.chunk)
+      )].sort((a, b) => a - b);
       let completedChunks = 0;
       const systemGeometries = new Map<string, THREE.BufferGeometry[]>();
       let skinGeometry: THREE.BufferGeometry | null = null;
@@ -600,8 +636,8 @@ export class ThreeViewer {
 
         femaleData.parts.forEach((part, partIdx) => {
           if (part.chunk !== chunkIndex) return;
-          // Only create geometries for female-specific organs (Breasts, Reproductive system, Skin)
-          if (!FEMALE_SPECIFIC_PARTS.has(part.id)) return;
+          // Keep female-specific organs plus the fitted female skeleton and donor lower-limb muscles.
+          if (!isFemaleRenderablePart(part)) return;
 
           const geo = new THREE.BufferGeometry();
           geo.setAttribute(
@@ -655,9 +691,7 @@ export class ThreeViewer {
         }
       };
 
-      for (const idx of targetChunkIndices) {
-        await loadSingleFemaleChunk(idx);
-      }
+      await Promise.all(targetChunkIndices.map(loadSingleFemaleChunk));
 
       // 4. Merge geometries per system into single draw calls
       systemGeometries.forEach((geos, sysId) => {
@@ -817,8 +851,17 @@ export class ThreeViewer {
         isVisible = this.visibleSystems.has(part.system) || isSelected;
       }
 
-      // In Female mode, hide male genitalia
-      if (this.activeGender === 'female' && MALE_GENITALIA_IDS.has(part.id)) {
+      // Female mode uses the fitted female skeleton, female reproductive parts, and matching donor muscles.
+      // Hide male equivalents to avoid male-shaped bones or reproductive anatomy showing through.
+      if (
+        this.activeGender === 'female' &&
+        (
+          part.system === 'skeletal' ||
+          part.system === 'reproductive' ||
+          MALE_GENITALIA_IDS.has(part.id) ||
+          this.femaleReplacedMaleMuscleIds.has(part.id)
+        )
+      ) {
         isVisible = false;
       }
 
@@ -851,8 +894,8 @@ export class ThreeViewer {
     const isIso = this.isIsolated;
 
     this.femaleAtlas.parts.forEach((part, idx) => {
-      // Hide duplicate borrowed organs so universal human body model renders them with zero clashing
-      if (!FEMALE_SPECIFIC_PARTS.has(part.id)) {
+      // Render female-specific organs plus the fitted female skeleton and VHF lower-limb muscles.
+      if (!isFemaleRenderablePart(part)) {
         this.femalePartStateArray[idx * 4 + 3] = 0.0;
         return;
       }
@@ -886,10 +929,14 @@ export class ThreeViewer {
       } else {
         if (part.id === 'HRAF0003') {
           isVisible = this.skinOpacity > 0.02 && this.visibleSystems.has('integumentary');
+        } else if (part.system === 'skeletal' || part.system === 'borrowed') {
+          isVisible = this.visibleSystems.has('skeletal') || isSelected;
+        } else if (part.system === 'donor-muscle') {
+          isVisible = this.visibleSystems.has('muscular') || isSelected;
         } else if (part.system === 'reproductive' || part.system === 'pregnancy') {
           isVisible = this.visibleSystems.has('reproductive') || isSelected;
         } else {
-          // Breasts & Mammary gland structures
+          // Female breasts & mammary gland structures
           isVisible = this.visibleSystems.has('integumentary') || this.visibleSystems.has('muscular') || isSelected;
         }
       }
@@ -949,7 +996,7 @@ export class ThreeViewer {
 
         const tempBox = new THREE.Box3();
         this.femaleAtlas.parts.forEach((part, idx) => {
-          if (!FEMALE_SPECIFIC_PARTS.has(part.id)) return;
+          if (!isFemaleRenderablePart(part)) return;
           const indMesh = this.femaleIndividualMeshes[idx];
           if (!indMesh || this.femalePartStateArray[idx * 4 + 3] < 0.5) return;
           // When skin is translucent, skip skin so user can effortlessly click internal organs/bones

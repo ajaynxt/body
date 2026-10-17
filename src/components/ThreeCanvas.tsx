@@ -36,6 +36,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
 
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorKind, setErrorKind] = useState<'female' | 'general' | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || !atlas) return;
@@ -49,6 +50,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
         const isFemaleLoadError = err.startsWith('महिला 3D मॉडल लोड करने में त्रुटि:');
         // Ignore a late female-load failure after the user has already returned to male mode.
         if (isFemaleLoadError && viewerRef.current?.getActiveGender() === 'male') return;
+        setErrorKind(isFemaleLoadError ? 'female' : 'general');
         setErrorMessage(err);
       },
     });
@@ -72,8 +74,13 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
     previousGenderRef.current = activeGender;
     if (activeGender === 'male' && previousGender === 'female') {
       setErrorMessage(null);
+      setErrorKind(null);
       // The female loader may have stopped before 100%; don't leave its spinner over the male model.
       setLoadingProgress(100);
+    } else if (activeGender === 'female') {
+      // Don't carry a previous male-model error into the female reference view.
+      setErrorMessage(null);
+      setErrorKind(null);
     }
     void viewerRef.current.switchGender(activeGender);
   }, [activeGender, atlas]);
@@ -149,15 +156,15 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
 
       {/* A failed female reference load falls back to shared anatomy instead of blocking the canvas. */}
       {errorMessage && (
-        <div className={`error-glass-overlay ${activeGender === 'female' ? 'female-fallback-error' : ''}`}>
+        <div className={`error-glass-overlay ${errorKind === 'female' ? 'female-fallback-error' : ''}`}>
           <div className="error-card glass-panel">
             <AlertTriangle size={26} className="text-danger" />
             <p className="error-msg">
-              {activeGender === 'female'
+              {errorKind === 'female'
                 ? 'Female reference model load nahi hua. Available shared anatomy fallback dikh rahi hai.'
                 : errorMessage}
             </p>
-            {activeGender === 'female' ? (
+            {errorKind === 'female' ? (
               <>
                 <details className="female-load-error-details">
                   <summary>Error details</summary>
@@ -167,6 +174,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
                   className="reload-btn"
                   onClick={async () => {
                     setErrorMessage(null);
+                    setErrorKind(null);
                     setLoadingProgress(0);
                     await viewerRef.current?.retryFemaleModel();
                   }}

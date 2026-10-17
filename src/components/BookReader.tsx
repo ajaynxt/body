@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { BookChapter, StudyPartItem, ClinicalDisease } from '../types/atlas';
 import { BOOK_CHAPTERS } from '../data/chapters';
+import { AnatomyStudyVisual } from './AnatomyStudyVisual';
 import {
   BookOpen,
   ChevronLeft,
@@ -359,6 +360,14 @@ export const BookReader: React.FC<BookReaderProps> = ({
                   )}
                 </div>
               </div>
+
+              {/* Relevant reference illustration for the structure currently being studied. */}
+              <AnatomyStudyVisual
+                name={currentPart.name}
+                hindiName={currentPart.hindiName}
+                latinName={currentPart.latinName}
+                system={currentPart.system}
+              />
 
               {/* Step Navigation Controls (Prev / Auto Tour / Next) */}
               <div className="part-nav-toolbar">

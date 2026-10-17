@@ -4,7 +4,6 @@ import {
   Box,
   Stethoscope,
   Info,
-  Sparkles,
   Brain,
   Moon,
   Sun,
@@ -75,8 +74,12 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="app-header glass-panel">
       {/* Brand Identity */}
       <div className="header-brand">
-        <div className="brand-logo-badge">
-          <Sparkles size={16} className="logo-sparkle" />
+        <div className="brand-logo-badge" title="AJAYNXT Official Logo">
+          <img
+            src="./ajaynxt-avatar.png"
+            alt="AJAYNXT"
+            className="brand-logo-img"
+          />
           <span className="live-status-dot" />
         </div>
         <div className="brand-text-col">

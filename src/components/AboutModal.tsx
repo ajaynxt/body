@@ -40,8 +40,17 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
 
           {/* CREATOR & ARCHITECT SHOWCASE */}
           <div className="credit-section creator-highlight-section">
-            <div className="credit-badge creator-tag">🚀 प्रमुख निर्माता एवं आर्किटेक्ट (Lead Developer)</div>
-            <h4 className="credit-heading font-extrabold text-accent">Ajay Saini (AJAYNXT)</h4>
+            <div className="creator-profile-header">
+              <img
+                src="./ajaynxt-avatar.png"
+                alt="Ajay Saini (AJAYNXT)"
+                className="creator-avatar-img"
+              />
+              <div className="creator-profile-info">
+                <div className="credit-badge creator-tag">🚀 प्रमुख निर्माता एवं आर्किटेक्ट (Lead Developer)</div>
+                <h4 className="credit-heading font-extrabold text-accent">Ajay Saini (AJAYNXT)</h4>
+              </div>
+            </div>
             <p>
               <strong>AJAYNXT Interactive Technologies</strong> · <code>body.ajaynxt.com</code>
             </p>

@@ -335,10 +335,10 @@ export const App: React.FC = () => {
             : viewMode === 'reader'
             ? '📖 व्यक्तिगत पाठ्यपुस्तक अध्ययन (PDF Reader)'
             : activeGender === 'female'
-            ? '♀ महिला संपूर्ण शरीर रचना (HuBMAP Human Atlas)'
+            ? '♀ महिला संपूर्ण शरीर रचना (3D Anatomy Atlas)'
             : currentChapter.hindiTitle
         }
-        totalPartsCount={activeGender === 'female' ? 1220 : atlas?.parts.length || 2234}
+        totalPartsCount={activeGender === 'female' ? 2285 : atlas?.parts.length || 2234}
       />
 
       {/* Main Workspace */}

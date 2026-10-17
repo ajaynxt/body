@@ -113,13 +113,13 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
             <div className="loading-text-col">
               <strong className="loading-heading">
                 {activeGender === 'female'
-                  ? 'महिला 3D एनाटॉमी मॉडल (HuBMAP VHF 1.5) तैयार हो रहा है...'
+                  ? 'महिला 3D संपूर्ण शारीरिक रचना तैयार हो रही है...'
                   : 'पुरुष 3D एनाटॉमी मॉडल (BodyParts3D) तैयार हो रहा है...'}
               </strong>
               <span className="loading-sub">
                 {loadingProgress}% ·{' '}
                 {activeGender === 'female'
-                  ? '888 शारीरिक संरचनाएं लोड हो रही हैं'
+                  ? '2,285 शारीरिक संरचनाएं लोड हो रही हैं'
                   : '2,234 शारीरिक अंग लोड हो रहे हैं'}
               </span>
               <div className="progress-bar-track">

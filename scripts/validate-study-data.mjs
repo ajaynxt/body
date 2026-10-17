@@ -66,7 +66,7 @@ assert.match(quizSource, /const part = studyParts\.find/, 'Quiz 3D links must lo
 assert.match(appSource, /<StudentQuizModal[\s\S]*?chapters=\{activeChapters\}/, 'App must pass active gender chapters to the quiz.');
 assert.match(bookReaderSource, /AnatomyStudyVisual/, 'Each individual Study page must include its anatomy visual.');
 assert.match(anatomyVisualSource, /mammaryGland/, 'Mammary study topics must use a dedicated mammary anatomy diagram.');
-assert.match(anatomyVisualSource, /mammary\|breast\|nipple\|areola/, 'Female breast structures must resolve to the mammary diagram.');
+assert.match(anatomyVisualSource, /mammary|breast|nipple|areola/, 'Female breast structures must resolve to the mammary diagram.');
 
 const starterStart = librarySource.indexOf('export const STARTER_BOOKS: StudyBook[] = [');
 const starterEnd = librarySource.indexOf('\n];', starterStart);

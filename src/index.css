@@ -13463,3 +13463,95 @@ textarea {
     overscroll-behavior: contain;
   }
 }
+
+
+/* Accessible interaction refinements for the 3D dock and nested mobile panels. */
+.dock-toggle-label {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dock-toggle-label:hover .dock-bar-title {
+  color: var(--accent-cyan, #7c3aed);
+}
+.dock-toggle-label:focus-visible,
+.dock-toggle-arrow-btn:focus-visible {
+  outline: 2px solid var(--accent-cyan, #7c3aed);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+.dock-toggle-arrow-btn {
+  flex: 0 0 auto;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 9px;
+}
+@media screen and (max-width: 768px) {
+  .dock-toggle-arrow-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* Prevent iOS from zooming the page unexpectedly when a form field receives focus. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  button,
+  a,
+  input[type="range"],
+  select {
+    touch-action: manipulation;
+  }
+  .anatomy-image-lightbox__controls button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+@media screen and (max-width: 900px) {
+  /* In stacked diagnostic mode, the test list gets its own bounded scroll pane
+     so it cannot push the selected test details below the modal viewport. */
+  .diagnostics-split-workspace {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .diagnostics-list-pane {
+    height: clamp(176px, 30dvh, 260px);
+    min-height: 0;
+    flex: 0 0 clamp(176px, 30dvh, 260px);
+    overflow: hidden;
+  }
+  .diagnostics-cards-scroll {
+    min-height: 0;
+    flex: 1 1 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .diagnostics-detail-pane {
+    min-height: 0;
+    flex: 1 1 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+@media screen and (max-width: 600px) {
+  .diagnostics-list-pane {
+    height: clamp(148px, 25dvh, 210px);
+    flex-basis: clamp(148px, 25dvh, 210px);
+  }
+  .dock-toggle-label {
+    gap: 6px;
+  }
+  .dock-bar-title {
+    line-height: 1.3;
+  }
+}

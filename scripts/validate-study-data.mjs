@@ -82,6 +82,7 @@ assert.match(appSource, /try\s*\{\s*const saved = window\.localStorage\.getItem\
 assert.match(appSource, /atlasLoadError/, 'Atlas load failures must be tracked instead of leaving a spinner forever.');
 assert.match(appSource, /onRetryAtlas=\{\(\) => setAtlasLoadAttempt/, 'Atlas loading must offer a retry action.');
 assert.match(threeViewerSource, /public isReady\(\): boolean/, 'ThreeViewer must expose initialization state.');
+assert.match(threeViewerSource, /knollingLayoutAspect === null[\s\S]*?Math\.abs\(aspect - this\.knollingLayoutAspect\) >= 0\.01[\s\S]*?calculateKnollingLayout\(this\.atlas\.parts, aspect\)/, 'Exploded-view packing must be cached instead of recomputed on each animation frame.');
 assert.match(threeViewerSource, /if \(!this\.renderer \|\| !this\.scene \|\| !this\.camera \|\| !this\.controls\) return/, 'ThreeViewer must stop safely when WebGL initialization fails.');
 assert.match(threeCanvasSource, /if \(!viewer\.isReady\(\)\)/, 'Canvas must not register a partially initialized viewer.');
 assert.match(cacheSource, /anatomy-models-v2/, 'Model-cache version must change when stale model assets could be reused.');

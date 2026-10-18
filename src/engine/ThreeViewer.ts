@@ -130,6 +130,8 @@ export class ThreeViewer {
   private partCentroids: THREE.Vector3[] = [];
   private partBoundingBoxes: THREE.Box3[] = [];
   private knolledCentroids: THREE.Vector3[] = [];
+  // Cache the knolling layout by viewport aspect ratio; it should not be repacked on every animation frame.
+  private knollingLayoutAspect: number | null = null;
 
   // Female Geometry & GPU DataTextures (Complete HuBMAP Female Reference Atlas + Fitted Skeleton & VHF Muscles)
   private femaleAtlas: AtlasData | null = null;
@@ -923,14 +925,22 @@ export class ThreeViewer {
     const numSystems = ANATOMICAL_SYSTEMS.length;
     const aspect = (this.container.clientWidth || 1) / (this.container.clientHeight || 1);
 
-    // Calculate 2D knolling inventory grid when exploded
-    const layout: KnollingLayout = calculateKnollingLayout(this.atlas.parts, aspect);
-    this.atlas.parts.forEach((part, idx) => {
-      const cell = layout.cells.get(part.id);
-      if (cell) {
-        this.knolledCentroids[idx] = new THREE.Vector3(cell.x, cell.y + 0.85, 0);
-      }
-    });
+    // Recompute the 2D inventory layout only when the viewport shape materially changes.
+    // updateStateTextures can run every animation frame while the model is exploding; re-sorting
+    // all anatomy parts on each frame caused avoidable allocations and stutter on mobile devices.
+    if (
+      this.knollingLayoutAspect === null ||
+      Math.abs(aspect - this.knollingLayoutAspect) >= 0.01
+    ) {
+      const layout: KnollingLayout = calculateKnollingLayout(this.atlas.parts, aspect);
+      this.atlas.parts.forEach((part, idx) => {
+        const cell = layout.cells.get(part.id);
+        if (cell) {
+          this.knolledCentroids[idx] = new THREE.Vector3(cell.x, cell.y + 0.85, 0);
+        }
+      });
+      this.knollingLayoutAspect = aspect;
+    }
 
     const h = this.currentExplodeDamped;
 

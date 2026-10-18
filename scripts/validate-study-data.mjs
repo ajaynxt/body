@@ -118,6 +118,8 @@ assert.match(anatomyVisualSource, /getFocusableElements/, 'The diagram lightbox 
 assert.match(anatomyVisualSource, /document\.body\.style\.overflow = 'hidden'/, 'Opening a zoomed diagram must prevent background page scrolling.');
 assert.match(headerSource, /aria-expanded=\{isToolsMenuOpen\}/, 'Medical tools menu must expose its expanded state.');
 assert.match(headerSource, /aria-expanded=\{isLangMenuOpen\}/, 'Language menu must expose its expanded state.');
+assert.match(headerSource, /onClick=\{\(\) => \{\s*setIsLangMenuOpen\(false\);\s*setIsToolsMenuOpen\(open => !open\)/, 'Opening the tools menu must close the language menu first.');
+assert.match(headerSource, /onClick=\{\(\) => \{\s*setIsToolsMenuOpen\(false\);\s*setIsLangMenuOpen\(open => !open\)/, 'Opening the language menu must close the tools menu first.');
 assert.match(headerSource, /event\.key !== 'Escape'/, 'Header dropdowns must close on Escape.');
 assert.match(headerSource, /langTriggerRef\.current\?\.focus\(\)/, 'Closing the language dropdown must restore keyboard focus.');
 assert.match(headerSource, /toolsTriggerRef\.current\?\.focus\(\)/, 'Closing the tools dropdown must restore keyboard focus.');

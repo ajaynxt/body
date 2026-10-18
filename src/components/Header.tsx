@@ -183,7 +183,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             ref={toolsTriggerRef}
             className={`tool-btn tools-dropdown-btn ${isToolsMenuOpen ? 'active' : ''}`}
-            onClick={() => setIsToolsMenuOpen(open => !open)}
+            onClick={() => {
+              setIsLangMenuOpen(false);
+              setIsToolsMenuOpen(open => !open);
+            }}
             aria-expanded={isToolsMenuOpen}
             aria-controls="medical-tools-menu"
             aria-haspopup="true"
@@ -309,7 +312,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             ref={langTriggerRef}
             className="tool-btn lang-toggle-btn"
-            onClick={() => setIsLangMenuOpen(open => !open)}
+            onClick={() => {
+              setIsToolsMenuOpen(false);
+              setIsLangMenuOpen(open => !open);
+            }}
             aria-expanded={isLangMenuOpen}
             aria-controls="language-selection-menu"
             aria-haspopup="true"
